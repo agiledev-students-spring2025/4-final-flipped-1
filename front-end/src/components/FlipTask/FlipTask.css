@@ -1,0 +1,36 @@
+.flip-container {
+    text-align: center;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
+    user-select: none;
+}
+
+.task-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.return-home {
+    background: black;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+    width: 100%;
+    max-width: 250px;
+}
+
+.flip-start {
+    text-decoration: underline;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}

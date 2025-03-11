@@ -1,0 +1,50 @@
+.flip-before-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+    touch-action: pan-y; /* 防止页面滚动干扰手势 */
+}
+
+.flip-container {
+    align-items: center;
+    text-align: center;
+    background: #eeecf9;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;  /* 适配不同屏幕 */
+    max-width: 400px;  /* 限制最大宽度 */
+}
+
+.task-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.today-text {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.time-text {
+    font-size: 24px;
+}
+
+.return-home {
+    background: black;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.flip-start {
+    font-size: 14px;
+    margin-top: 10px;
+}
