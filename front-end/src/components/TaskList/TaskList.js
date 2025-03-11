@@ -4,6 +4,8 @@ import './TaskList.css';
 
 function TaskList() {
   const navigate = useNavigate();
+  const totalFlipTime = parseFloat(localStorage.getItem("totalFlipTime")) || 0;
+
 
   const tasks = [
     { id: 1, name: 'Read Books' },
@@ -12,7 +14,7 @@ function TaskList() {
   ];
 
   const FlipTaskClick = (taskId) => {
-    navigate(`/flipbefore/${taskId}`);  // 使用反引号（`）
+    navigate(`/flipbefore/${taskId}?mode=before&totalTime=${totalFlipTime}`);  // 传递 mode=before
   };
 
   

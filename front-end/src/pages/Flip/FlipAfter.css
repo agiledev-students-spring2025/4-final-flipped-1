@@ -1,0 +1,9 @@
+/* 让整个页面黑屏 */
+.black-screen {
+    background-color: black;
+    color: black;
+}
+
+.black-screen * {
+    visibility: hidden;
+}
