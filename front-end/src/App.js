@@ -9,12 +9,14 @@ import FlipBefore from './pages/Flip/FlipBefore';
 
 function App() {
   return (
+
     <Router>
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/flipbefore/:taskId" element={<FlipBefore />} />
       </Routes>
     </Router>
+
   );
 }
 
