@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import MainPage from './pages/MainPage/MainPage';
 import FlipBefore from './pages/Flip/FlipBefore';
+import FlipAfter from './pages/Flip/FlipAfter';
+
 
 
 
@@ -13,7 +15,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<MainPage />} />
-        <Route path="/flipbefore/:taskId" element={<FlipBefore />} />
+        <Route path="/FlipBefore/:taskId" element={<FlipBefore />} />
+        <Route path="/FlipAfter/:taskId" element={<FlipAfter />} />
       </Routes>
     </Router>
 
