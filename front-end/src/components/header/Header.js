@@ -17,8 +17,11 @@ function Header({ onAddTask }) {
           setIsModalOpen(false);
         }}
       />
+
     </div>
   );
 }
+
+
 
 export default Header; 

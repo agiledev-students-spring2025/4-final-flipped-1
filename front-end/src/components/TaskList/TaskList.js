@@ -4,9 +4,12 @@ import './TaskList.css';
 
 function TaskList({ tasks }) {
   const navigate = useNavigate();
+  const totalFlipTime = parseFloat(localStorage.getItem("totalFlipTime")) || 0;
+
 
   const FlipTaskClick = (taskId) => {
     navigate(`/flipbefore/${taskId}`);
+
   };
 
   return (
