@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Header.css';
+import AddTaskModal from '../AddTaskModal/AddTaskModal';
 
+function Header({ onAddTask }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-function Header({ title = "Flipped" }) {
   return (
     <div className="header">
-      <h1>{title}</h1>
-      <button className="add-button">+</button>
+      <h1>Flipped</h1>
+      <button className="add-button" onClick={() => setIsModalOpen(true)}>+</button>
+      <AddTaskModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={(taskName) => {
+          onAddTask(taskName);
+          setIsModalOpen(false);
+        }}
+      />
+
     </div>
   );
 }

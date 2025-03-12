@@ -102,7 +102,9 @@ function FlipBefore() {
     return (
         <div className={`flip-before-page ${isFlipped ? 'black-screen' : ''}`}>
             <Header />
+
             <FlipTask taskId={taskId} mode = "before" duration={totalFlipTime} />
+
             <BottomNav />
         </div>
     );
