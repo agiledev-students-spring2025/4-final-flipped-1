@@ -35,10 +35,7 @@ function FlipBefore() {
     return (
         <div className="Flip-before-page">
             <Header />
-
             <FlipTask taskId={taskId} />
-
-
             <BottomNav />
         </div>
     );
