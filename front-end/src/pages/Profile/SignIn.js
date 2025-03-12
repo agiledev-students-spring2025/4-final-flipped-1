@@ -21,16 +21,29 @@ const SignIn = () => {
   };
 
   return (
-    <div className="signin-container">
-    <Header title="Profile" />
-      <h2>Sign In</h2>
-      <input type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      <button onClick={handleSignIn}>Sign In</button>
-    
-    <BottomNav />
+    <div>
+      <Header title="Sign In" />
+      
+      <div className="signin-container">
+        <input 
+          type="email" 
+          placeholder="Email Address" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+        />
+        <input 
+          type="password" 
+          placeholder="Password" 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)} 
+        />
+        <button onClick={handleSignIn}>Sign In</button>
+      </div>
+  
+      <BottomNav />
     </div>
   );
 };
+  
 
 export default SignIn;
