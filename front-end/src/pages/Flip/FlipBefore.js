@@ -18,7 +18,7 @@ function FlipBefore() {
     );
 
 
-    useEffect(() => {
+    useEffect( () => {
         const handleOrientation = (event) => {
             const beta = event.beta; // `beta` 代表前后倾斜角度 绕x轴
             console.log(event.beta)
@@ -58,20 +58,48 @@ function FlipBefore() {
         //     console.log(e);
         // }
 
-        try{
-            // const permissionState = await DeviceOrientationEvent.requestPerission()
-            // if (permissionState === 'granted'){
+        const requestPermissionAndAddListener = () => {
+            if (
+                typeof DeviceOrientationEvent !== "undefined" &&
+                typeof DeviceOrientationEvent.requestPermission === "function"
+            ) {
+                alert("Gamma: ");
+                DeviceOrientationEvent.requestPermission()
+                    .then((permissionState) => {
+                        if (permissionState === "granted") {
+                            window.addEventListener("deviceorientation", handleOrientation);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error requesting permission:", error);
+                    });
+            } else if ("DeviceOrientationEvent" in window) {
+                console.log("DeviceOrientationEvent supported, adding listener");
+                alert("Alpha: " + handleOrientation.beta + handleOrientation.beta);
                 window.addEventListener("deviceorientation", handleOrientation);
-            // }
-        } catch(error){
-            console.log(error)
-        }
+            } else {
+                alert("Device orientation not supported");
+            }
+        };
+
+        const setupGyroOnUserAction = () => {
+            alert("A: " );
+            requestPermissionAndAddListener();
+            document.removeEventListener("touchstart", setupGyroOnUserAction);
+            document.removeEventListener("click", setupGyroOnUserAction);
+        };
+        
+        document.addEventListener("touchstart", setupGyroOnUserAction, { once: true });
+        alert("B: " );
+        document.addEventListener("click", setupGyroOnUserAction, { once: true });
+        alert("C: " );
+        
 
         // 监听设备方向变化
         // window.addEventListener("deviceorientation", handleOrientation);
 
+        // 组件卸载时，移除事件监听
         return () => {
-            // 组件卸载时，移除事件监听
             window.removeEventListener("deviceorientation", handleOrientation);
         };
     }, [isFlipped, startTime, taskId, navigate, totalFlipTime]);
@@ -79,24 +107,24 @@ function FlipBefore() {
 
 
     // 处理左滑（上一个任务）
-    const taskLeftSwipe = () => {
-        const prevTask = Math.max(parseInt(taskId) - 1, 1);
-        navigate(`/flipbefore/${prevTask}`);
-    };
+    // const taskLeftSwipe = () => {
+    //     const prevTask = Math.max(parseInt(taskId) - 1, 1);
+    //     navigate(`/flipbefore/${prevTask}`);
+    // };
 
-    // 处理右滑（下一个任务）
-    const taskRightSwipe = () => {
-        const nextTask = Math.min(parseInt(taskId) + 1, taskCount);
-        navigate(`/flipbefore/${nextTask}`);
-    };
+    // // 处理右滑（下一个任务）
+    // const taskRightSwipe = () => {
+    //     const nextTask = Math.min(parseInt(taskId) + 1, taskCount);
+    //     navigate(`/flipbefore/${nextTask}`);
+    // };
 
-    //这东西目前滑不了啊
-    const handlers = useSwipeable({
-        onSwipedLeft: taskLeftSwipe, 
-        onSwipedRight: taskRightSwipe, 
-        preventDefaultTouchmoveEvent: true,
-        trackMouse: true, // 允许鼠标滑动（适用于桌面浏览器）
-    });
+    // //这东西目前滑不了啊
+    // const handlers = useSwipeable({
+    //     onSwipedLeft: taskLeftSwipe, 
+    //     onSwipedRight: taskRightSwipe, 
+    //     preventDefaultTouchmoveEvent: true,
+    //     trackMouse: true, // 允许鼠标滑动（适用于桌面浏览器）
+    // });
 
 
     return (
