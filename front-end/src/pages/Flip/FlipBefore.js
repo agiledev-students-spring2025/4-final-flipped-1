@@ -10,6 +10,7 @@ function FlipBefore() {
     const { taskId } = useParams(); // 从 URL 获取 taskId
     const location = useLocation();
     const taskName = location.state?.taskName || "Unknown Task"; // 获取 taskName
+    const taskColor = location.state?.taskColor || "#eeecf9";
 
     const navigate = useNavigate();
     const taskCount = 3;  // 任务总数，防止滑出范围
@@ -131,12 +132,14 @@ function FlipBefore() {
 
 
     return (
-        <div className={`flip-before-page ${isFlipped ? 'black-screen' : ''}`}>
-            <Header />
+        <div className={`flip-before-page ${isFlipped ? 'black-screen' : ''}`}
+            style={{ backgroundColor: isFlipped ? 'black' : taskColor }}>
+        {/* <div className={`flip-before-page ${isFlipped ? 'black-screen' : ''}`}> */}
+            {/* <Header /> */}
 
             <FlipTask taskName={taskName} mode = "before" duration={totalFlipTime} />
 
-            <BottomNav />
+            {/* <BottomNav /> */}
         </div>
     );
 }
