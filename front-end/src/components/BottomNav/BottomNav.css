@@ -18,7 +18,7 @@
   background: none;
   cursor: pointer;
   padding: 0.5rem;
-  /* color: #a8a4e6; */
+  color: #0077b6;
   transition: color 0.2s ease;
 }
 
@@ -30,7 +30,7 @@
 }
 
 .nav-item:hover {
-  color: #6c5ce7;
+  color: #00b4d8;
 }
 
 .nav-item:hover .nav-icon {
@@ -45,5 +45,5 @@
 
 /* 选中状态的图标颜色 */
 .nav-item.active {
-  color: #6c5ce7;
+  color: #1E90FF;
 } 
