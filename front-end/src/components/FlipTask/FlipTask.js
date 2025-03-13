@@ -1,11 +1,11 @@
 import React from 'react';
 import './FlipTask.css';
 
-function FlipTask({ taskId, mode, duration }) {
-    console.log(taskId, mode, duration)
+function FlipTask({ taskName, mode, duration }) {
+    console.log(taskName, mode, duration)
     return (
         <div className="flip-container">
-            <h2 className="task-title">Task {taskId}</h2>
+            <h2 className="task-title">{taskName}</h2>
 
             {mode === "before" ? (
                 <p className="flip-time">Total Flip Time Today: {duration} seconds</p>
