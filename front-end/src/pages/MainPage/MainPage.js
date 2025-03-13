@@ -6,17 +6,18 @@ import BottomNav from '../../components/BottomNav/BottomNav';
 
 function MainPage() {
   const [tasks, setTasks] = useState([
-    { id: 1, name: 'Read Books' },
-    { id: 2, name: 'Study' },
-    { id: 3, name: 'Watching Video' }
+    { id: 1, name: 'Read Books', color: "#dbf7ff" },
+    { id: 2, name: 'Study', color: "#fefbfc" },
+    { id: 3, name: 'Watching Video', color: "#fff6e6" }
   ]);
 
-  const handleAddTask = (taskName) => {
-    const newTask = {
+  const handleAddTask = (newTask) => {
+    const newTaskWithId = {
       id: tasks.length > 0 ? Math.max(...tasks.map(task => task.id)) + 1 : 1,
-      name: taskName
+      name: newTask.name,
+      color: newTask.color
     };
-    setTasks([...tasks, newTask]);
+    setTasks([...tasks, newTaskWithId]);
   };
 
   return (

@@ -10,7 +10,7 @@ function TaskList({ tasks }) {
 
   
   const FlipTaskClick = (task) => {
-    navigate(`/flipbefore/${task.id}`, { state: { taskName: task.name } }); // 传递 taskName
+    navigate(`/flipbefore/${task.id}`, { state: { taskName: task.name, taskColor: task.color } }); // 传递 taskName
     console.log("this is tasklist.js page and forward task name",task.name)
     console.log("this is tasklist.js page and forward task id",task.id)
   };
@@ -27,5 +27,12 @@ function TaskList({ tasks }) {
     </div>
   );
 }
+
+// {tasks.map(task => (
+//   <li key={task.id} style={{ color: task.color }}> 
+//     {task.name} 
+//   </li>
+// ))}
+
 
 export default TaskList;
