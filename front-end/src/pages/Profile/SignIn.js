@@ -14,7 +14,7 @@ const SignIn = () => {
   const handleSignIn = () => {
     if (email === "test@example.com" && password === "password123") {
       localStorage.setItem("user", JSON.stringify(fakeUser));
-      navigate(0); // Refresh page after login to force Profile reload
+      navigate("/profile"); // Navigate to Profile page after login
     } else {
       alert("Invalid email or password. Use 'test@example.com' and 'password123'.");
     }
@@ -23,8 +23,13 @@ const SignIn = () => {
   return (
     <div>
       <Header title="Sign In" />
-      
       <div className="signin-container">
+        <div className="logo-container">
+          <img src="./logo.jpg" alt="App Logo" className="app-logo" />
+          <h1 className="app-title">
+            Start your journey <span className="flip-highlight">with a FLIP!</span>
+          </h1>
+        </div>
         <input 
           type="email" 
           placeholder="Email Address" 
@@ -38,6 +43,9 @@ const SignIn = () => {
           onChange={(e) => setPassword(e.target.value)} 
         />
         <button onClick={handleSignIn}>Sign In</button>
+        <p className="register-text">
+          Don't have an account with us? <span className="register-link">Register</span>
+        </p>
       </div>
   
       <BottomNav />
