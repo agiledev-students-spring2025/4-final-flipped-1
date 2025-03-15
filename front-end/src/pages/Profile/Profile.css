@@ -59,10 +59,10 @@
 .logout-btn {
   margin-top: 15px;
   padding: 10px;
-  background-color: #000;
+  background: linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%);
   color: white;
   border: none;
-  width: 100%;
+  width: 80%;
   border-radius: 5px;
   cursor: pointer;
 }

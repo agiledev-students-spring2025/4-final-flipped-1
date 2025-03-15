@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SignIn.css";
-import Header from "../../components/header/Header";
+import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
 
 const SignIn = () => {
@@ -22,7 +22,7 @@ const SignIn = () => {
 
   return (
     <div>
-      <Header title="Sign In" />
+      <Header2 title="Sign In" />
       <div className="signin-container">
         <div className="logo-container">
           <img src="./logo.jpg" alt="App Logo" className="app-logo" />
@@ -44,7 +44,7 @@ const SignIn = () => {
         />
         <button onClick={handleSignIn}>Sign In</button>
         <p className="register-text">
-          Don't have an account with us? <span className="register-link">Register</span>
+          Don't have an account with us? <span className="register-link" onClick={() => navigate("/register")}>Register</span>
         </p>
       </div>
   
