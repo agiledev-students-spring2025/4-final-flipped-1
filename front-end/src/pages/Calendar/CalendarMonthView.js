@@ -30,9 +30,9 @@ const CalendarMonthView = ({ toDoList }) => {
           return (
             <div key={day} className="calendar-day">
               <div className="day-number">{day}</div>
-              <ul className="task-list">
+              <ul className="task-lists">
                 {tasksByDate[dateKey]?.map((toDo, index) => (
-                  <li key={index} className="task-item">
+                  <li key={index} className="task-items">
                     {toDo.toDo} ({toDo.time})
                   </li>
                 ))}

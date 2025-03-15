@@ -197,7 +197,7 @@
 }
 
 /* Task list inside each date */
-.task-list {
+.task-lists {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -205,8 +205,8 @@
 }
 
 /* Each task inside a day's box */
-.task-item {
-  background: #4caf50;
+.task-items {
+  background: linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%);
   color: white;
   padding: 5px;
   border-radius: 4px;
