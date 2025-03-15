@@ -23,45 +23,82 @@
   }
   
   .view-selector button {
-    padding: 8px 12px;
+    padding: 10px 12px;
     border: none;
     cursor: pointer;
-    background-color: #ddd;
+    background-color: #ffffff;
     border-radius: 5px;
   }
   
   .view-selector button.active {
-    background-color: black;
+    background: linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%);
     color: white;
   }
   
   /* Daily View */
-  .day-view {
-    padding: 20px;
-  }
-  
-  .day-timeline {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .time-slot {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .time-slot span {
-    width: 80px;
-    font-weight: bold;
-  }
-  
-  .time-slot .event {
-    background-color: #4caf50;
-    padding: 5px;
-    border-radius: 5px;
-    color: white;
-  }
+.day-view-container {
+  width: 80%;
+  margin: 30px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.day-view-container h2 {
+  text-align: center;
+  font-size: 22px;
+  color: #333;
+}
+
+/* To-Do List */
+.toDo-list {
+  list-style: none;
+  padding: 0;
+}
+
+.toDo-item {
+  background: #f4f4f4;
+  margin: 10px 0;
+  padding: 10px;
+  border-left: 5px solid rgb(30,144,255);
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* No Tasks Message */
+.day-view-container p {
+  text-align: center;
+  font-size: 18px;
+  color: gray;
+  margin-top: 20px;
+}
+
+.date-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  gap: 5px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Label Styling */
+.date-selector label {
+  font-size: 18px;
+  color: #444;
+}
+
+/* Select Dropdown */
+.date-selector select {
+  padding: 8px 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  background: white;
+  color: #000000;
+  cursor: pointer;
+}
   
   /* Weekly View */
   .week-view {
