@@ -1,21 +1,30 @@
 import React from "react";
 import "./Calendar.css";
 
-const CalendarDayView = () => {
+const CalendarDayView = ({ selectedDate, toDoList }) => {
+  // Filter and sort to-dos by time for the selected date
+  const filteredToDoList = toDoList
+    .filter(toDo => toDo.date === selectedDate)
+    .sort((a, b) => {
+      const [hourA, minA] = a.time.split(":").map(Number);
+      const [hourB, minB] = b.time.split(":").map(Number);
+      return hourA * 60 + minA - (hourB * 60 + minB);
+    });
+
   return (
-    <div className="day-view">
-      <h2>28 Feb 2025</h2>
-      <div className="day-timeline">
-        <div className="time-slot">
-          <span>8:00 AM</span> <div className="event">Focus</div>
-        </div>
-        <div className="time-slot">
-          <span>9:00 AM</span> <div className="event">Interview with A</div>
-        </div>
-        <div className="time-slot">
-          <span>12:00 PM</span> <div className="event">Course B</div>
-        </div>
-      </div>
+    <div className="day-view-container">
+      <h2>To-Do List for {selectedDate}</h2>
+      {filteredToDoList.length === 0 ? (
+        <p>No to-dos for this day.</p>
+      ) : (
+        <ul className="toDo-list">
+          {filteredToDoList.map((toDo, index) => (
+            <li key={index} className="toDo-item">
+              <strong>{toDo.time}</strong> - {toDo.toDo} ({toDo.TimeRange})
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

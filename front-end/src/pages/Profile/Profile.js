@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
-import Header from "../../components/header/Header";
+import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
 
 const Profile = () => {
@@ -27,7 +27,7 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
-      <Header title="Profile" />
+      <Header2 title="Profile" />
 
       <div className="profile-content">
         {user ? (
