@@ -23,7 +23,7 @@ const CalendarMonthView = ({ toDoList }) => {
 
   return (
     <div className="month-view-container">
-      <h2>Monthly Calendar</h2>
+      <h2>To-do List for February 2025</h2>
       <div className="calendar-grid">
         {days.map((day) => {
           const dateKey = `${day} Feb`; // Match task date format

@@ -145,28 +145,81 @@
   
   
   /* Monthly View */
-  .month-view {
-    text-align: center;
+.month-view-container {
+  width: 90%;
+  max-width: 800px;
+  margin: 20px auto;
+  background: white;
+  padding: 20px;
+  padding-bottom: 65px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Calendar Header */
+.month-view-container h2 {
+  text-align: center;
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Grid layout for the calendar */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 columns for each day of the week */
+  gap: 8px;
+  background: #f8f8f8;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* Individual day boxes */
+.calendar-day {
+  background: white;
+  padding: 10px;
+  min-height: 100px;
+  border-radius: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Day number styling */
+.day-number {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+/* Task list inside each date */
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Each task inside a day's box */
+.task-item {
+  background: #4caf50;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  margin: 3px 0;
+  font-size: 12px;
+}
+
+/* Responsive Styling */
+@media (max-width: 600px) {
+  .calendar-grid {
+    grid-template-columns: repeat(4, 1fr); /* 4 columns for mobile */
   }
-  
-  .month-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    padding: 20px;
+  .calendar-day {
+    min-height: 80px;
   }
-  
-  .month-day {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .event {
-    background-color: #2196f3;
-    padding: 5px;
-    border-radius: 5px;
-    color: white;
-    margin-top: 5px;
-  }
-  
+}
