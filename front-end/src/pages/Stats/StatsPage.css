@@ -1,117 +1,117 @@
 /* Apply the same layout as Main Page */
 .App {
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #f5f5f5;
-  }
-  
-  /* Header */
-  .App-header.stats-header {
-    width: 100%;
-    background-color: #ccc;
-    padding: 20px;
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-  }
-  
-  /* Main Content Section */
-  .stats-content {
-    width: 90%;
-    margin-top: 20px;
-    flex-grow: 1;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  /* Concentration Card */
-  .concentration-card {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f5f5f5;
+}
 
-    padding: 20px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%;
-  }
-  
-  .concentration-info h1 {
-    font-size: 32px;
-  }
-  
-  .timeframe-selector {
-    padding: 8px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  /* Distribution Card */
-  .distribution-card {
-    background: white;
-    padding: 20px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%;
-  }
-  
-  .chart-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 10px;
-  }
-  
-  .bars {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .bar {
-    width: 150px;
-    height: 20px;
-    background: lightgray;
-    border-radius: 4px;
-  }
-  
-  .chart {
-    width: 100px;
-    height: 100px;
-    background: lightgray;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-  }
-  
-  /* Bottom Navigation */
-  .bottom-nav {
-    display: flex;
-    justify-content: space-around;
-    padding: 15px;
-    background: white;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    box-shadow: 0px -2px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .nav-item {
-    font-size: 16px;
-    color: black;
-  }
-  
-  .nav-item.active {
-    color: purple;
-    font-weight: bold;
-  }
-  
+/* Header */
+.App-header.stats-header {
+  width: 100%;
+  background-color: #ccc;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Main Content Section */
+.stats-content {
+  width: 90%;
+  margin-top: 20px;
+  flex-grow: 1;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Concentration Card */
+.concentration-card {
+
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.concentration-info h1 {
+  font-size: 32px;
+}
+
+.timeframe-selector {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Distribution Card */
+.distribution-card {
+  background: white;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.chart-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bar {
+  width: 150px;
+  height: 20px;
+  background: lightgray;
+  border-radius: 4px;
+}
+
+.chart {
+  width: 100px;
+  height: 100px;
+  background: lightgray;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Bottom Navigation */
+
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  padding: 15px;
+  background: white;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  box-shadow: 0px -4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item {
+  font-size: 16px;
+  color: black;
+}
+
+.nav-item.active {
+  color: purple;
+  font-weight: bold;
+}
