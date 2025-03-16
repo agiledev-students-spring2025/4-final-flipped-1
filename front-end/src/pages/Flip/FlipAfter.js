@@ -9,6 +9,9 @@ import BottomNav from '../../components/BottomNav/BottomNav';
 function FlipAfter() {
     const { taskId } = useParams();
     const location = useLocation();
+    const taskName = location.state?.taskName || "Unknown Task"; // 获取 taskName
+    const taskColor = location.state?.taskColor || "#eeecf9";
+
     const navigate = useNavigate();
 
     const queryParams = new URLSearchParams(location.search);
@@ -71,11 +74,11 @@ function FlipAfter() {
 
     return (
         <div className={`flip-after-page ${isFlipped ? 'black-screen' : ''}`}>
-            <Header />
+            {/* <Header /> */}
 
-            <FlipTask taskId={taskId} mode="after" duration={duration} />
+            <FlipTask taskName={taskName} mode="after" duration={duration} />
 
-            <BottomNav />
+            {/* <BottomNav /> */}
         </div>
     );
 }

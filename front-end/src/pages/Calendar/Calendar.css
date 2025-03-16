@@ -23,81 +23,203 @@
   }
   
   .view-selector button {
-    padding: 8px 12px;
+    padding: 10px 12px;
     border: none;
     cursor: pointer;
-    background-color: #ddd;
+    background-color: #ffffff;
     border-radius: 5px;
   }
   
   .view-selector button.active {
-    background-color: black;
+    background: linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%);
     color: white;
   }
   
   /* Daily View */
-  .day-view {
-    padding: 20px;
-  }
-  
-  .day-timeline {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .time-slot {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .time-slot span {
-    width: 80px;
-    font-weight: bold;
-  }
-  
-  .time-slot .event {
-    background-color: #4caf50;
-    padding: 5px;
-    border-radius: 5px;
-    color: white;
-  }
+.day-view-container {
+  width: 80%;
+  margin: 30px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.day-view-container h2 {
+  text-align: center;
+  font-size: 22px;
+  color: #333;
+}
+
+/* To-Do List */
+.toDo-list {
+  list-style: none;
+  padding: 0;
+}
+
+.toDo-item {
+  background: #f4f4f4;
+  margin: 10px 0;
+  padding: 10px;
+  border-left: 5px solid rgb(30,144,255);
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* No Tasks Message */
+.day-view-container p {
+  text-align: center;
+  font-size: 18px;
+  color: gray;
+  margin-top: 20px;
+}
+
+.date-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  gap: 5px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Label Styling */
+.date-selector label {
+  font-size: 18px;
+  color: #444;
+}
+
+/* Select Dropdown */
+.date-selector select {
+  padding: 8px 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  background: white;
+  color: #000000;
+  cursor: pointer;
+}
   
   /* Weekly View */
-  .week-view {
+  .week-view-container {
+    width: 80%;
+    margin: 20px auto;
+    background: white;
     padding: 20px;
+    padding-bottom: 60px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   }
   
-  .week-day {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
+  .week-view-container h2 {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
   }
+  
+  .day-group {
+    margin-top: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+  }
+  
+  .day-group h3 {
+    font-size: 18px;
+    color: #2c3e50;
+    margin-bottom: 5px;
+  }
+  
+  .toDo-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .toDo-item {
+    background: #f4f4f4;
+    margin: 5px 0;
+    padding: 10px;
+    border-left: 5px solid rgb(30,144,255);
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
   
   /* Monthly View */
-  .month-view {
-    text-align: center;
+.month-view-container {
+  width: 90%;
+  max-width: 800px;
+  margin: 20px auto;
+  background: white;
+  padding: 20px;
+  padding-bottom: 65px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Calendar Header */
+.month-view-container h2 {
+  text-align: center;
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Grid layout for the calendar */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 columns for each day of the week */
+  gap: 8px;
+  background: #f8f8f8;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* Individual day boxes */
+.calendar-day {
+  background: white;
+  padding: 10px;
+  min-height: 100px;
+  border-radius: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Day number styling */
+.day-number {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+/* Task list inside each date */
+.task-lists {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Each task inside a day's box */
+.task-items {
+  background: linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%);
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  margin: 3px 0;
+  font-size: 12px;
+}
+
+/* Responsive Styling */
+@media (max-width: 600px) {
+  .calendar-grid {
+    grid-template-columns: repeat(4, 1fr); /* 4 columns for mobile */
   }
-  
-  .month-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    padding: 20px;
+  .calendar-day {
+    min-height: 80px;
   }
-  
-  .month-day {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .event {
-    background-color: #2196f3;
-    padding: 5px;
-    border-radius: 5px;
-    color: white;
-    margin-top: 5px;
-  }
-  
+}

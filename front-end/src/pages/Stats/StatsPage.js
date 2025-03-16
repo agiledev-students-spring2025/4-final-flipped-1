@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./StatsPage.css";
-import Header from "../../components/header/Header";  
+import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";  
 
 const StatsPage = () => {
@@ -9,7 +9,7 @@ const StatsPage = () => {
   return (
     <div className="stats-container">
 
-      <Header title="Statistics" />
+      <Header2 title="Statistics" />
 
       {/* Main Content */}
       <div className="stats-content">

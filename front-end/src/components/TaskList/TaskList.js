@@ -2,32 +2,37 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TaskList.css';
 
-function TaskList() {
+function TaskList({ tasks }) {
   const navigate = useNavigate();
   const totalFlipTime = parseFloat(localStorage.getItem("totalFlipTime")) || 0;
+  console.log("this is a test print of tasks", tasks)
+  
 
-
-  const tasks = [
-    { id: 1, name: 'Read Books' },
-    { id: 2, name: 'Study' },
-    { id: 3, name: 'Watching Video' }
-  ];
-
-  const FlipTaskClick = (taskId) => {
-    navigate(`/flipbefore/${taskId}?mode=before&totalTime=${totalFlipTime}`);  // 传递 mode=before
+  
+  const FlipTaskClick = (task) => {
+    navigate(`/flipbefore/${task.id}`, { state: { taskName: task.name, taskColor: task.color } }); // 传递 taskName
+    console.log("this is tasklist.js page and forward task name",task.name)
+    console.log("this is tasklist.js page and forward task id",task.id)
   };
 
-  
-    return (
-      <div className="task-list">
-        {tasks.map(task => (
-          <div key={task.id} className="task-item">
-            <div className="task-text">{task.name}</div>
-            <button className="flip-button" onClick={() => FlipTaskClick(task.id)}>Flip</button>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  
-  export default TaskList;
+
+  return (
+    <div className="task-list">
+      {tasks.map(task => (
+        <div key={task.id} className="task-item">
+          <div className="task-text">{task.name}</div>
+          <button className="flip-button" onClick={() => FlipTaskClick(task)}>Flip</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// {tasks.map(task => (
+//   <li key={task.id} style={{ color: task.color }}> 
+//     {task.name} 
+//   </li>
+// ))}
+
+
+export default TaskList;
