@@ -1,9 +1,35 @@
+/* React Calendar */
+/* Wrapper for centering */
+.calendar-wrapper {
+  display: flex;
+  justify-content: center;
+  height: flex;
+}
+
+/* Resize the Calendar */
+.react-calendar {
+  width: 300px; 
+  max-width: 100%;
+  font-size: 14px; 
+  background: white;
+  border-radius: 10px;
+  padding: 10px; 
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Resize day numbers */
+.react-calendar__tile {
+  padding: 5px; 
+  font-size: 12px; 
+}
 /* Calendar container */
 .calendar-container {
     display: flex;
     flex-direction: column;
     height: 100vh;
     background-color: #f5f5f5;
+    text-align: center;
+    padding:5px
   }
   
   .add-event-btn {
@@ -45,12 +71,6 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.day-view-container h2 {
-  text-align: center;
-  font-size: 22px;
-  color: #333;
-}
-
 /* To-Do List */
 .toDo-list {
   list-style: none;
@@ -64,6 +84,17 @@
   border-left: 5px solid rgb(30,144,255);
   border-radius: 5px;
   font-size: 16px;
+}
+
+.toDo-item.completed span {
+  text-decoration: line-through;
+  color: gray;
+}
+
+.toDo-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
 
 /* No Tasks Message */
@@ -113,7 +144,7 @@
   
   .week-view-container h2 {
     text-align: center;
-    font-size: 24px;
+    font-size: 15px;
     color: #333;
   }
   
@@ -214,12 +245,19 @@
   font-size: 12px;
 }
 
-/* Responsive Styling */
-@media (max-width: 600px) {
-  .calendar-grid {
-    grid-template-columns: repeat(4, 1fr); /* 4 columns for mobile */
-  }
-  .calendar-day {
-    min-height: 80px;
-  }
+/* Delete button */
+.delete-btn {
+  margin-left: 10px;
+  padding: 4px 8px;
+  background: red;
+  border: none;
+  color: white;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.delete-btn:hover {
+  background: darkred;
 }
