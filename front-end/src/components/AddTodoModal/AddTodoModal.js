@@ -47,11 +47,10 @@ function AddTodoModal({ isOpen, onClose, onSubmit }) {
         <form onSubmit={handleSubmit}>
           <div className="input-container">
             <input
-              type="text"
+              type="date"
               name="date"
               value={todoData.date}
               onChange={handleChange}
-              placeholder="Enter Date (e.g., 20 Feb)"
               className="todo-input"
               autoFocus
             />
@@ -68,11 +67,10 @@ function AddTodoModal({ isOpen, onClose, onSubmit }) {
           </div>
           <div className="input-container">
             <input
-              type="text"
+              type="time"
               name="time"
               value={todoData.time}
               onChange={handleChange}
-              placeholder="Enter Time (e.g., 14:00)"
               className="todo-input"
             />
           </div>
