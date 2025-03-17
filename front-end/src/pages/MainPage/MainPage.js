@@ -20,10 +20,20 @@ function MainPage() {
     setTasks([...tasks, newTaskWithId]);
   };
 
+  const handleDeleteTask = (taskId) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+  };
+
+  const handleRenameTask = (taskId, newName) => {
+    setTasks(tasks.map(task =>
+      task.id === taskId ? { ...task, name: newName } : task
+    ));
+  };
+
   return (
     <div className="main-page">
       <Header onAddTask={handleAddTask} />
-      <TaskList tasks={tasks} />
+      <TaskList tasks={tasks} onDelete={handleDeleteTask} onRename={handleRenameTask} />
       <BottomNav />
     </div>
   );
