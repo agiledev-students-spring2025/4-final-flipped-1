@@ -1,26 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
+import ReactCalendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import "./Calendar.css";
 
 const CalendarWeekView = ({ toDoList }) => {
-  // Helper function to convert a date string into a Date object for sorting
-  const parseDate = (dateStr) => new Date(`${dateStr} 2025`);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Sort tasks by date first, then sorts by time
-  const sortedToDoList = [...toDoList].sort((a, b) => {
-    const dateA = parseDate(a.date);
-    const dateB = parseDate(b.date);
+  // Get start and end of the selected week
+  const getStartOfWeek = (date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    return new Date(d.setDate(d.getDate() - day + (day === 0 ? -6 : 1))); // Start from Monday
+  };
 
-    if (dateA.getTime() !== dateB.getTime()) {
-      return dateA - dateB; // Sort by date first
-    }
+  const getEndOfWeek = (date) => {
+    const start = getStartOfWeek(date);
+    return new Date(start.setDate(start.getDate() + 6)); // Sunday
+  };
 
-    // Same date, sort by time
-    const [hourA, minA] = a.time.split(":").map(Number);
-    const [hourB, minB] = b.time.split(":").map(Number);
-    return hourA * 60 + minA - (hourB * 60 + minB);
+  const startOfWeek = getStartOfWeek(selectedDate).toISOString().split("T")[0];
+  const endOfWeek = getEndOfWeek(selectedDate).toISOString().split("T")[0];
+
+  // Filter tasks for the selected week
+  const tasksForWeek = toDoList.filter((task) => {
+    return task.date >= startOfWeek && task.date <= endOfWeek;
   });
 
   // Group tasks by date
-  const groupedToDo = sortedToDoList.reduce((acc, toDo) => {
+  const groupedToDo = tasksForWeek.reduce((acc, toDo) => {
     acc[toDo.date] = acc[toDo.date] || [];
     acc[toDo.date].push(toDo);
     return acc;
@@ -28,7 +35,18 @@ const CalendarWeekView = ({ toDoList }) => {
 
   return (
     <div className="week-view-container">
-      <h2>To-Do List for 20 Feb - 26 Feb</h2>
+      <h2>To-Do List for {startOfWeek} to {endOfWeek}</h2>
+
+      {/* Week Selector using react-calendar */}
+      <div className="calendar-wrapper">
+        <ReactCalendar 
+          onChange={setSelectedDate} 
+          value={selectedDate} 
+          locale="en-US" //Show english by defult
+          showWeekNumbers={true} // Show week numbers for better selection
+          selectRange={false} // Select only one day to determine the week
+        />
+      </div>
 
       {Object.keys(groupedToDo).length === 0 ? (
         <p>No tasks for this week.</p>

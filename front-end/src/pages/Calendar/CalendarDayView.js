@@ -1,29 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Calendar.css";
 
 const CalendarDayView = ({ selectedDate, toDoList }) => {
-  // Filter and sort to-dos by time for the selected date
-  const filteredToDoList = toDoList
-    .filter(toDo => toDo.date === selectedDate)
-    .sort((a, b) => {
-      const [hourA, minA] = a.time.split(":").map(Number);
-      const [hourB, minB] = b.time.split(":").map(Number);
-      return hourA * 60 + minA - (hourB * 60 + minB);
-    });
+  // Store completed tasks(for use of checkbox)
+  const [completedTasks, setCompletedTasks] = useState({});
+
+  // Toggle task completion
+  const handleCheckboxChange = (date, index) => {
+    setCompletedTasks((prev) => ({
+      ...prev,
+      [`${date}-${index}`]: !prev[`${date}-${index}`], // Toggle completion
+    }));
+  };
+
+  // Filter tasks for the selected day
+  const tasksForDay = toDoList.filter((task) => task.date === selectedDate);
 
   return (
     <div className="day-view-container">
-      <h2>To-Do List for {selectedDate}</h2>
-      {filteredToDoList.length === 0 ? (
-        <p>No to-dos for this day.</p>
-      ) : (
+      <h3>Tasks for {selectedDate}</h3>
+      {tasksForDay.length > 0 ? (
         <ul className="toDo-list">
-          {filteredToDoList.map((toDo, index) => (
-            <li key={index} className="toDo-item">
-              <strong>{toDo.time}</strong> - {toDo.toDo} ({toDo.TimeRange})
+          {tasksForDay.map((task, index) => (
+            <li key={index} className={`toDo-item ${completedTasks[`${task.date}-${index}`] ? "completed" : ""}`}>
+              <input
+                type="checkbox"
+                checked={completedTasks[`${task.date}-${index}`] || false}
+                onChange={() => handleCheckboxChange(task.date, index)}
+              />
+              <span>{task.toDo} at {task.time} ({task.TimeRange})</span>
             </li>
           ))}
         </ul>
+      ) : (
+        <p>No tasks for this day.</p>
       )}
     </div>
   );
