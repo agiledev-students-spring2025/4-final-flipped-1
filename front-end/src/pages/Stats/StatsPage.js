@@ -5,33 +5,57 @@ import BottomNav from "../../components/BottomNav/BottomNav";
 
 const StatsPage = () => {
   const [timeframe, setTimeframe] = useState("Daily");
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Function to get the correct date format based on timeframe
-  const getFormattedDate = () => {
-    const today = new Date();
+  // Function to handle week selection
+  const handleWeekChange = (e) => {
+    const selectedWeek = e.target.value; // Format: "2025-W11"
+    const year = parseInt(selectedWeek.substring(0, 4));
+    const weekNumber = parseInt(selectedWeek.substring(6));
 
-    if (timeframe === "Daily") {
-      return today.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" });
+    // Get the first day of the year
+    const firstDayOfYear = new Date(year, 0, 1);
+    const firstWeekStart =
+      firstDayOfYear.getDay() === 0
+        ? firstDayOfYear
+        : new Date(
+            firstDayOfYear.setDate(
+              firstDayOfYear.getDate() - firstDayOfYear.getDay()
+            )
+          );
+
+    // Calculate start of selected week
+    const startOfWeek = new Date(firstWeekStart);
+    startOfWeek.setDate(startOfWeek.getDate() + (weekNumber - 1) * 7);
+
+    setSelectedDate(startOfWeek);
+  };
+
+  // Function to select month
+  const handleMonthChange = (e) => {
+    const newDate = new Date(e.target.value + "-01"); // Ensures valid date format (YYYY-MM-01)
+    if (!isNaN(newDate)) {
+      setSelectedDate(newDate);
     }
+  };
 
-    if (timeframe === "Weekly") {
-      const startOfWeek = new Date(today);
-      startOfWeek.setDate(today.getDate() - today.getDay()); // Start of the week (Sunday)
-      const endOfWeek = new Date(today);
-      endOfWeek.setDate(startOfWeek.getDate() + 6); // End of the week (Saturday)
-
-      return `${startOfWeek.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit" })} - ${endOfWeek.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit" })}`;
+  // Functions for year selection with arrows
+  const incrementYear = () => {
+    const currentYear = selectedDate.getFullYear();
+    if (currentYear < 2100) {
+      const newDate = new Date(selectedDate);
+      newDate.setFullYear(currentYear + 1);
+      setSelectedDate(newDate);
     }
+  };
 
-    if (timeframe === "Monthly") {
-      return today.toLocaleDateString("en-US", { month: "long" }); // Example: "March"
+  const decrementYear = () => {
+    const currentYear = selectedDate.getFullYear();
+    if (currentYear > 1900) {
+      const newDate = new Date(selectedDate);
+      newDate.setFullYear(currentYear - 1);
+      setSelectedDate(newDate);
     }
-
-    if (timeframe === "Yearly") {
-      return today.getFullYear(); // Example: "2025"
-    }
-
-    return "";
   };
 
   return (
@@ -42,23 +66,81 @@ const StatsPage = () => {
       <div className="stats-content">
         {/* Concentration Card */}
         <div className="concentration-card">
+          <h2>Concentration</h2>
+
+          {/* This container holds the timeframe selector AND the date pickers */}
           <div className="concentration-info">
-            <h2>Concentration</h2>
-            <p>{getFormattedDate()}</p > 
-            <h1>
-              10 <span>Hours</span> 59 <span>Mins</span>
-            </h1>
+            {/* Timeframe Selector */}
+            <select
+              className="timeframe-selector"
+              value={timeframe}
+              onChange={(e) => {
+                setTimeframe(e.target.value);
+                setSelectedDate(new Date()); // Reset to today when switching timeframe
+              }}
+            >
+              <option value="Daily">Daily</option>
+              <option value="Weekly">Weekly</option>
+              <option value="Monthly">Monthly</option>
+              <option value="Yearly">Yearly</option>
+            </select>
+
+            {/* Date/Week/Month/Year Pickers */}
+            {timeframe === "Daily" && (
+              <input
+                type="date"
+                className="date-picker"
+                value={selectedDate.toISOString().split("T")[0]}
+                onChange={(e) => {
+                  const newDate = new Date(e.target.value);
+                  if (!isNaN(newDate)) {
+                    setSelectedDate(newDate);
+                  }
+                }}
+              />
+            )}
+
+            {timeframe === "Weekly" && (
+              <input
+                type="week"
+                className="week-picker"
+                onChange={handleWeekChange}
+              />
+            )}
+
+            {timeframe === "Monthly" && (
+              <input
+                type="month"
+                className="month-picker"
+                value={selectedDate.toISOString().slice(0, 7)} // Format: YYYY-MM
+                onChange={handleMonthChange}
+              />
+            )}
+
+            {timeframe === "Yearly" && (
+              <div className="year-picker-container">
+                <input
+                  type="number"
+                  className="year-picker"
+                  value={selectedDate.getFullYear()}
+                  readOnly
+                />
+                <div className="year-arrows">
+                  <button onClick={incrementYear} className="arrow-btn">
+                    ▲
+                  </button>
+                  <button onClick={decrementYear} className="arrow-btn">
+                    ▼
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-          <select
-            className="timeframe-selector"
-            value={timeframe}
-            onChange={(e) => setTimeframe(e.target.value)}
-          >
-            <option value="Daily">Daily</option>
-            <option value="Weekly">Weekly</option>
-            <option value="Monthly">Monthly</option>
-            <option value="Yearly">Yearly</option>
-          </select>
+
+          {/* Display the total hours/minutes */}
+          <h1>
+            10 <span>Hours</span> 59 <span>Mins</span>
+          </h1>
         </div>
 
         {/* Dynamic Rendering Based on Timeframe */}
@@ -123,7 +205,6 @@ const StatsPage = () => {
         )}
       </div>
 
-      
       <BottomNav />
     </div>
   );
