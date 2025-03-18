@@ -28,7 +28,7 @@ function FlipTask({ taskId, taskName, mode, duration, onDelete, onRename, onChan
                     taskName={taskName}
                     onClose={() => setIsModalOpen(false)}
                     onDelete={(id) => { console.log(`Delete task with id: ${id}`); onDelete(id); }}
-                    onRename={(id, newName, newColor) => { console.log(`Rename task with id: ${id} to ${newName} using ${newColor}`); onRename(id, newName, newColor); }}
+                    onRename={(id, newName) => { console.log(`Rename task with id: ${id} to ${newName}`); onRename(id, newName); }}
                     onChangeColor={(id, color) => { console.log(`Change color of task with id: ${id} to ${color}`); onChangeColor(id, color); }}
                 />
             )}

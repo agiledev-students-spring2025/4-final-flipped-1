@@ -22,7 +22,7 @@ function TaskList({ tasks, onDelete, onRename, onChangeColor }) {
       {tasks.map(task => (
         <div key={task.id} className="task-item" onClick={() => handleTaskClick(task)}>
           <div className="task-text">{task.name}</div>
-          <button className="flip-button" onClick={() => navigate(`/flipbefore/${task.id}`, { state: { taskName: task.name } })}>Flip</button>
+          <button className="flip-button" onClick={() => navigate(`/flipbefore/${task.id}`)}>Flip</button>
         </div>
       ))}
 
@@ -40,13 +40,7 @@ function TaskList({ tasks, onDelete, onRename, onChangeColor }) {
         <AddTaskModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
-          onSubmit={(updatedTask) => {  
-            console.log(`Renaming Task ID: ${selectedTask.id} to ${updatedTask.name} with Color: ${updatedTask.color}`);
-
-            onRename(selectedTask.id, updatedTask.name, updatedTask.color); // ✅ Pass color as well
-            setIsEditModalOpen(false);
-            setSelectedTask(null);
-        }}
+          onSubmit={(taskName) => { console.log(`Task name to submit: ${taskName}`); /* onRename(selectedTask.id, taskName); */ setIsEditModalOpen(false); setSelectedTask(null); }}
         />
       )}
     </div>
