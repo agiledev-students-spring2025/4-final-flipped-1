@@ -7,7 +7,7 @@ function TaskOptionsModal({ taskId, taskName, onClose, onDelete, onEdit }) {
       <div className="modal-content">
         <h2>Task Options</h2>
         <button onClick={() => onDelete(taskId)}>Delete Task</button>
-        <button onClick={() => onEdit(taskId)}>Edit Task</button>
+        <button onClick={() => onEdit({ id: taskId, name: taskName })}>Edit Task</button>
         <button onClick={onClose}>Close</button>
       </div>
     </div>
