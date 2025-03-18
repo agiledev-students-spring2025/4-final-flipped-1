@@ -124,17 +124,15 @@
 .color-button {
   width: 10px;
   height: 10px;
-  align-self: center;
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
   flex-shrink: 0; /* 防止按钮被拉伸 */
-  flex-grow: 0;
 }
 
 .color-button:hover {
-  /* transform: scale(1.2); */
+  transform: scale(1.2);
 }
 
 .color-button.selected {
