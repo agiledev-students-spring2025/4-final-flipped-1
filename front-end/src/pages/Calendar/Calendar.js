@@ -4,7 +4,7 @@ import "react-calendar/dist/Calendar.css";
 import CalendarDayView from "./CalendarDayView";
 import CalendarWeekView from "./CalendarWeekView";
 import CalendarMonthView from "./CalendarMonthView";
-import Header from "../../components/header/Header";  
+import Header3 from "../../components/header/Header3";  
 import BottomNav from "../../components/BottomNav/BottomNav";  
 import "./Calendar.css"; 
 
@@ -30,7 +30,7 @@ const Calendar = () => {
 
   return (
     <div className="calendar-container"> {/* Added wrapper div */}
-      <Header title="Calendar" />
+      <Header3 title="Calendar" />
 
       {/* View Selector */}
       <div className="view-selector">
