@@ -3,15 +3,12 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
 import './FlipBefore.css';
 import FlipTask from '../../components/FlipTask/FlipTask';
-import Header from '../../components/header/Header';
-import BottomNav from '../../components/BottomNav/BottomNav';
 
 function FlipBefore() {
     const { taskId } = useParams(); // 从 URL 获取 taskId
     const location = useLocation();
-    const taskName = location.state?.taskName || "Unknown Task"; // 获取 taskName
+    const taskName = location.state?.taskName || "Loading Task Name..."; // 获取 taskName
     const taskColor = location.state?.taskColor || "#eeecf9";
-
     const navigate = useNavigate();
     const taskCount = 3;  // 任务总数，防止滑出范围
     const [isFlipped, setIsFlipped] = useState(false); //true的话代表现在正在flipped
