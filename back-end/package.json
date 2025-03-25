@@ -2,7 +2,8 @@
   "name": "back-end",
   "version": "1.0.0",
   "description": "The back-end of your project will live in this directory.",
-  "main": "index.js",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
     "test": "mocha",
     "coverage": "c8 mocha",
