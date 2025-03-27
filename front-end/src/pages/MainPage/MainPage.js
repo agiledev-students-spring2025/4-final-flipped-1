@@ -1,23 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './MainPage.css';
 import Header from '../../components/header/Header';
 import TaskList from '../../components/TaskList/TaskList';
 import BottomNav from '../../components/BottomNav/BottomNav';
 
 function MainPage() {
-  const [tasks, setTasks] = useState([
-    { id: 1, name: 'Read Books', color: "#dbf7ff" },
-    { id: 2, name: 'Study', color: "#fefbfc" },
-    { id: 3, name: 'Watching Video', color: "#fff6e6" }
-  ]);
+  const [tasks, setTasks] = useState([]);
 
-  const handleAddTask = (newTask) => {
-    const newTaskWithId = {
-      id: tasks.length > 0 ? Math.max(...tasks.map(task => task.id)) + 1 : 1,
-      name: newTask.name,
-      color: newTask.color
+  useEffect(() => {
+    // Fetch tasks when component mounts
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/tasks');
+        setTasks(response.data);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
     };
-    setTasks([...tasks, newTaskWithId]);
+
+    fetchTasks();
+  }, []); // Empty dependency array means this runs once when component mounts
+
+  const handleAddTask = async (newTask) => {
+    try {
+      const response = await axios.post('http://localhost:3001/api/tasks', newTask);
+      setTasks([...tasks, response.data]);
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
   };
 
   return (
@@ -29,4 +40,4 @@ function MainPage() {
   );
 }
 
-export default MainPage; 
+export default MainPage;
