@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import ReactCalendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import CalendarDayView from "./CalendarDayView";
@@ -11,29 +12,34 @@ import "./Calendar.css";
 const Calendar = () => {
   const [view, setView] = useState("daily"); 
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [toDoList, setToDoList] = useState([
-    { date: "2025-02-20", toDo: "Interview with A", time: "14:00", TimeRange: "15min" },
-    { date: "2025-02-26", toDo: "Lunch with B", time: "12:30", TimeRange: "45min" },
-    { date: "2025-02-20", toDo: "Evening Study", time: "18:00", TimeRange: "2h" },
-    { date: "2025-02-23", toDo: "Course A HW", time: "20:00", TimeRange: "1h" },
-    { date: "2025-02-23", toDo: "Gym Session", time: "07:30", TimeRange: "1h" },
-    { date: "2025-02-26", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
-    { date: "2025-02-26", toDo: "Course C", time: "19:00", TimeRange: "2h 15min" },
-    { date: "2025-02-26", toDo: "Course D", time: "22:00", TimeRange: "2h 15min" },
-    { date: "2025-03-25", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
-    { date: "2025-03-17", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
-  ]);
+  const [toDoList, setToDoList] = useState([])
 
-  // Function to add a new task
-  const handleAddTask = (newTask) => {
-    console.log("Adding new task:", newTask);
-    setToDoList([...toDoList, newTask]); // Update the task list
+  useEffect(() => {
+    const fetchToDos = async () => {
+      try{
+        const response = await axios.get('http://localhost:3001/api/todos');
+        setToDoList(response.data);
+      } catch (error) {
+        console.error('Error fetching todos:', error);
+      }
+    };
+
+    fetchToDos();
+  },[]);
+
+  const handleAddToDos = async (newToDo) => {
+    try{
+      const response = await axios.post('http://localhost:3001/api/todos', newToDo);
+      setToDoList([...toDoList, response.data]);
+    } catch (error) {
+      console.error('Error adding todo:', error);
+    }
   };
 
   return (
     <div className="calendar-container">
       {/* Pass handleAddTask as a prop */}
-      <Header3 title="Calendar" onAddTask={handleAddTask} />
+      <Header3 title="Calendar" onAddTask={handleAddToDos} />
 
       {/* View Selector */}
       <div className="view-selector">
