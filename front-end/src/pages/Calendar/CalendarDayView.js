@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Calendar.css";
 
-const CalendarDayView = ({ selectedDate, toDoList }) => {
+const CalendarDayView = ({ selectedDate, toDoList, onDelete }) => {
   // Store completed tasks(for use of checkbox)
   const [completedTasks, setCompletedTasks] = useState({});
 
@@ -21,14 +21,17 @@ const CalendarDayView = ({ selectedDate, toDoList }) => {
       <h3>Tasks for {selectedDate}</h3>
       {tasksForDay.length > 0 ? (
         <ul className="toDo-list">
-          {tasksForDay.map((task, index) => (
-            <li key={index} className={`toDo-item ${completedTasks[`${task.date}-${index}`] ? "completed" : ""}`}>
+          {tasksForDay.map((task) => (
+            <li key={task.id} className={`toDo-item ${completedTasks[`${task.date}-${task.id}`] ? "completed" : ""}`}>
               <input
                 type="checkbox"
-                checked={completedTasks[`${task.date}-${index}`] || false}
-                onChange={() => handleCheckboxChange(task.date, index)}
+                checked={completedTasks[`${task.date}-${task.id}`] || false}
+                onChange={() => handleCheckboxChange(task.date, task.id)}
               />
               <span>{task.toDo} at {task.time} ({task.TimeRange})</span>
+              <button className="delete-btn" onClick={() => onDelete(task.id)}>
+                Delete
+              </button>
             </li>
           ))}
         </ul>

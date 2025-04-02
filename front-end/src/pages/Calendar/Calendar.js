@@ -36,6 +36,15 @@ const Calendar = () => {
     }
   };
 
+  const handleDeleteToDo = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3001/api/todos/${id}`);
+      setToDoList(toDoList.filter(todo => todo.id !== id));
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+    }
+  };
+
   return (
     <div className="calendar-container">
       {/* Pass handleAddTask as a prop */}
@@ -62,9 +71,9 @@ const Calendar = () => {
 
       {/* Render the selected view */}
       <div className="calendar-view">
-        {view === "daily" && <CalendarDayView selectedDate={selectedDate.toISOString().split("T")[0]} toDoList={toDoList}/>}
-        {view === "weekly" && <CalendarWeekView toDoList={toDoList}/>}
-        {view === "monthly" && <CalendarMonthView toDoList={toDoList}/>}
+        {view === "daily" && <CalendarDayView selectedDate={selectedDate.toISOString().split("T")[0]} toDoList={toDoList} onDelete={handleDeleteToDo} />}
+        {view === "weekly" && <CalendarWeekView toDoList={toDoList} onDelete={handleDeleteToDo} />}
+        {view === "monthly" && <CalendarMonthView toDoList={toDoList} onDelete={handleDeleteToDo} />}
       </div>
 
       {/* Bottom Nav */}
