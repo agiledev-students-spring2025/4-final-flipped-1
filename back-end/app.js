@@ -16,16 +16,17 @@ app.use(express.urlencoded({ extended: true }))
 
 // Mock data for todos
 const mockToDos = [
-  { date: "2025-02-20", toDo: "Interview with A", time: "14:00", TimeRange: "15min" },
-  { date: "2025-02-26", toDo: "Lunch with B", time: "12:30", TimeRange: "45min" },
-  { date: "2025-02-20", toDo: "Evening Study", time: "18:00", TimeRange: "2h" },
-  { date: "2025-02-23", toDo: "Course A HW", time: "20:00", TimeRange: "1h" },
-  { date: "2025-02-23", toDo: "Gym Session", time: "07:30", TimeRange: "1h" },
-  { date: "2025-02-26", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
-  { date: "2025-02-26", toDo: "Course C", time: "19:00", TimeRange: "2h 15min" },
-  { date: "2025-02-26", toDo: "Course D", time: "22:00", TimeRange: "2h 15min" },
-  { date: "2025-03-25", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
-  { date: "2025-03-17", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" }
+  { id: 1, date: "2025-02-20", toDo: "Interview with A", time: "14:00", TimeRange: "15min" },
+  { id: 2, date: "2025-02-26", toDo: "Lunch with B", time: "12:30", TimeRange: "45min" },
+  { id: 3, date: "2025-02-26", toDo: "Lunch with B", time: "12:30", TimeRange: "45min" },
+  { id: 4, date: "2025-02-20", toDo: "Evening Study", time: "18:00", TimeRange: "2h" },
+  { id: 5, date: "2025-02-23", toDo: "Course A HW", time: "20:00", TimeRange: "1h" },
+  { id: 6, date: "2025-02-23", toDo: "Gym Session", time: "07:30", TimeRange: "1h" },
+  { id: 7, date: "2025-02-26", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
+  { id: 8, date: "2025-02-26", toDo: "Course C", time: "19:00", TimeRange: "2h 15min" },
+  { id: 9, date: "2025-02-26", toDo: "Course D", time: "22:00", TimeRange: "2h 15min" },
+  { id: 10, date: "2025-03-25", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
+  { id: 11, date: "2025-03-17", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" }
 ];
 
 // API endpoint to get todos
@@ -36,7 +37,9 @@ app.get('/api/todos', (req, res) => {
 // API endpoint to add a new task
 app.post('/api/todos', (req, res) => {
   const { date, toDo, time, TimeRange } = req.body;
+  const newId = mockToDos.length ? Math.max(...mockToDos.map(todo => todo.id)) + 1 : 1;
   const newToDo = {
+    id: newId,
     date,
     toDo,
     time,
@@ -45,6 +48,19 @@ app.post('/api/todos', (req, res) => {
   mockToDos.push(newToDo);
   res.json(newToDo);
 });
+
+app.delete('/api/todos/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const index = mockToDos.findIndex(todo => todo.id === id);
+
+  if (index !== -1) {
+    const deleted = mockToDos.splice(index, 1);
+    res.json({ message: 'Todo deleted', deleted: deleted[0] });
+  } else {
+    res.status(404).json({ message: 'Todo not found' });
+  }
+});
+
 
 // Mock data for tasks
 const mockTasks = [
