@@ -14,6 +14,38 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+// Mock data for todos
+const mockToDos = [
+  { date: "2025-02-20", toDo: "Interview with A", time: "14:00", TimeRange: "15min" },
+  { date: "2025-02-26", toDo: "Lunch with B", time: "12:30", TimeRange: "45min" },
+  { date: "2025-02-20", toDo: "Evening Study", time: "18:00", TimeRange: "2h" },
+  { date: "2025-02-23", toDo: "Course A HW", time: "20:00", TimeRange: "1h" },
+  { date: "2025-02-23", toDo: "Gym Session", time: "07:30", TimeRange: "1h" },
+  { date: "2025-02-26", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
+  { date: "2025-02-26", toDo: "Course C", time: "19:00", TimeRange: "2h 15min" },
+  { date: "2025-02-26", toDo: "Course D", time: "22:00", TimeRange: "2h 15min" },
+  { date: "2025-03-25", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
+  { date: "2025-03-17", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" }
+];
+
+// API endpoint to get todos
+app.get('/api/todos', (req, res) => {
+  res.json(mockToDos);
+});
+
+// API endpoint to add a new task
+app.post('/api/todos', (req, res) => {
+  const { date, toDo, time, TimeRange } = req.body;
+  const newToDo = {
+    date,
+    toDo,
+    time,
+    TimeRange
+  };
+  mockToDos.push(newToDo);
+  res.json(newToDo);
+});
+
 // Mock data for tasks
 const mockTasks = [
   { id: 1, name: 'Read Books', color: "#dbf7ff" },
