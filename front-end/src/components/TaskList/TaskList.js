@@ -5,7 +5,7 @@ import './TaskList.css';
 function TaskList({ tasks }) {
   const navigate = useNavigate();
   const totalFlipTime = parseFloat(localStorage.getItem("totalFlipTime")) || 0;
-  console.log("this is a test print of tasks", tasks)
+  // console.log("this is a test print of tasks", tasks)
   
 
   
