@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-  PieChart,
-  Pie,
-} from "recharts";
+import { ResponsiveContainer, Tooltip, PieChart, Pie } from "recharts";
 
 import "./StatsPage.css";
 import Header2 from "../../components/header/Header2";
@@ -122,6 +112,7 @@ const StatsPage = () => {
     setSelectedDate(startOfWeek);
   };
 
+
   // useEffect to filter and aggregate data based on selectedDate and timeframe
   useEffect(() => {
     let filteredLogs = [];
@@ -157,14 +148,10 @@ const StatsPage = () => {
       });
     }
 
-    // Aggregate duration per task (convert seconds to minutes)
+    // Aggregate duration per task and convert seconds to minutes
     const aggregated = {};
     filteredLogs.forEach((log) => {
-      if (aggregated[log.task_name]) {
-        aggregated[log.task_name] += log.duration;
-      } else {
-        aggregated[log.task_name] = log.duration;
-      }
+      aggregated[log.task_name] = (aggregated[log.task_name] || 0) + log.duration;
     });
     const chartData = Object.keys(aggregated).map((task) => ({
       name: task,
@@ -295,23 +282,8 @@ const StatsPage = () => {
           <div className="distribution-card">
             <h3>{timeframe} Time Distribution</h3>
             <div className="chart-container">
-              {/* Bar Chart */}
-              <ResponsiveContainer width="50%" height={300}>
-                <BarChart
-                  data={distributionData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="minutes" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-
-              {/* Pie Chart */}
-              <ResponsiveContainer width="50%" height={300}>
-                <PieChart>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
                   <Pie
                     data={distributionData}
                     dataKey="minutes"
@@ -320,11 +292,49 @@ const StatsPage = () => {
                     cy="50%"
                     outerRadius={80}
                     fill="#82ca9d"
-                    label
+                    // Disable the connecting line
+                    labelLine={false}
+                    // Conditionally place the label
+                    label={({ cx, cy, midAngle, innerRadius, outerRadius, value, payload }) => {
+                      // If there's only one slice, center the label
+                      if (distributionData.length === 1) {
+                        return (
+                          <text
+                            x={cx}
+                            y={cy}
+                            fill="black"
+                            textAnchor="middle"
+                            dominantBaseline="central"
+                          >
+                            {`${payload.name}: ${value} min`}
+                          </text>
+                        );
+                      }
+
+                      // Otherwise, use a normal "outside" placement
+                      const RADIAN = Math.PI / 180;
+                      const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+                      return (
+                        <text
+                          x={x}
+                          y={y}
+                          fill="black"
+                          textAnchor={x > cx ? "start" : "end"}
+                          dominantBaseline="central"
+                        >
+                          {`${payload.name}: ${value} min`}
+                        </text>
+                      );
+                    }}
                   />
-                  <Tooltip />
+                  <Tooltip formatter={(value) => `${value} min`} />
                 </PieChart>
               </ResponsiveContainer>
+
+
             </div>
           </div>
         ) : (
