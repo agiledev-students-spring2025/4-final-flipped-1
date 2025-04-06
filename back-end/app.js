@@ -148,9 +148,35 @@ app.post('/api/tasks', (req, res) => {
   //返回本次的name+duration
 // }
 
+app.post('/api/fliplog', (req, res) => {
+  const { task_name, date, start_time, end_time, duration } = req.body;
+
+  // flip log
+  const newLog = { task_name, date, start_time, end_time, duration };
+  flipLogs.push(newLog);
+
+  // daily duration
+  const todayLogs = flipLogs.filter(
+    log => log.task_name === task_name && log.date === date
+  );
+
+  const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
+
+  // return back to front end?
+  res.status(201).json({
+    success: true,
+    log: newLog,
+    todayTotalTime: todayTotalTime
+  });
+});
+
+
+app.get('/api/fliplog', (req, res) => {
+  res.json(flipLogs);
+});
 
 //接口，往FlipLog里面插入新的数据，返回今天task_name的总时长
-app.post('/api/fliplog', async (req, res) => {
+app.post('/api/fliplog/insert', async (req, res) => {
   const { task_name, start_time, end_time, duration } = req.body;
 
   try {
