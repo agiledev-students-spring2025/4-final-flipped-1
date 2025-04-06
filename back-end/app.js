@@ -1,3 +1,7 @@
+import dotenv from 'dotenv'
+dotenv.config()
+import mongoose from 'mongoose'
+
 // import and instantiate express
 import express from 'express'
 const app = express()
@@ -6,6 +10,9 @@ import cors from 'cors'
 // import some useful middleware
 import morgan from 'morgan'
 
+// import database table
+import FlipLog from './models/FlipLog.js';
+
 // use the morgan middleware to log all incoming http requests
 app.use(morgan('dev'))
 app.use(cors())
@@ -13,6 +20,28 @@ app.use(cors())
 // use express's builtin body-parser middleware to parse any data included in a request
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+
+mongoose.connect('mongodb://localhost:27017/flip', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log("Connected to MongoDB: flip")
+})
+.catch((err) => {
+  console.error("MongoDB connection error:", err)
+})
+
+
+// mongoose.connect(MONGO_URI)
+//   .then(() => {
+//     console.log("Connected to MongoDB: flip")
+//   })
+//   .catch((err) => {
+//     console.error("MongoDB connection error:", err)
+//   })
+
 
 // Mock data for tasks
 const mockTasks = [
@@ -106,48 +135,95 @@ app.post('/api/tasks', (req, res) => {
   res.json(newTask);
 });
 
-// API endpoint to get flip duration
-app.post('/api/tasks/:taskId/time', (req, res) => {
-  const { taskId } = req.params;
-  const { timeSpent } = req.body;
+//API endpoint to delect a task
 
-  // 假设你有 tasks 数组
-  const task = tasks.find(t => t.id === Number(taskId));
-  if (task) {
-    task.totalTime = (task.totalTime || 0) + timeSpent;
-    res.json({ success: true, task });
-  } else {
-    res.status(404).json({ error: "Task not found" });
+// app.get today total time//翻转flipbefore的时候发出的请求
+ 
+
+//作为fakedata flip before翻转后
+// app.post('/api/fliplog', async (req, res) => {
+  // 给flipbefore用
+  // 插数据+返回total today time
+  //+log
+  //返回本次的name+duration
+// }
+
+
+//接口，往FlipLog里面插入新的数据，返回今天task_name的总时长
+app.post('/api/fliplog', async (req, res) => {
+  const { task_name, start_time, end_time, duration } = req.body;
+
+  try {
+    const newLog = new FlipLog({
+      task_name,
+      start_time: new Date(start_time),
+      end_time: new Date(end_time),
+      duration
+    });
+
+    await newLog.save();
+
+    // 拉今天的日期
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    // 查今天这个task的总时长
+    const todayLogs = await FlipLog.find({
+      task_name,
+      start_time: { $gte: startOfDay, $lte: endOfDay }
+    });
+
+    const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
+
+    res.status(201).json({
+      success: true,
+      taskName: task_name,
+      duration: duration,
+      log: newLog,
+      todayTotalTime,
+    });
+
+  } catch (err) {
+    console.error("Fail to insert flip log into FlipLog Collection", err);
+    res.status(500).json({ error: "server error" });
   }
 });
 
 
-app.post('/api/fliplog', (req, res) => {
-  const { task_name, date, start_time, end_time, duration } = req.body;
+//get today total flip time
+//return：task name, today Total Time
+app.get('/api/today/:taskName', async (req, res) => {
+  const { taskName } = req.params;
 
-  // flip log
-  const newLog = { task_name, date, start_time, end_time, duration };
-  flipLogs.push(newLog);
+  // 拉今天的日期
+  const today = new Date();
+  const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+  const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
-  // daily duration
-  const todayLogs = flipLogs.filter(
-    log => log.task_name === task_name && log.date === date
-  );
+  
+  try {
+    const todayLogs = await FlipLog.find({
+      task_name: taskName,
+      start_time: {
+        $gte: startOfDay,
+        $lte: endOfDay
+      }
+    });
 
-  const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
+    const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
 
-  // return back to front end?
-  res.status(201).json({
-    success: true,
-    log: newLog,
-    todayTotalTime: todayTotalTime
-  });
+    res.json({
+      taskName,
+      todayTotalTime
+    });
+  } catch (err) {
+    console.error("Fail to get today total flip time", err);
+    res.status(500).json({ error: 'server error' });
+  }
 });
 
 
-app.get('/api/fliplog', (req, res) => {
-  res.json(flipLogs);
-});
 
 
 // export the express app we created to make it available to other modules
