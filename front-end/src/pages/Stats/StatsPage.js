@@ -1,15 +1,106 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  PieChart,
+  Pie,
+} from "recharts";
+
 import "./StatsPage.css";
 import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
 
 const StatsPage = () => {
+  // Set initial date to match one of the fake data entries
   const [timeframe, setTimeframe] = useState("Daily");
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date("2025-03-27"));
+  const [totalHours, setTotalHours] = useState(0);
+  const [totalMinutes, setTotalMinutes] = useState(0);
+  const [distributionData, setDistributionData] = useState([]);
 
-  // Function to handle week selection
+  // Fake data: flipLogs (duration in seconds)
+  const flipLogs = [
+    {
+      task_name: "Study",
+      date: "2025.3.27",
+      start_time: "14:00:00",
+      end_time: "14:11:00",
+      duration: 660,
+    },
+    {
+      task_name: "Study",
+      date: "2025.3.26",
+      start_time: "19:51:00",
+      end_time: "06:56:46",
+      duration: 36346,
+    },
+    {
+      task_name: "Study",
+      date: "2025.3.24",
+      start_time: "20:45:00",
+      end_time: "21:26:05",
+      duration: 2465,
+    },
+    {
+      task_name: "Read Books",
+      date: "2025.3.21",
+      start_time: "11:09:00",
+      end_time: "13:11:00",
+      duration: 7320,
+    },
+    {
+      task_name: "Read Books",
+      date: "2025.3.20",
+      start_time: "01:00:00",
+      end_time: "01:00:22",
+      duration: 22,
+    },
+    {
+      task_name: "Study",
+      date: "2025.3.18",
+      start_time: "21:19:00",
+      end_time: "22:49:00",
+      duration: 5400,
+    },
+    {
+      task_name: "Haha",
+      date: "2025.3.16",
+      start_time: "21:22:00",
+      end_time: "23:59:00",
+      duration: 9540,
+    },
+    {
+      task_name: "Exercise",
+      date: "2025.3.13",
+      start_time: "19:55:00",
+      end_time: "20:32:43",
+      duration: 2203,
+    },
+    {
+      task_name: "Study",
+      date: "2025.2.24",
+      start_time: "11:35:00",
+      end_time: "11:35:07",
+      duration: 7,
+    },
+  ];
+
+  // Helper function to format Date to match "YYYY.M.D"
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // getMonth() is 0-indexed
+    const day = date.getDate();
+    return `${year}.${month}.${day}`;
+  };
+
+  // Handler for week selection (for "Weekly" timeframe)
   const handleWeekChange = (e) => {
-    const selectedWeek = e.target.value; // Format: "2025-W11"
+    const selectedWeek = e.target.value; // Format: "YYYY-Www"
     const year = parseInt(selectedWeek.substring(0, 4));
     const weekNumber = parseInt(selectedWeek.substring(6));
 
@@ -31,32 +122,64 @@ const StatsPage = () => {
     setSelectedDate(startOfWeek);
   };
 
-  // Function to select month
-  const handleMonthChange = (e) => {
-    const newDate = new Date(e.target.value + "-01"); // Ensures valid date format (YYYY-MM-01)
-    if (!isNaN(newDate)) {
-      setSelectedDate(newDate);
+  // useEffect to filter and aggregate data based on selectedDate and timeframe
+  useEffect(() => {
+    let filteredLogs = [];
+    if (timeframe === "Daily") {
+      const formattedDate = formatDate(selectedDate);
+      filteredLogs = flipLogs.filter((log) => log.date === formattedDate);
+    } else if (timeframe === "Weekly") {
+      // Compute start and end of week (using Sunday as the first day)
+      const dayOfWeek = selectedDate.getDay();
+      const startOfWeek = new Date(selectedDate);
+      startOfWeek.setDate(selectedDate.getDate() - dayOfWeek);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      filteredLogs = flipLogs.filter((log) => {
+        const parts = log.date.split(".");
+        const logDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        return logDate >= startOfWeek && logDate <= endOfWeek;
+      });
+    } else if (timeframe === "Monthly") {
+      const month = selectedDate.getMonth();
+      const year = selectedDate.getFullYear();
+      filteredLogs = flipLogs.filter((log) => {
+        const parts = log.date.split(".");
+        const logDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        return logDate.getMonth() === month && logDate.getFullYear() === year;
+      });
+    } else if (timeframe === "Yearly") {
+      const year = selectedDate.getFullYear();
+      filteredLogs = flipLogs.filter((log) => {
+        const parts = log.date.split(".");
+        const logDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        return logDate.getFullYear() === year;
+      });
     }
-  };
 
-  // Functions for year selection with arrows
-  const incrementYear = () => {
-    const currentYear = selectedDate.getFullYear();
-    if (currentYear < 2100) {
-      const newDate = new Date(selectedDate);
-      newDate.setFullYear(currentYear + 1);
-      setSelectedDate(newDate);
-    }
-  };
+    // Aggregate duration per task (convert seconds to minutes)
+    const aggregated = {};
+    filteredLogs.forEach((log) => {
+      if (aggregated[log.task_name]) {
+        aggregated[log.task_name] += log.duration;
+      } else {
+        aggregated[log.task_name] = log.duration;
+      }
+    });
+    const chartData = Object.keys(aggregated).map((task) => ({
+      name: task,
+      minutes: Math.round(aggregated[task] / 60),
+    }));
 
-  const decrementYear = () => {
-    const currentYear = selectedDate.getFullYear();
-    if (currentYear > 1900) {
-      const newDate = new Date(selectedDate);
-      newDate.setFullYear(currentYear - 1);
-      setSelectedDate(newDate);
-    }
-  };
+    // Compute total duration for display
+    const totalDuration = filteredLogs.reduce((sum, log) => sum + log.duration, 0);
+    const hours = Math.floor(totalDuration / 3600);
+    const minutes = Math.floor((totalDuration % 3600) / 60);
+
+    setDistributionData(chartData);
+    setTotalHours(hours);
+    setTotalMinutes(minutes);
+  }, [selectedDate, timeframe]);
 
   return (
     <div className="stats-container">
@@ -68,15 +191,19 @@ const StatsPage = () => {
         <div className="concentration-card">
           <h2>Concentration</h2>
 
-          {/* This container holds the timeframe selector AND the date pickers */}
+          {/* Timeframe Selector & Date Pickers */}
           <div className="concentration-info">
-            {/* Timeframe Selector */}
             <select
               className="timeframe-selector"
               value={timeframe}
               onChange={(e) => {
                 setTimeframe(e.target.value);
-                setSelectedDate(new Date()); // Reset to today when switching timeframe
+                // Reset the date when switching timeframe if desired
+                if (e.target.value === "Daily") {
+                  setSelectedDate(new Date("2025-03-27"));
+                } else {
+                  setSelectedDate(new Date());
+                }
               }}
             >
               <option value="Daily">Daily</option>
@@ -85,7 +212,6 @@ const StatsPage = () => {
               <option value="Yearly">Yearly</option>
             </select>
 
-            {/* Date/Week/Month/Year Pickers */}
             {timeframe === "Daily" && (
               <input
                 type="date"
@@ -93,9 +219,7 @@ const StatsPage = () => {
                 value={selectedDate.toISOString().split("T")[0]}
                 onChange={(e) => {
                   const newDate = new Date(e.target.value);
-                  if (!isNaN(newDate)) {
-                    setSelectedDate(newDate);
-                  }
+                  if (!isNaN(newDate)) setSelectedDate(newDate);
                 }}
               />
             )}
@@ -112,8 +236,11 @@ const StatsPage = () => {
               <input
                 type="month"
                 className="month-picker"
-                value={selectedDate.toISOString().slice(0, 7)} // Format: YYYY-MM
-                onChange={handleMonthChange}
+                value={selectedDate.toISOString().slice(0, 7)}
+                onChange={(e) => {
+                  const newDate = new Date(e.target.value + "-01");
+                  if (!isNaN(newDate)) setSelectedDate(newDate);
+                }}
               />
             )}
 
@@ -126,10 +253,30 @@ const StatsPage = () => {
                   readOnly
                 />
                 <div className="year-arrows">
-                  <button onClick={incrementYear} className="arrow-btn">
+                  <button
+                    onClick={() => {
+                      const currentYear = selectedDate.getFullYear();
+                      if (currentYear < 2100) {
+                        const newDate = new Date(selectedDate);
+                        newDate.setFullYear(currentYear + 1);
+                        setSelectedDate(newDate);
+                      }
+                    }}
+                    className="arrow-btn"
+                  >
                     ▲
                   </button>
-                  <button onClick={decrementYear} className="arrow-btn">
+                  <button
+                    onClick={() => {
+                      const currentYear = selectedDate.getFullYear();
+                      if (currentYear > 1900) {
+                        const newDate = new Date(selectedDate);
+                        newDate.setFullYear(currentYear - 1);
+                        setSelectedDate(newDate);
+                      }
+                    }}
+                    className="arrow-btn"
+                  >
                     ▼
                   </button>
                 </div>
@@ -137,70 +284,52 @@ const StatsPage = () => {
             )}
           </div>
 
-          {/* Display the total hours/minutes */}
+          {/* Total Time Display */}
           <h1>
-            10 <span>Hours</span> 59 <span>Mins</span>
+            {totalHours} <span>Hours</span> {totalMinutes} <span>Mins</span>
           </h1>
         </div>
 
-        {/* Dynamic Rendering Based on Timeframe */}
-        {timeframe === "Daily" && (
+        {/* Distribution Chart Section */}
+        {distributionData.length > 0 ? (
           <div className="distribution-card">
-            <h3>Daily Time Distribution</h3>
+            <h3>{timeframe} Time Distribution</h3>
             <div className="chart-container">
-              <div className="bars">
-                <div className="bar"></div>
-                <div className="bar"></div>
-                <div className="bar"></div>
-                <div className="bar"></div>
-              </div>
-              <div className="chart">chart</div>
+              {/* Bar Chart */}
+              <ResponsiveContainer width="50%" height={300}>
+                <BarChart
+                  data={distributionData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="minutes" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+
+              {/* Pie Chart */}
+              <ResponsiveContainer width="50%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={distributionData}
+                    dataKey="minutes"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    fill="#82ca9d"
+                    label
+                  />
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
-        )}
-
-        {timeframe === "Weekly" && (
+        ) : (
           <div className="distribution-card">
-            <h3>Weekly Time Distribution</h3>
-            <div className="chart-container">
-              <div className="bars">
-                <div className="bar weekly"></div>
-                <div className="bar weekly"></div>
-                <div className="bar weekly"></div>
-                <div className="bar weekly"></div>
-              </div>
-              <div className="chart">weekly chart</div>
-            </div>
-          </div>
-        )}
-
-        {timeframe === "Monthly" && (
-          <div className="distribution-card">
-            <h3>Monthly Time Distribution</h3>
-            <div className="chart-container">
-              <div className="bars">
-                <div className="bar monthly"></div>
-                <div className="bar monthly"></div>
-                <div className="bar monthly"></div>
-                <div className="bar monthly"></div>
-              </div>
-              <div className="chart">monthly chart</div>
-            </div>
-          </div>
-        )}
-
-        {timeframe === "Yearly" && (
-          <div className="distribution-card">
-            <h3>Yearly Time Distribution</h3>
-            <div className="chart-container">
-              <div className="bars">
-                <div className="bar yearly"></div>
-                <div className="bar yearly"></div>
-                <div className="bar yearly"></div>
-                <div className="bar yearly"></div>
-              </div>
-              <div className="chart">yearly chart</div>
-            </div>
+            <h3>No data available for the {timeframe} timeframe.</h3>
           </div>
         )}
       </div>
