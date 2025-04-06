@@ -24,6 +24,19 @@ function FlipBefore() {
     );
 
 
+    //进入页面的时候抓今天的该task的使用时长
+    useEffect(() => {
+        const fetchTodayTime = async () => {
+          try {
+            const res = await axios.get(`http://localhost:3001/api/today/${taskName}`);
+            setTodayTime(res.data.todayTotalTime);
+          } catch (err) {
+            console.error("fail to get total flip time today:", err);
+          }
+        };
+      
+        fetchTodayTime();
+      }, [taskName]);
 
 
 
@@ -64,7 +77,7 @@ function FlipBefore() {
           const todayTotal = res.data.todayTotalTime;
           setTodayTime(todayTotal); 
         } catch (err) {
-          console.error("发送打卡失败：", err);
+          console.error("fail to send flip log data：", err);
         }
       };
 
