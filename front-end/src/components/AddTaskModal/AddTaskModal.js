@@ -1,29 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AddTaskModal.css';
 
 const COLORS = [ "#6ddefe", "#a8c6e0", "#cbbfe6", "#fde8f2", "#f6bf96","#febe46","#fee767", "#fdec9a", "#cfeb97", "#bafede", "#DFF3E4"];
 
-function AddTaskModal({ isOpen, onClose, onSubmit }) {
+function AddTaskModal({ isOpen, onClose, onSubmit, editingTask }) {
   const [taskName, setTaskName] = useState('');
-  const [taskColor, setTaskColor] = useState(COLORS[0]); // 默认选中第一个颜色
+  const [taskColor, setTaskColor] = useState(COLORS[0]);
+
+  useEffect(() => {
+    // console.log('Effect triggered:', { editingTask, isOpen });
+    if (editingTask) {
+      setTaskName(editingTask.name);
+      setTaskColor(editingTask.color);
+    } else {
+      setTaskName('');
+      setTaskColor(COLORS[0]);
+    }
+  }, [editingTask]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (taskName.trim()) {
-      onSubmit({ name: taskName, color: taskColor });
-      setTaskName('');
-      setTaskColor(COLORS[0]);  // 重置颜色选择
-      onClose();
+    // console.log('Form submitted:', { taskName, taskColor });
+    const trimmedName = taskName.trim();
+    if (trimmedName) {
+      // console.log('Calling onSubmit with:', { name: trimmedName, color: taskColor });
+      onSubmit({ 
+        name: trimmedName, 
+        color: taskColor 
+      });
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Add Task</h2>
+          <h2>{editingTask ? 'Edit Task' : 'Add Task'}</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
         <form onSubmit={handleSubmit}>
@@ -31,14 +45,16 @@ function AddTaskModal({ isOpen, onClose, onSubmit }) {
             <input
               type="text"
               value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
+              onChange={(e) => {
+                // console.log('Input changed:', e.target.value);
+                setTaskName(e.target.value);
+              }}
               placeholder="Type the name of task"
               className="task-input"
               autoFocus
             />
           </div>
 
-          {/* 任务颜色选择器 */}
           <div className="color-picker-container">
             <div className="color-options">
               {COLORS.map((color) => (
@@ -47,7 +63,7 @@ function AddTaskModal({ isOpen, onClose, onSubmit }) {
                   className={`color-button ${taskColor === color ? 'selected' : ''}`}
                   style={{ backgroundColor: color }}
                   onClick={(e) => {
-                    e.preventDefault(); // 阻止提交
+                    e.preventDefault();
                     setTaskColor(color);
                   }}
                 />
@@ -60,7 +76,7 @@ function AddTaskModal({ isOpen, onClose, onSubmit }) {
               Cancel
             </button>
             <button type="submit" className="submit-button">
-              Add
+              {editingTask ? 'Save' : 'Add'}
             </button>
           </div>
         </form>
@@ -69,4 +85,4 @@ function AddTaskModal({ isOpen, onClose, onSubmit }) {
   );
 }
 
-export default AddTaskModal; 
+export default AddTaskModal;
