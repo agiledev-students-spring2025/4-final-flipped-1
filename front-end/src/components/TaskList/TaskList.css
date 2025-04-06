@@ -5,6 +5,8 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-height: 0; /* 确保内容可以正确滚动 */
+  padding-bottom: 80px; /* 为底部导航留出空间 */
 }
 
 .task-item {
@@ -19,21 +21,18 @@
   border: 1px solid rgba(108, 92, 231, 0.1);
 }
 
-/* .task-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.1);
-} */
-
 .task-text {
   font-size: 1.1rem;
   font-weight: 500;
   color: #2d3436;
+  word-break: break-word; /* 确保长文本会换行 */
+  flex: 1;
+  margin-right: 1rem;
 }
 
 .flip-button {
   padding: 0.6rem 1.2rem;
-  /* background: linear-gradient(135deg, #6c5ce7 0%, #a8a4e6 100%); */
-  background: linear-gradient(135deg, #1E90FF 0%,  #99BADD 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #99BADD 100%);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -41,9 +40,10 @@
   font-weight: 500;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
+  flex-shrink: 0; /* 防止按钮被压缩 */
 }
 
 .flip-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
-} 
+}

@@ -145,13 +145,56 @@ app.get('/api/tasks', (req, res) => {
 // API endpoint to add a new task
 app.post('/api/tasks', (req, res) => {
   const { name, color } = req.body;
+  
+  // 找到当前最大的 task_id
+  const maxId = mockTasks.reduce((max, task) => {
+    return task.task_id > max ? task.task_id : max;
+  }, 0);
+
   const newTask = {
-    task_id: mockTasks.length > 0 ? Math.max(...mockTasks.map(task => task.task_id)) + 1 : 1,
+    task_id: maxId + 1,
     name,
     color
   };
+
   mockTasks.push(newTask);
-  res.json(newTask);
+  res.status(201).json(newTask);
+});
+
+// API endpoint to update an existing task
+app.put('/api/tasks/:taskId', (req, res) => {
+  const taskId = parseInt(req.params.taskId);
+  const { name, color } = req.body;
+  
+  const taskIndex = mockTasks.findIndex(task => task.task_id === taskId);
+  
+  if (taskIndex === -1) {
+    return res.status(404).json({ message: 'Task not found' });
+  }
+
+  // Update the task
+  mockTasks[taskIndex] = {
+    ...mockTasks[taskIndex],
+    name,
+    color
+  };
+
+  res.json(mockTasks[taskIndex]);
+});
+
+// API endpoint to delete a task
+app.post('/api/tasks/:taskId/delete', (req, res) => {
+  const taskId = parseInt(req.params.taskId);
+  const taskIndex = mockTasks.findIndex(task => task.task_id === taskId);
+  
+  if (taskIndex === -1) {
+    return res.status(404).json({ message: 'Task not found' });
+  }
+
+  // Remove the task from the array
+  mockTasks.splice(taskIndex, 1);
+
+  res.status(200).json({ message: 'Task deleted successfully' });
 });
 
 // API endpoint to get flip duration

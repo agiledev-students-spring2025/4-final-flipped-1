@@ -16,7 +16,7 @@ function AddTodoModal({ isOpen, onClose, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("onSubmit function:", onSubmit);
+    // console.log("onSubmit function:", onSubmit);
     // Validate that all fields are provided
     if (
       todoData.date.trim() &&
