@@ -70,6 +70,8 @@ app.delete('/api/todos/:id', (req, res) => {
 
 
 
+/*
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Connected to MongoDB: flip")
@@ -77,6 +79,8 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => {
     console.error("MongoDB connection error:", err)
   })
+
+*/
 
 // mongoose.connect(MONGO_URI)
 //   .then(() => {
