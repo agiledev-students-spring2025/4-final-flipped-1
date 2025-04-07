@@ -1,4 +1,5 @@
 import app from '../app.js'
+import mongoose from 'mongoose'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 
@@ -158,5 +159,10 @@ describe('Full API Test Suite', () => {
         expect(res.body).to.have.property('todayTotalTime')
         done()
       })
+  })
+
+  after(async () => {
+    await mongoose.connection.close()
+    console.log("Closed MongoDB connection after tests")
   })
 })
