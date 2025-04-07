@@ -140,12 +140,13 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-
+/*
 .bars {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+  */
 
 .bar {
   width: 150px;
