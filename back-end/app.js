@@ -70,17 +70,13 @@ app.delete('/api/todos/:id', (req, res) => {
 
 
 
-mongoose.connect('mongodb://localhost:27017/flip', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log("Connected to MongoDB: flip")
-})
-.catch((err) => {
-  console.error("MongoDB connection error:", err)
-})
-
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("Connected to MongoDB: flip")
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err)
+  })
 
 // mongoose.connect(MONGO_URI)
 //   .then(() => {
@@ -339,6 +335,31 @@ app.get('/api/today/:taskName', async (req, res) => {
     res.status(500).json({ error: 'server error' });
   }
 });
+
+// Temporary in-memory object to store time (since tasks don't have time tracking yet)
+const taskTimes = {}
+
+app.post('/api/tasks/:taskId/time', (req, res) => {
+  const { taskId } = req.params;
+  const { timeSpent } = req.body;
+
+  const task = mockTasks.find(t => t.task_id === Number(taskId));
+  if (!task) {
+    return res.status(404).json({ message: "Task not found" });
+  }
+
+  // Store time in taskTimes map
+  taskTimes[taskId] = (taskTimes[taskId] || 0) + timeSpent;
+
+  res.json({
+    success: true,
+    task: {
+      ...task,
+      totalTime: taskTimes[taskId]
+    }
+  });
+});
+
 
 
 
