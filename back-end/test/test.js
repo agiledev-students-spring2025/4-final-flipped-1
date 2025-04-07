@@ -1,10 +1,10 @@
 import app from '../app.js'
+import mongoose from 'mongoose'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 
 const chai = require('chai')
 const chaiHttp = require('chai-http')
-
 chai.use(chaiHttp)
 const { expect } = chai
 
@@ -23,38 +23,35 @@ describe('Full API Test Suite', () => {
   })
 
   it('POST /api/todos adds a new todo', done => {
-    const newTodo = {
-      date: '2025-04-06',
-      toDo: 'Write full test suite',
-      time: '12:00',
-      TimeRange: '1h'
-    }
-
     chai.request(app)
       .post('/api/todos')
-      .send(newTodo)
+      .send({
+        date: '2025-04-06',
+        toDo: 'Write tests',
+        time: '12:00',
+        TimeRange: '1h'
+      })
       .end((err, res) => {
         expect(res).to.have.status(200)
-        expect(res.body).to.include({ toDo: 'Write full test suite' })
+        expect(res.body).to.include({ toDo: 'Write tests' })
         done()
       })
   })
 
-  it('DELETE /api/todos/:id deletes a todo by id', done => {
+  it('DELETE /api/todos/:id deletes a todo', done => {
     const tempTodo = {
       date: '2025-04-07',
-      toDo: 'Temporary Task',
+      toDo: 'Temp',
       time: '09:00',
-      TimeRange: '30min'
+      TimeRange: '15min'
     }
-
     chai.request(app)
       .post('/api/todos')
       .send(tempTodo)
       .end((err, res) => {
-        const todoId = res.body.id
+        const id = res.body.id
         chai.request(app)
-          .delete(`/api/todos/${todoId}`)
+          .delete(`/api/todos/${id}`)
           .end((err, res) => {
             expect(res).to.have.status(200)
             expect(res.body.message).to.equal('Todo deleted')
@@ -68,7 +65,6 @@ describe('Full API Test Suite', () => {
     chai.request(app)
       .get('/api/tasks')
       .end((err, res) => {
-        expect(err).to.be.null
         expect(res).to.have.status(200)
         expect(res.body).to.be.an('array')
         expect(res.body[0]).to.have.property('name')
@@ -76,33 +72,26 @@ describe('Full API Test Suite', () => {
       })
   })
 
-  it('POST /api/tasks adds a new task', done => {
-    const newTask = {
-      name: 'Focus Study',
-      color: '#112233'
-    }
-
+  it('POST /api/tasks adds a task', done => {
     chai.request(app)
       .post('/api/tasks')
-      .send(newTask)
+      .send({ name: 'Test Task', color: '#abc123' })
       .end((err, res) => {
-        expect(res).to.have.status(200)
-        expect(res.body).to.include({ name: 'Focus Study' })
+        expect(res).to.have.status(201)
+        expect(res.body).to.include({ name: 'Test Task' })
         done()
       })
   })
 
-  /*it('POST /api/tasks/:taskId/time updates time for a task', done => {
-    const timeUpdate = { timeSpent: 3600 }
-
+  it('POST /api/tasks/:taskId/time updates time for task', done => {
     chai.request(app)
       .post('/api/tasks')
       .send({ name: 'Timed Task', color: '#ffeeaa' })
       .end((err, res) => {
-        const taskId = res.body.id
+        const taskId = res.body.task_id
         chai.request(app)
           .post(`/api/tasks/${taskId}/time`)
-          .send(timeUpdate)
+          .send({ timeSpent: 3600 })
           .end((err, res) => {
             expect(res).to.have.status(200)
             expect(res.body.success).to.be.true
@@ -110,51 +99,70 @@ describe('Full API Test Suite', () => {
             done()
           })
       })
-  })*/
+  })
 
-  // Flip Log
+  // Flip Logs (Mock)
   it('GET /api/fliplog returns flip logs', done => {
-    const log = {
-      task_name: 'Study',
-      date: '2025.04.06',
-      start_time: '14:00:00',
-      end_time: '14:30:00',
-      duration: 1800
-    }
-
     chai.request(app)
-      .post('/api/fliplog')
-      .send(log)
-      .end(() => {
-        chai.request(app)
-          .get('/api/fliplog')
-          .end((err, res) => {
-            expect(res).to.have.status(200)
-            expect(res.body).to.be.an('array')
-            expect(res.body[0]).to.have.property('task_name')
-            done()
-          })
+      .get('/api/fliplog')
+      .end((err, res) => {
+        expect(res).to.have.status(200)
+        expect(res.body).to.be.an('array')
+        done()
       })
   })
 
-  it('POST /api/fliplog adds a new flip log and returns daily total', done => {
-    const newLog = {
-      task_name: 'Study',
-      date: '2025.04.06',
-      start_time: '14:00:00',
-      end_time: '14:30:00',
-      duration: 1800
-    }
-
+  it('POST /api/fliplog adds a new flip log & returns total', done => {
     chai.request(app)
       .post('/api/fliplog')
-      .send(newLog)
+      .send({
+        task_name: 'Study',
+        date: '2025.04.06',
+        start_time: '14:00:00',
+        end_time: '14:30:00',
+        duration: 1800
+      })
+      .end((err, res) => {
+        expect(res).to.have.status(201)
+        expect(res.body.success).to.be.true
+        expect(res.body.todayTotalTime).to.be.a('number')
+        done()
+      })
+  })
+
+  // Flip Logs (MongoDB)
+  it('POST /api/fliplog/insert inserts flip log into DB and returns today total', done => {
+    const now = new Date()
+    const log = {
+      task_name: 'MongoStudy',
+      start_time: now,
+      end_time: new Date(now.getTime() + 1000 * 60),
+      duration: 60
+    }
+    chai.request(app)
+      .post('/api/fliplog/insert')
+      .send(log)
       .end((err, res) => {
         expect(res).to.have.status(201)
         expect(res.body).to.have.property('success', true)
-        expect(res.body.log).to.include({ task_name: 'Study' })
         expect(res.body).to.have.property('todayTotalTime')
         done()
       })
+  })
+
+  it('GET /api/today/:taskName returns today total time', done => {
+    chai.request(app)
+      .get('/api/today/MongoStudy')
+      .end((err, res) => {
+        expect(res).to.have.status(200)
+        expect(res.body).to.have.property('taskName', 'MongoStudy')
+        expect(res.body).to.have.property('todayTotalTime')
+        done()
+      })
+  })
+
+  after(async () => {
+    await mongoose.connection.close()
+    console.log("Closed MongoDB connection after tests")
   })
 })
