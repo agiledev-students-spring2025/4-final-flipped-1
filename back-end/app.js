@@ -68,10 +68,6 @@ app.delete('/api/todos/:id', (req, res) => {
   }
 });
 
-
-
-/*
-
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Connected to MongoDB: flip")
@@ -79,16 +75,6 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => {
     console.error("MongoDB connection error:", err)
   })
-
-*/
-
-// mongoose.connect(MONGO_URI)
-//   .then(() => {
-//     console.log("Connected to MongoDB: flip")
-//   })
-//   .catch((err) => {
-//     console.error("MongoDB connection error:", err)
-//   })
 
 
 // Mock data for tasks
@@ -190,6 +176,30 @@ app.post('/api/tasks', (req, res) => {
   res.status(201).json(newTask);
 });
 
+// Temporary in-memory object to store time (since tasks don't have time tracking yet)
+const taskTimes = {}
+
+app.post('/api/tasks/:taskId/time', (req, res) => {
+  const { taskId } = req.params;
+  const { timeSpent } = req.body;
+
+  const task = mockTasks.find(t => t.task_id === Number(taskId));
+  if (!task) {
+    return res.status(404).json({ message: "Task not found" });
+  }
+
+  // Store time in taskTimes map
+  taskTimes[taskId] = (taskTimes[taskId] || 0) + timeSpent;
+
+  res.json({
+    success: true,
+    task: {
+      ...task,
+      totalTime: taskTimes[taskId]
+    }
+  });
+});
+
 // API endpoint to update an existing task
 app.put('/api/tasks/:taskId', (req, res) => {
   const taskId = parseInt(req.params.taskId);
@@ -226,7 +236,6 @@ app.post('/api/tasks/:taskId/delete', (req, res) => {
   res.status(200).json({ message: 'Task deleted successfully' });
 });
 
-//API endpoint to delect a task
 
 // app.get today total time//翻转flipbefore的时候发出的请求
  
@@ -340,29 +349,7 @@ app.get('/api/today/:taskName', async (req, res) => {
   }
 });
 
-// Temporary in-memory object to store time (since tasks don't have time tracking yet)
-const taskTimes = {}
 
-app.post('/api/tasks/:taskId/time', (req, res) => {
-  const { taskId } = req.params;
-  const { timeSpent } = req.body;
-
-  const task = mockTasks.find(t => t.task_id === Number(taskId));
-  if (!task) {
-    return res.status(404).json({ message: "Task not found" });
-  }
-
-  // Store time in taskTimes map
-  taskTimes[taskId] = (taskTimes[taskId] || 0) + timeSpent;
-
-  res.json({
-    success: true,
-    task: {
-      ...task,
-      totalTime: taskTimes[taskId]
-    }
-  });
-});
 
 
 
