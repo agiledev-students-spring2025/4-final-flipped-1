@@ -70,25 +70,25 @@ app.delete('/api/todos/:id', (req, res) => {
 
 
 
-mongoose.connect('mongodb://localhost:27017/flip', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log("Connected to MongoDB: flip")
-})
-.catch((err) => {
-  console.error("MongoDB connection error:", err)
-})
+// mongoose.connect('mongodb://localhost:27017/flip', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// })
+// .then(() => {
+//   console.log("Connected to MongoDB: flip")
+// })
+// .catch((err) => {
+//   console.error("MongoDB connection error:", err)
+// })
 
 
-// mongoose.connect(MONGO_URI)
-//   .then(() => {
-//     console.log("Connected to MongoDB: flip")
-//   })
-//   .catch((err) => {
-//     console.error("MongoDB connection error:", err)
-//   })
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("Connected to MongoDB: flip")
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err)
+  })
 
 
 // Mock data for tasks
