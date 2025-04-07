@@ -261,6 +261,59 @@ describe('Flip Logs (MongoDB)', () => {
       console.log("Reconnected to MongoDB after simulated failure");
     }
   });
+  it('PUT /api/tasks/:taskId updates a task', done => {
+    chai.request(app)
+      .post('/api/tasks')
+      .send({ name: 'Old Task', color: '#000000' })
+      .end((err, res) => {
+        const taskId = res.body.task_id;
+        chai.request(app)
+          .put(`/api/tasks/${taskId}`)
+          .send({ name: 'Updated Task', color: '#ffffff' })
+          .end((err, res) => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.include({ name: 'Updated Task', color: '#ffffff' });
+            done();
+          });
+      });
+  });
+
+  it('PUT /api/tasks/:taskId returns 404 when task not found', done => {
+    chai.request(app)
+      .put('/api/tasks/9999') 
+      .send({ name: 'Nope', color: '#000000' })
+      .end((err, res) => {
+        expect(res).to.have.status(404);
+        expect(res.body.message).to.equal('Task not found');
+        done();
+      });
+  });
+
+  it('POST /api/tasks/:taskId/delete deletes a task', done => {
+    chai.request(app)
+      .post('/api/tasks')
+      .send({ name: 'Delete Me', color: '#ff0000' })
+      .end((err, res) => {
+        const taskId = res.body.task_id;
+        chai.request(app)
+          .post(`/api/tasks/${taskId}/delete`)
+          .end((err, res) => {
+            expect(res).to.have.status(200);
+            expect(res.body.message).to.equal('Task deleted successfully');
+            done();
+          });
+      });
+  });
+
+  it('POST /api/tasks/:taskId/delete returns 404 for non-existent task', done => {
+    chai.request(app)
+      .post('/api/tasks/9999/delete')
+      .end((err, res) => {
+        expect(res).to.have.status(404);
+        expect(res.body.message).to.equal('Task not found');
+        done();
+      });
+  });
   
 
   after(async () => {
