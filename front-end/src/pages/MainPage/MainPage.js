@@ -1,41 +1,100 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './MainPage.css';
-import Header from '../../components/header/Header';
 import TaskList from '../../components/TaskList/TaskList';
+import AddTaskModal from '../../components/AddTaskModal/AddTaskModal';
+import { API_ENDPOINTS } from '../../config/api';
 import BottomNav from '../../components/BottomNav/BottomNav';
+import './MainPage.css';
 
 function MainPage() {
   const [tasks, setTasks] = useState([]);
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
 
   useEffect(() => {
-    // Fetch tasks when component mounts
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/api/tasks');
-        setTasks(response.data);
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-      }
-    };
-
     fetchTasks();
-  }, []); // Empty dependency array means this runs once when component mounts
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get(API_ENDPOINTS.TASKS.LIST);
+      setTasks(response.data);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    }
+  };
 
   const handleAddTask = async (newTask) => {
+    console.log('handleAddTask called with:', newTask);
     try {
-      const response = await axios.post('http://localhost:3001/api/tasks', newTask);
-      setTasks([...tasks, response.data]);
+      let response;
+      if (editingTask) {
+        console.log('Updating existing task:', editingTask.task_id);
+        response = await axios.put(API_ENDPOINTS.TASKS.UPDATE(editingTask.task_id), newTask);
+        setTasks(tasks.map(task => 
+          task.task_id === editingTask.task_id ? response.data : task
+        ));
+      } else {
+        console.log('Creating new task');
+        response = await axios.post(API_ENDPOINTS.TASKS.CREATE, newTask);
+        setTasks([...tasks, response.data]);
+      }
+      handleCloseModal();
     } catch (error) {
-      console.error('Error adding task:', error);
+      console.error('Error adding/updating task:', error);
     }
+  };
+
+  const handleEditTask = (task) => {
+    console.log('handleEditTask called with:', task);
+    setEditingTask(task);
+    setIsAddTaskModalOpen(true);
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await axios.post(API_ENDPOINTS.TASKS.DELETE(taskId));
+      setTasks(tasks.filter(task => task.task_id !== taskId));
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
+  };
+
+  const handleOpenAddModal = () => {
+    console.log('Opening add modal');
+    setEditingTask(null);
+    setIsAddTaskModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    console.log('Closing modal');
+    setIsAddTaskModalOpen(false);
+    setEditingTask(null);
   };
 
   return (
     <div className="main-page">
-      <Header onAddTask={handleAddTask} />
-      <TaskList tasks={tasks} />
+      <header className="header">
+        <h1>Flipped</h1>
+        <button className="add-button" onClick={handleOpenAddModal}>+</button>
+      </header>
+
+      <div className="main-content">
+        <TaskList 
+          tasks={tasks} 
+          onEditTask={handleEditTask}
+          onDeleteTask={handleDeleteTask}
+        />
+      </div>
+
       <BottomNav />
+
+      <AddTaskModal
+        isOpen={isAddTaskModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleAddTask}
+        editingTask={editingTask}
+      />
     </div>
   );
 }
