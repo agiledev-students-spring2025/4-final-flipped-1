@@ -8,7 +8,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Full API Test Suite', () => {
-  // ---------- TODOS ----------
+  // TODO
   describe('Todos', () => {
     it('GET /api/todos returns a list of todos', done => {
       chai.request(app)
@@ -73,7 +73,7 @@ describe('Full API Test Suite', () => {
     });
   });
 
-  // ---------- TASKS ----------
+  // TASKS
   describe('Tasks', () => {
     it('GET /api/tasks returns a list of tasks', done => {
       chai.request(app)
