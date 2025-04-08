@@ -21,6 +21,14 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("Connected to MongoDB: flip")
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err)
+  })
+
 // Mock data for todos
 const mockToDos = [
   { id: 1, date: "2025-02-20", toDo: "Interview with A", time: "14:00", TimeRange: "15min" },
@@ -67,14 +75,6 @@ app.delete('/api/todos/:id', (req, res) => {
     res.status(404).json({ message: 'Todo not found' });
   }
 });
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("Connected to MongoDB: flip")
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err)
-  })
 
 
 // Mock data for tasks
@@ -275,24 +275,33 @@ app.get('/api/fliplog', (req, res) => {
   res.json(flipLogs);
 });
 
-//接口，往FlipLog里面插入新的数据，返回今天task_name的总时长
+
+
+
+
+
+
+//API real endpoint for insert new log to fliplog table
+// 接口，往FlipLog里面插入新的数据，返回该task name, task_name的今日总时长（单位秒）
 app.post('/api/fliplog/insert', async (req, res) => {
   const { task_name, start_time, end_time, duration } = req.body;
+  const roundDuration = Math.floor(duration)
 
   try {
     const newLog = new FlipLog({
       task_name,
       start_time: new Date(start_time),
       end_time: new Date(end_time),
-      duration
+      duration: roundDuration
     });
 
     await newLog.save();
 
     // 拉今天的日期
-    const today = new Date();
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
 
     // 查今天这个task的总时长
     const todayLogs = await FlipLog.find({
@@ -302,10 +311,11 @@ app.post('/api/fliplog/insert', async (req, res) => {
 
     const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
 
+    //返回数据
     res.status(201).json({
       success: true,
       taskName: task_name,
-      duration: duration,
+      duration: roundDuration,
       log: newLog,
       todayTotalTime,
     });
@@ -319,13 +329,14 @@ app.post('/api/fliplog/insert', async (req, res) => {
 
 //get today total flip time
 //return：task name, today Total Time
+//flip before page显示时调用
 app.get('/api/today/:taskName', async (req, res) => {
   const { taskName } = req.params;
 
   // 拉今天的日期
-  const today = new Date();
-  const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-  const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
   
   try {
