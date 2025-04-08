@@ -6,27 +6,27 @@ import FlipTask from '../../components/FlipTask/FlipTask';
 import Header from '../../components/header/Header';
 import BottomNav from '../../components/BottomNav/BottomNav';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../../config/api';
 
 function FlipBefore() {
 
-    const { taskId } = useParams(); // 从 URL 获取 taskId
     const location = useLocation();
-    const taskName = location.state?.taskName || "Unknown Task"; // 获取 taskName
+    const taskName = location.state?.taskName || "Unknown Task"; // 从navigate（tasklist.js）得到 taskName
     const taskColor = location.state?.taskColor || "#eeecf9";
 
     const navigate = useNavigate();
     const taskCount = 3;  // 任务总数，防止滑出范围
-    const [isFlipped, setIsFlipped] = useState(false); //true的话代表现在正在flipped
-    const [startTime, setStartTime] = useState(null);
 
-    const [todayTime, setTodayTime] = useState(0);   
+
+    const [isFlipped, setIsFlipped] = useState(false); //true的话代表现在正在flipped
+    const [startTime, setStartTime] = useState(null); //标记每次开始flip的时候
+    const [todayTime, setTodayTime] = useState(0);  //用来显示标记和update一天该task的总flip时长
 
     //进入页面的时候抓今天的该task的使用时长
-    //转换成xhx分（除非不满1分钟则显示秒）
     useEffect(() => {
         const fetchTodayTime = async () => {
           try {
-            const res = await axios.get(`http://localhost:3001/api/today/${taskName}`);
+            const res = await axios.get(API_ENDPOINTS.FLIPLOG.GET_TODAY(taskName));
             setTodayTime(res.data.todayTotalTime);
           } catch (err) {
             console.error("fail to get total flip time today:", err);
@@ -50,7 +50,7 @@ function FlipBefore() {
       };
     
       try {
-        const res = await axios.post('http://localhost:3001/api/fliplog/insert', flipData);
+        const res = await axios.post(API_ENDPOINTS.FLIPLOG.INSERT, flipData);
         const todayTotal = res.data.todayTotalTime;
         return todayTotal
       } catch (err) {

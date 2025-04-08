@@ -20,8 +20,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<MainPage />} />
-        <Route path="/FlipBefore/:taskId" element={<FlipBefore />} />
-        <Route path="/FlipAfter/:taskId" element={<FlipAfter />} />
+        <Route path="/FlipBefore/:taskName" element={<FlipBefore />} />
+        <Route path="/FlipAfter/:taskName" element={<FlipAfter />} />
         <Route path="/Statistics" element={<StatsPage />} />
         <Route path="/Calendar" element={<Calendar />} />
         <Route path="/Profile" element={<Profile />} />
