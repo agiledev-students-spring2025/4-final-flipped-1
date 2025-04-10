@@ -62,44 +62,44 @@ function FlipBefore() {
     //检测orientation翻
     useEffect( () => {
       const handleOrientation = (event) => {
-          const beta = event.beta; // `beta` 代表前后倾斜角度 绕x轴
-          // console.log(event.beta)
+        const beta = event.beta; // `beta` 代表前后倾斜角度 绕x轴
+        // console.log(event.beta)
 
-          if ( ( beta<-120 || beta > 120 ) && !isFlipped) {
-              // 手机翻转超过 90°，进入黑屏状态并开始计时
-              setIsFlipped(true);
-              setStartTime(Date.now());
-              // console.log(event)
-              // console.log("this is flipped",isFlipped) 
-          } else if ( (beta>-90 && beta < 90) && isFlipped) {
-              // 手机翻转回去，退出黑屏状态，并计算时间
-              if (startTime){
-                const duration = Math.floor((Date.now() - startTime) / 1000); // 计算翻转时间（秒）（向下取整）
-                  setIsFlipped(false);
-                  // console.log(duration)
-                  // console.log(isFlipped)
-                  
-                  (async () => {
-                    try {
-                      //在这里调用函数之后return today time会，然后我们把today time也用setTodayTime set掉
-                      const todayTotal = await sendFlipLog(taskName, startTime, duration);
-                      setTodayTime(todayTotal);
-                      
-                      // 跳转到 FlipAfter 页面，并传递翻转时长
-                      navigate(`/flipafter/${taskName}?duration=${duration}`, {
-                        state: {
-                          taskName,
-                          taskColor,
-                          todayTime: todayTotal
-                        }
-                      });
-                    } catch (err) {
-                      console.error("Failed to handle flip log:", err);
-                      // 你可以加 UI 提示，toast 等
-                    }
-                  })(); // 匿名 async 函数立即执行
-              }  
-          }
+        if ( ( beta<-120 || beta > 120 ) && !isFlipped) {
+            // 手机翻转超过 90°，进入黑屏状态并开始计时
+            setIsFlipped(true);
+            setStartTime(Date.now());
+            // console.log(event)
+            // console.log("this is flipped",isFlipped) 
+        } else if ( (beta>-90 && beta < 90) && isFlipped) {
+            // 手机翻转回去，退出黑屏状态，并计算时间
+            if (startTime){
+              const duration = Math.floor((Date.now() - startTime) / 1000); // 计算翻转时间（秒）（向下取整）
+                setIsFlipped(false);
+                // console.log(duration)
+                // console.log(isFlipped)
+                
+                (async () => {
+                  try {
+                    //在这里调用函数之后return today time会，然后我们把today time也用setTodayTime set掉
+                    const todayTotal = await sendFlipLog(taskName, startTime, duration);
+                    setTodayTime(todayTotal);
+                    
+                    // 跳转到 FlipAfter 页面，并传递翻转时长
+                    navigate(`/flipafter/${taskName}?duration=${duration}`, {
+                      state: {
+                        taskName,
+                        taskColor,
+                        todayTime: todayTotal
+                      }
+                    });
+                  } catch (err) {
+                    console.error("Failed to handle flip log:", err);
+                    // 你可以加 UI 提示，toast 等
+                  }
+                })(); // 匿名 async 函数立即执行
+            }  
+        }
       };
 
       // function handleOrientation(e){

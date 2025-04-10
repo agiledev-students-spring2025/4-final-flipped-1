@@ -9,6 +9,7 @@ import cors from 'cors'
 
 // import some useful middleware
 import morgan from 'morgan'
+import { body, validationResult } from 'express-validator';
 
 // import database table
 import FlipLog from './models/FlipLog.js';
@@ -23,7 +24,7 @@ app.use(express.urlencoded({ extended: true }))
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("Connected to MongoDB: flip")
+    console.log("Connected to MongoDB Atlas: flip")
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err)
@@ -178,17 +179,19 @@ app.post('/api/tasks/:taskId/delete', (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
 //API real endpoint for insert new log to fliplog table
 // 接口，往FlipLog里面插入新的数据，返回该task name, task_name的今日总时长（单位秒）
-app.post('/api/fliplog/insert', async (req, res) => {
+app.post('/api/fliplog/insert', [
+  body('task_name').isString().notEmpty(),
+  body('start_time').isISO8601(),
+  body('end_time').isISO8601(),
+  body('duration').isInt({ min: 1 })
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { task_name, start_time, end_time, duration } = req.body;
   const roundDuration = Math.floor(duration)
 
@@ -254,6 +257,7 @@ app.get('/api/today/:taskName', async (req, res) => {
     });
 
     const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
+    // console.log(todayTotalTime)
 
     res.json({
       taskName,
@@ -276,6 +280,36 @@ app.get('/api/fliplog', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+
+//get对应时间段的flip log，pass argument start/end date
+app.get('/api/fliplog/range', async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  //这里强制两个都，之后可以改
+  if (!startDate || !endDate) {
+    return res.status(400).json({ error: "Please provide both startDate and endDate in query parameters." });
+  }
+
+  try {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const logs = await FlipLog.find({
+      start_time: {
+        $gte: start,
+        $lte: end
+      }
+    }).sort({ start_time: -1 }); // 时间倒序
+
+    res.status(200).json(logs);
+  } catch (err) {
+    console.error("Failed to fetch flip logs in date range", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 
 
