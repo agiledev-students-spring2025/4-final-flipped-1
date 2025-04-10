@@ -7,5 +7,12 @@ export const API_ENDPOINTS = {
     UPDATE: (taskId) => `${API_BASE_URL}/api/tasks/${taskId}`,
     DELETE: (taskId) => `${API_BASE_URL}/api/tasks/${taskId}/delete`,
     GET_TIME: (taskId) => `${API_BASE_URL}/api/tasks/${taskId}/time`,
+  },
+
+  FLIPLOG: {
+    INSERT: `${API_BASE_URL}/api/fliplog/insert`, 
+    LIST: `${API_BASE_URL}/api/fliplog`,          
+    GET_TODAY: (taskName) => `${API_BASE_URL}/api/today/${taskName}`,
   }
+
 };
