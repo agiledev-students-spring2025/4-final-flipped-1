@@ -78,6 +78,14 @@ app.delete('/api/todos/:id', (req, res) => {
 });
 
 
+
+
+
+
+
+
+
+
 // Mock data for tasks
 const mockTasks = [
   { task_id: 1, name: 'Read Books', color: "#dbf7ff" },
