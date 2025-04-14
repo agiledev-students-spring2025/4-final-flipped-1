@@ -10,11 +10,10 @@ function TaskList({ tasks, onEditTask, onDeleteTask }) {
   // console.log("this is a test print of tasks", tasks)
   
 
-  
+  //函数，点对应task的flip按钮跳转对应flipbefore page
   const FlipTaskClick = (task) => {
-    navigate(`/flipbefore/${task.task_id}`, { state: { taskName: task.name, taskColor: task.color } }); // 传递 taskName
-    console.log("this is tasklist.js page and forward task name",task.name)
-    console.log("this is tasklist.js page and forward task id",task.task_id)
+    navigate(`/flipbefore/${task.task_name}`, { state: { taskName: task.task_name, taskColor: task.color } }); 
+    console.log("Navigating to flip page with task name:", task.task_name);
   };
 
   const handleTaskClick = (task, e) => {
@@ -27,11 +26,11 @@ function TaskList({ tasks, onEditTask, onDeleteTask }) {
     <div className="task-list">
       {tasks.map(task => (
         <div 
-          key={task.task_id} 
+          key={task.task_name} 
           className="task-item"
           onClick={(e) => handleTaskClick(task, e)}
         >
-          <div className="task-text">{task.name}</div>
+          <div className="task-text">{task.task_name}</div>
           <button className="flip-button" onClick={() => FlipTaskClick(task)}>Flip</button>
         </div>
       ))}
@@ -40,7 +39,7 @@ function TaskList({ tasks, onEditTask, onDeleteTask }) {
         isOpen={selectedTask !== null}
         onClose={() => setSelectedTask(null)}
         onEdit={() => onEditTask(selectedTask)}
-        onDelete={() => onDeleteTask(selectedTask?.task_id)}
+        onDelete={() => onDeleteTask(selectedTask?.task_name)}
       />
     </div>
   );
