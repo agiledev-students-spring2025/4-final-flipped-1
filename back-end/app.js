@@ -13,6 +13,8 @@ import { body, validationResult } from 'express-validator';
 
 // import database table
 import FlipLog from './models/FlipLog.js';
+import Task from './models/Task.js';
+// import ToDo from './models/ToDo.js';
 
 // use the morgan middleware to log all incoming http requests
 app.use(morgan('dev'))
@@ -87,96 +89,170 @@ app.delete('/api/todos/:id', (req, res) => {
 
 
 // Mock data for tasks
-const mockTasks = [
-  { task_id: 1, name: 'Read Books', color: "#dbf7ff" },
-  { task_id: 2, name: 'Study', color: "#fefbfc" },
-  { task_id: 3, name: 'Haha', color: "#fff6e6" },
-  { task_id: 4, name: 'Exercise', color: "#e8f5e9" }
-];
+// const mockTasks = [
+//   { task_id: 1, name: 'Read Books', color: "#dbf7ff" },
+//   { task_id: 2, name: 'Study', color: "#fefbfc" },
+//   { task_id: 3, name: 'Haha', color: "#fff6e6" },
+//   { task_id: 4, name: 'Exercise', color: "#e8f5e9" }
+// ];
 
 
 // API endpoint to get tasks
-app.get('/api/tasks', (req, res) => {
-  res.json(mockTasks);
+// 可以用
+app.get('/api/tasks', async (req, res) => {
+  try {
+    // Fetch all tasks from the database
+    const tasks = await Task.find();  
+    res.json(tasks);  
+    // console.log("get tasks and show on the main page")
+  } catch (err) {
+    console.error("Error fetching tasks:", err);
+    res.status(500).send("Error fetching tasks.");
+  }
 });
+
 
 // API endpoint to add a new task
-app.post('/api/tasks', (req, res) => {
-  const { name, color } = req.body;
-  
-  // 找到当前最大的 task_id
-  const maxId = mockTasks.reduce((max, task) => {
-    return task.task_id > max ? task.task_id : max;
-  }, 0);
-
-  const newTask = {
-    task_id: maxId + 1,
-    name,
-    color
-  };
-
-  mockTasks.push(newTask);
-  res.status(201).json(newTask);
-});
-
-// Temporary in-memory object to store time (since tasks don't have time tracking yet)
-const taskTimes = {}
-
-app.post('/api/tasks/:taskId/time', (req, res) => {
-  const { taskId } = req.params;
-  const { timeSpent } = req.body;
-
-  const task = mockTasks.find(t => t.task_id === Number(taskId));
-  if (!task) {
-    return res.status(404).json({ message: "Task not found" });
+//没加装user id插入
+// 目前不能用！会报错！
+app.post('/api/tasks', [
+  body('task_name').isString().notEmpty(),
+  body('color').isString(),
+  body('user_id').optional().isString(),
+],async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
 
-  // Store time in taskTimes map
-  taskTimes[taskId] = (taskTimes[taskId] || 0) + timeSpent;
+  const { task_name, color, user_id } = req.body;
 
-  res.json({
-    success: true,
-    task: {
-      ...task,
-      totalTime: taskTimes[taskId]
-    }
-  });
+  try {
+    const newTask = new Task({
+      task_name,
+      color,
+      user_id: user_id || null
+    });
+
+    console.log("add task")
+    console.log(newTask)
+
+    const savedTask = await newTask.save();
+
+    res.status(201).json(savedTask);  // 返回创建的任务
+  } catch (error) {
+    console.error("Error creating task:", error);
+    res.status(500).json({ message: "Error creating task" });
+  }
 });
+
+// app.post('/api/tasks', (req, res) => {
+//   const { name, color } = req.body;
+  
+//   // 找到当前最大的 task_id
+//   const maxId = mockTasks.reduce((max, task) => {
+//     return task.task_id > max ? task.task_id : max;
+//   }, 0);
+
+//   const newTask = {
+//     task_id: maxId + 1,
+//     name,
+//     color
+//   };
+
+//   mockTasks.push(newTask);
+//   res.status(201).json(newTask);
+// });
+
+// // Temporary in-memory object to store time (since tasks don't have time tracking yet)
+// const taskTimes = {}
+
+// app.post('/api/tasks/:taskId/time', (req, res) => {
+//   const { taskId } = req.params;
+//   const { timeSpent } = req.body;
+
+//   const task = mockTasks.find(t => t.task_id === Number(taskId));
+//   if (!task) {
+//     return res.status(404).json({ message: "Task not found" });
+//   }
+
+//   // Store time in taskTimes map
+//   taskTimes[taskId] = (taskTimes[taskId] || 0) + timeSpent;
+
+//   res.json({
+//     success: true,
+//     task: {
+//       ...task,
+//       totalTime: taskTimes[taskId]
+//     }
+//   });
+// });
 
 // API endpoint to update an existing task
-app.put('/api/tasks/:taskId', (req, res) => {
-  const taskId = parseInt(req.params.taskId);
-  const { name, color } = req.body;
+// app.put('/api/tasks/:taskId', (req, res) => {
+//   const taskId = parseInt(req.params.taskId);
+//   const { name, color } = req.body;
   
-  const taskIndex = mockTasks.findIndex(task => task.task_id === taskId);
+//   const taskIndex = mockTasks.findIndex(task => task.task_id === taskId);
   
-  if (taskIndex === -1) {
-    return res.status(404).json({ message: 'Task not found' });
-  }
+//   if (taskIndex === -1) {
+//     return res.status(404).json({ message: 'Task not found' });
+//   }
 
-  // Update the task
-  mockTasks[taskIndex] = {
-    ...mockTasks[taskIndex],
-    name,
-    color
-  };
+//   // Update the task
+//   mockTasks[taskIndex] = {
+//     ...mockTasks[taskIndex],
+//     name,
+//     color
+//   };
 
-  res.json(mockTasks[taskIndex]);
-});
+//   res.json(mockTasks[taskIndex]);
+// });
+
+
+
 
 // API endpoint to delete a task
-app.post('/api/tasks/:taskId/delete', (req, res) => {
-  const taskId = parseInt(req.params.taskId);
-  const taskIndex = mockTasks.findIndex(task => task.task_id === taskId);
-  
-  if (taskIndex === -1) {
-    return res.status(404).json({ message: 'Task not found' });
+// user login check and preventing 'all' user_id tasks deletion
+// 用户没登录不能删，user_id为all的不能删
+// 目前不能用！
+app.post('/api/tasks/:taskName/delete', async (req, res) => {
+  const { taskName } = req.params; 
+
+  console.log("delete ",taskName)
+  // const userId = req.user?.id;  // 获取当前登录用户的 user_id (假设通过中间件验证用户并设置)
+
+  // if (!userId) {
+  //   return res.status(401).json({ message: 'User not logged in' });  // 如果用户未登录，返回 401 错误
+  // }
+
+  try {
+    // 查找任务
+    const task = await Task.findOne({ task_name: taskName });
+
+    // 任务未找到
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });  
+    }
+
+    // 如果任务的 user_id 是 "all"，则不能删除
+    if (task.user_id === 'all') {
+      return res.status(403).json({ message: 'Cannot delete default user_id "all"' });
+    }
+
+    // 如果任务的 user_id 和当前登录的 user_id 不匹配，无法删除
+    // 这个在前端不会实现吧除非有人后端抓这个api
+    // if (task.user_id !== userId) {
+    //   return res.status(403).json({ message: 'You cannot delete this task' });
+    // }
+
+    await Task.deleteOne({ task_name: taskName });
+    res.status(200).json({ message: 'Task deleted successfully' });  
+
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    res.status(500).json({ message: 'Error deleting task' });
   }
-
-  // Remove the task from the array
-  mockTasks.splice(taskIndex, 1);
-
-  res.status(200).json({ message: 'Task deleted successfully' });
 });
 
 
