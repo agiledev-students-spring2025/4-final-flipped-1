@@ -17,8 +17,12 @@ import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
 
 const StatsPage = () => {
-  const [timeframe, setTimeframe] = useState("Daily");
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  // CHANGED: Start timeframe at "Monthly" for testing
+  const [timeframe, setTimeframe] = useState("Monthly");
+
+  // CHANGED: Default date is Mar 1, 2025 so we see March logs
+  const [selectedDate, setSelectedDate] = useState(new Date(2025, 2, 1));
+
   const [chartData, setChartData] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
   const [totalMinutes, setTotalMinutes] = useState(0);
@@ -165,89 +169,65 @@ const StatsPage = () => {
       <div className="stats-content">
         <div className="concentration-card">
           <h2>Concentration</h2>
-          
-          {/* Time Frame Selector */}
-          <div className="time-selector-container">
-            <button 
-              className={`time-option ${timeframe === 'Daily' ? 'active' : ''}`}
-              onClick={() => setTimeframe('Daily')}
+          <div className="concentration-info">
+            <select
+              className="timeframe-selector"
+              value={timeframe}
+              onChange={(e) => {
+                setTimeframe(e.target.value);
+                // REMOVED setSelectedDate(new Date());
+                // So we don't reset date each time
+              }}
             >
-              Daily
-            </button>
-            <button 
-              className={`time-option ${timeframe === 'Weekly' ? 'active' : ''}`}
-              onClick={() => setTimeframe('Weekly')}
-            >
-              Weekly
-            </button>
-            <button 
-              className={`time-option ${timeframe === 'Monthly' ? 'active' : ''}`}
-              onClick={() => setTimeframe('Monthly')}
-            >
-              Monthly
-            </button>
+              <option value="Daily">Daily</option>
+              <option value="Weekly">Weekly</option>
+              <option value="Monthly">Monthly</option>
+            </select>
+
+            {timeframe === "Daily" && (
+              <input
+                type="date"
+                className="date-picker"
+                value={selectedDate.toISOString().split("T")[0]}
+                onChange={(e) => setSelectedDate(new Date(e.target.value))}
+              />
+            )}
+
+            {timeframe === "Weekly" && (
+              <input
+                type="week"
+                className="week-picker"
+                onChange={(e) => {
+                  const [year, week] = e.target.value.split("-W");
+                  const firstDayOfYear = new Date(year, 0, 1);
+                  const janOffset = firstDayOfYear.getDay();
+                  const isoStart = new Date(firstDayOfYear);
+                  isoStart.setDate(
+                    1 + (janOffset <= 4 ? -janOffset + 1 : 8 - janOffset)
+                  );
+                  const startOfWeek = new Date(isoStart);
+                  startOfWeek.setDate(isoStart.getDate() + (week - 1) * 7);
+                  setSelectedDate(startOfWeek);
+                }}
+              />
+            )}
+
+            {timeframe === "Monthly" && (
+              <input
+                type="month"
+                className="month-picker"
+                value={selectedDate.toISOString().slice(0, 7)}
+                onChange={(e) => {
+                  const newDate = new Date(e.target.value + "-01");
+                  if (!isNaN(newDate)) setSelectedDate(newDate);
+                }}
+              />
+            )}
           </div>
 
-          {/* Date Navigation */}
-          {timeframe === 'Daily' && (
-            <div className="date-navigation">
-              <div className="date-numbers">
-                {getDateNumbers().map((date, index) => (
-                  <div
-                    key={index}
-                    className={`date-number ${
-                      date.getDate() === selectedDate.getDate() ? 'active' : ''
-                    }`}
-                    onClick={() => setSelectedDate(new Date(date))}
-                  >
-                    {date.getDate()}
-                  </div>
-                ))}
-              </div>
-              <div className="date-text">
-                {selectedDate.toLocaleDateString('en-US', { 
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Hidden date pickers for Weekly and Monthly views */}
-          {timeframe === "Weekly" && (
-            <input
-              type="week"
-              value={`${selectedDate.getFullYear()}-W${Math.ceil(
-                (selectedDate.getDate() + selectedDate.getDay()) / 7
-              )}`}
-              onChange={(e) => {
-                const [year, week] = e.target.value.split("-W");
-                const firstDayOfYear = new Date(year, 0, 1);
-                const days = (week - 1) * 7;
-                const newDate = new Date(firstDayOfYear);
-                newDate.setDate(firstDayOfYear.getDate() + days);
-                setSelectedDate(newDate);
-              }}
-            />
-          )}
-
-          {timeframe === "Monthly" && (
-            <input
-              type="month"
-              value={selectedDate.toISOString().slice(0, 7)}
-              onChange={(e) => {
-                const newDate = new Date(e.target.value + "-01");
-                if (!isNaN(newDate)) setSelectedDate(newDate);
-              }}
-            />
-          )}
-
-          {/* Time Display */}
-          <div className="time-display">
-            {totalHours}<span>Hours</span>{totalMinutes}<span>Mins</span>
-          </div>
+          <h1>
+            {totalHours} <span>Hours</span> {totalMinutes} <span>Mins</span>
+          </h1>
         </div>
 
         <div className="distribution-card">
