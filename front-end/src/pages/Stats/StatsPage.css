@@ -10,168 +10,181 @@
 }
 
 /* Main Content Section */
-.stats-content {
-  width: 90%;
-  margin-top: 20px;
-  flex-grow: 1;
+.stats-container {
+  display: flex;
   flex-direction: column;
-  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f6fa;
+}
+
+.stats-content {
+  flex: 1;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
 }
 
 /* Concentration Card */
 .concentration-card {
-  padding: 20px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column; /* stack vertically */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  gap: 16px; /* spacing between elements */
-}
-
-/* Container for timeframe selector and pickers */
-.concentration-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px; /* space between timeframe selector and pickers */
-}
-
-.concentration-info h1 {
-  font-size: 32px;
-}
-
-/* Timeframe Selector */
-.timeframe-selector {
-  padding: 8px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  cursor: pointer;
-}
-
-/* Unified Picker Styles (Daily/Weekly/Monthly/Yearly) */
-.date-picker,
-.week-picker,
-.month-picker,
-.year-picker {
-  width: 160px !important;
-  max-width: 100%;
-  height: 34px;
-  font-size: 16px;
-  padding: 6px 10px;
-  border: 1px solid #ccc;       /* Same border as timeframe-selector */
-  border-image: none;           /* Disable any gradient border */
-  border-radius: 8px;
-  background-color: #fff;
-  cursor: pointer;
-  text-align: center;
-  transition: border-color 0.2s ease-in-out;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-/* Hover & Focus Effects */
-.date-picker:hover,
-.date-picker:focus,
-.week-picker:hover,
-.week-picker:focus,
-.month-picker:hover,
-.month-picker:focus,
-.year-picker:hover,
-.year-picker:focus {
-  border-color: #aaa;
-  box-shadow: 0 0 4px rgba(30, 144, 255, 0.4);
-  border-image: none;
-}
-
-
-/* Year Picker Container */
-.year-picker-container {
-  display: flex;
-  align-items: center;
-}
-
-.year-arrows {
-  display: flex;
-  flex-direction: column;
-  margin-left: 8px;
-}
-
-.year-arrows .arrow-btn {
-  background: linear-gradient(
-    159deg,
-    rgba(30, 144, 255, 1) 0%,
-    rgba(153, 186, 221, 1) 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
-}
-
-/* Distribution Card */
-
-.chart-wrapper {
-  width: 60%;
-  max-width: 300px;
-  height: auto;
-  margin: 0;
-  padding: 0;
-}
-
-.chart-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.distribution-card {
   background: white;
   border-radius: 16px;
-  padding: 16px;
-  margin: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
 }
 
-/*
-.bars {
+.concentration-card h2 {
+  color: #2d3436;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+/* Time Frame Selector */
+.time-selector-container {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-  */
-
-.bar {
-  width: 150px;
-  height: 20px;
-  background: linear-gradient(
-    159deg,
-    rgba(30, 144, 255, 1) 0%,
-    rgba(153, 186, 221, 1) 100%
-  );
-  border-radius: 4px;
+  gap: 12px;
+  background: #f5f6fa;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 24px;
 }
 
-.chart {
-  width: 100px;
-  height: 100px;
-  background: linear-gradient(
-    159deg,
-    rgba(30, 144, 255, 1) 0%,
-    rgba(153, 186, 221, 1) 100%
-  );
-  border-radius: 50%;
+.time-option {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  color: #2d3436;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-option:hover {
+  background: rgba(108, 92, 231, 0.1);
+}
+
+.time-option.active {
+  background: #6c5ce7;
+  color: white;
+}
+
+/* Date Navigation */
+.date-navigation {
+  margin-bottom: 24px;
+}
+
+.date-numbers {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.date-number {
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  color: #2d3436;
+  transition: all 0.2s ease;
+}
+
+.date-number:hover {
+  background: rgba(108, 92, 231, 0.1);
+}
+
+.date-number.active {
+  background: #6c5ce7;
+  color: white;
+}
+
+.date-text {
+  text-align: center;
+  color: #2d3436;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Time Display */
+.time-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  font-size: 32px;
+  color: #2d3436;
   font-weight: bold;
+}
+
+.time-display span {
+  font-size: 14px;
+  color: #2d3436;
+  opacity: 0.6;
+  margin-right: 16px;
+}
+
+/* Week and Month Pickers */
+input[type="week"],
+input[type="month"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2d3436;
+  background: white;
+  margin-bottom: 24px;
+}
+
+input[type="week"]:focus,
+input[type="month"]:focus {
+  outline: none;
+  border-color: #6c5ce7;
+}
+
+/* Distribution Card styles remain unchanged */
+.distribution-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  gap: 15px;
+  padding: 15px 0;
+  margin-top: 10px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* Bottom Navigation */

@@ -1,84 +1,255 @@
 /* Profile.css */
-.profile-container {
+
+/* General Page Container */
+.profile-page-container {
   display: flex;
   flex-direction: column;
-  align-items: left;
-  width: 100%;
   min-height: 100vh;
-  background-color: #f8f8f8;
+  background-color: #f0f0f0; /* Light grey background like screenshot */
 }
 
-.profile-content {
-  display: center;
-  align-items: center;
-  width: 90%;
-  max-width: flex;
-  margin-top: 20px;
-  padding: 20px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+/* Removed Header Area styles as Header component is now used */
+/* .profile-header { ... } */
+/* .profile-header h1 { ... } */
+/* .back-button { ... } */
+
+/* Scrollable Content Area */
+.profile-content-area {
+  flex-grow: 1; /* Takes up remaining space */
+  overflow-y: auto; /* Allows scrolling if content overflows */
+  padding-bottom: 70px; /* Space for BottomNav */
+}
+
+/* User Info Section */
+.profile-user-info {
+  background-color: white;
+  padding: 25px 15px;
   text-align: center;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.profile-photo {
-  width: 100px;
-  height: 100px;
-  background-color: lightgray;
+.profile-avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  background-color: #d7f0d2; /* Light green placeholder */
+  border-radius: 50%;
+  margin: 0 auto 15px auto;
+  display: flex; /* For potential icon inside */
+  align-items: center;
+  justify-content: center;
+  /* Add a simple icon or leave blank */
+}
+
+.profile-name-edit {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: auto;
-  border-radius: 50%;
+  gap: 5px;
+  margin-bottom: 10px;
 }
 
-.profile-info p {
-  font-size: 16px;
-  margin: 10px 0;
+.profile-username {
+  font-size: 1.2em;
+  font-weight: bold;
 }
 
-.password-section {
+.edit-icon-placeholder {
+  width: 16px;
+  height: 16px;
+  background-color: lightgrey; /* Placeholder for edit icon */
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer; /* Indicate it's clickable */
+  border-radius: 3px;
+}
+
+.profile-stats {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.profile-summary-stats {
+  /* display: flex; */
+  display:none;
+  justify-content: space-around; /* Distribute items */
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  margin-top: 15px;
+}
+
+.profile-summary-stats span {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
+  align-items: center;
+  gap: 8px;
+  font-size: 1em;
+  color: #333;
 }
 
-.password-section label {
-  font-size: 14px;
-  text-align: left;
+.stat-icon-placeholder {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
 }
 
-.password-section input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+.stat-icon-placeholder.green { background-color: #4CAF50; }
+.stat-icon-placeholder.blue { background-color: #2196F3; }
+.stat-icon-placeholder.teal { background-color: #009688; }
+
+
+/* Menu List */
+.profile-menu {
+  background-color: white;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.logout-btn {
-  margin-top: 15px;
-  padding: 10px;
-  background: linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%);
-  color: white;
-  border: none;
-  width: 80%;
-  border-radius: 5px;
+.profile-menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
+  font-size: 1em;
+  color: #333;
+  transition: background-color 0.2s ease; /* Add hover effect */
 }
 
-.auth-options {
+/* Add hover style for clickable items */
+.profile-menu-item:not(.non-clickable):hover {
+  background-color: #f9f9f9;
+}
+
+/* Style for non-clickable items */
+.profile-menu-item.non-clickable {
+  cursor: default; /* No pointer cursor */
+  color: #666; /* Slightly muted color */
+}
+
+.profile-menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-arrow {
+  color: #aaa;
+  font-size: 1.2em;
+}
+
+/* Footer Info */
+.profile-footer-info {
+  text-align: center;
+  padding: 20px 15px;
+  font-size: 0.9em;
+  color: #888;
+}
+
+.profile-footer-info p {
+  margin: 5px 0;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed; /* Cover the whole screen */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Dim background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's on top */
+}
+
+.modal-content {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  width: 85%;
+  max-width: 400px;
   text-align: center;
 }
 
-.auth-btn {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
-  padding: 10px;
-  background-color: #000;
-  color: white;
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.3em;
+  color: #333;
+}
+
+.modal-content form input {
+  width: calc(100% - 20px); /* Adjust width considering padding */
+  padding: 12px 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between; /* Space out buttons */
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  flex-grow: 1; /* Make buttons fill space */
+  padding: 12px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  transition: background-color 0.2s ease, border-color 0.2s ease; /* Add transition */
 }
+
+.modal-buttons .cancel-btn {
+  /* Change to white background, grey border and text */
+  background-color: white;
+  color: #555;
+  border: 1px solid #ccc;
+}
+
+/* Optional: Add hover effect for cancel button */
+.modal-buttons .cancel-btn:hover {
+  background-color: #f8f8f8;
+  border-color: #bbb;
+}
+
+.modal-buttons .confirm-btn {
+  /* Apply gradient and style from AddTaskModal */
+  background: linear-gradient(135deg, #6c5ce7 0%, #a8a4e6 100%);
+  color: white;
+  border: none; /* Remove border */
+  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3); /* Add similar shadow */
+}
+
+/* Adjust hover effect for gradient */
+.modal-buttons .confirm-btn:hover {
+  /* Slightly darken or adjust gradient - using brightness filter */
+  filter: brightness(95%);
+  /* Remove specific background/border changes from previous state */
+  background-color: initial; 
+  border-color: initial;
+}
+
+
+/* Remove old styles if they conflict */
+.profile-container, .profile-content, .profile-info, .profile-photo, .password-section, .logout-btn {
+  /* These might need adjustment or removal if they clash with new structure */
+  /* Example: Resetting some properties if needed */
+  /* width: auto; 
+     margin: 0; 
+     padding: 0; 
+     box-shadow: none; 
+     text-align: left; */
+}
+
+/* Make sure BottomNav is visible and doesn't overlap */
+/* Handled by padding-bottom in .profile-content-area and BottomNav's own styling potentially */
