@@ -16,4 +16,6 @@ export const API_ENDPOINTS = {
     GET_TODAY: (taskName) => `${API_BASE_URL}/api/today/${taskName}`,
   }
 
+  
+
 };

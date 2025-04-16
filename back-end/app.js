@@ -1,24 +1,56 @@
 import dotenv from 'dotenv'
 dotenv.config()
-import mongoose from 'mongoose'
+
 
 // import and instantiate express
 import express from 'express'
 const app = express()
+import mongoose from 'mongoose'
 import cors from 'cors'
 
 // import some useful middleware
 import morgan from 'morgan'
 import { body, validationResult } from 'express-validator';
+import cookieRouter from './routes/cookieRouter.js';
+import protectedContentRoutes from './routes/protectedContentRoutes.js';
+import passport from 'passport'
+
+app.use('/cookies', cookieRouter());
+app.use('/protected', protectedContentRoutes());
+
+import cookieParser from 'cookie-parser';
+app.use(cookieParser());
+
+const jwt = require('jsonwebtoken')
+
 
 // import database table
 import FlipLog from './models/FlipLog.js';
 import Task from './models/Task.js';
+import User from './models/User.js';
 // import ToDo from './models/ToDo.js';
+import cookieRouter from './routes/cookieRouter.js'
+import protectedContentRoutes from './routes/protectedContentRoutes.js'
+import authenticationRouter from './routes/authenticationRoutes.js'
+
+import jwtStrategy from './config/jwt-config.js'
+passport.use(jwtStrategy)
+
+
+app.use('/auth', authenticationRoutes()) // all requests for /auth/* will be handled by the authenticationRoutes router
+app.use('/cookie', cookieRoutes()) // all requests for /cookie/* will be handled by the cookieRoutes router
+app.use('/protected', protectedContentRoutes()) // all requests for /protected/* will be handled by the protectedRoutes router
+
+
+
 
 // use the morgan middleware to log all incoming http requests
 app.use(morgan('dev'))
 app.use(cors())
+app.use(morgan('dev'))
+app.use(cors({ origin: process.env.FRONT_END_DOMAIN || '*', credentials: true }))
+app.use(cookieParser())
+app.use(passport.initialize())
 
 // use express's builtin body-parser middleware to parse any data included in a request
 app.use(express.json())
