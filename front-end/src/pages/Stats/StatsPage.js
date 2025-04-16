@@ -32,7 +32,9 @@ const StatsPage = () => {
     { task_name: "Study", date: "2025.3.18", start_time: "21:19:00", end_time: "22:49:00", duration: 5400 },
     { task_name: "Haha", date: "2025.3.16", start_time: "21:22:00", end_time: "23:59:00", duration: 9540 },
     { task_name: "Exercise", date: "2025.3.13", start_time: "19:55:00", end_time: "20:32:43", duration: 2203 },
-    { task_name: "Study", date: "2025.2.24", start_time: "11:35:00", end_time: "11:35:07", duration: 7 },
+    { task_name: "Study", date: "2025.4.16", start_time: "11:35:00", end_time: "20:35:07", duration: 5400 },
+    { task_name: "Exercise", date: "2025.4.16", start_time: "15:35:00", end_time: "20:35:07", duration: 2200 },
+    { task_name: "Read Books", date: "2025.4.16", start_time: "9:35:00", end_time: "20:35:07", duration: 1200 },
   ];
 
   // Utility: format date to YYYY.M.D
@@ -164,7 +166,7 @@ const StatsPage = () => {
       <Header2 title="Statistics" />
       <div className="stats-content">
         <div className="concentration-card">
-          <h2>Concentration</h2>
+          {/* <h2>Concentration</h2> */}
           
           {/* Time Frame Selector */}
           <div className="time-selector-container">
@@ -205,12 +207,40 @@ const StatsPage = () => {
                 ))}
               </div>
               <div className="date-text">
-                {selectedDate.toLocaleDateString('en-US', { 
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
+                <label 
+                  htmlFor="date-picker-input" 
+                  className="date-picker-label"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const input = document.getElementById('date-picker-input');
+                    if (input) {
+                      input.showPicker();
+                    }
+                  }}
+                >
+                  <span className="date-display">
+                    {selectedDate.toLocaleDateString('en-US', { 
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </span>
+                  <span className="calendar-icon">📅</span>
+                </label>
+                <input
+                  type="date"
+                  id="date-picker-input"
+                  value={selectedDate.toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    const newDate = new Date(e.target.value);
+                    newDate.setMinutes(newDate.getMinutes() + newDate.getTimezoneOffset());
+                    if (!isNaN(newDate)) {
+                      setSelectedDate(newDate);
+                    }
+                  }}
+                  className="date-picker"
+                />
               </div>
             </div>
           )}
@@ -243,14 +273,15 @@ const StatsPage = () => {
               }}
             />
           )}
-
-          {/* Time Display */}
-          <div className="time-display">
-            {totalHours}<span>Hours</span>{totalMinutes}<span>Mins</span>
-          </div>
         </div>
 
         <div className="distribution-card">
+          {/* Time Display */}
+          <h3>Total Time</h3>
+          <div className="time-display">
+            {totalHours}<span>Hours</span>{totalMinutes}<span>Mins</span>
+          </div>
+          
           <h3>{timeframe} Time Distribution</h3>
           <ResponsiveContainer width="100%" height={250}>
             {timeframe === "Daily" ? (
@@ -261,9 +292,15 @@ const StatsPage = () => {
                 <Area
                   type="monotone"
                   dataKey="minutes"
-                  stroke="#fcd34d"
-                  fill="#fde68a"
+                  stroke="#1E90FF"
+                  fill="url(#colorGradient)"
                 />
+                <defs>
+                  <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#1E90FF" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#99BADD" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
               </AreaChart>
             ) : (
               <LineChart
@@ -283,10 +320,10 @@ const StatsPage = () => {
                 <Line
                   type="monotone"
                   dataKey="minutes"
-                  stroke="#fcd34d"
-                  strokeWidth={3}
-                  dot={{ r: 6 }}
-                  activeDot={{ r: 8 }}
+                  stroke="#1E90FF"
+                  strokeWidth={2}
+                  dot={{ r: 4, fill: "#1E90FF", strokeWidth: 2 }}
+                  activeDot={{ r: 6, fill: "#1E90FF", stroke: "#fff", strokeWidth: 2 }}
                 >
                   {/* OFFSET THE LABELS TO GIVE THEM MORE ROOM */}
                   <LabelList dataKey="label" position="top" offset={10} />
