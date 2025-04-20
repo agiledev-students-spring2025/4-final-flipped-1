@@ -5,8 +5,8 @@ function AddTodoModal({ isOpen, onClose, onSubmit }) {
   const [todoData, setTodoData] = useState({
     date: '',
     toDo: '',
-    time: '',
-    TimeRange: '',
+    startTime: '',
+    endTime: '',
   });
 
   const handleChange = (e) => {
@@ -16,21 +16,18 @@ function AddTodoModal({ isOpen, onClose, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // console.log("onSubmit function:", onSubmit);
-    // Validate that all fields are provided
     if (
       todoData.date.trim() &&
       todoData.toDo.trim() &&
-      todoData.time.trim() &&
-      todoData.TimeRange.trim()
+      todoData.startTime.trim() &&
+      todoData.endTime.trim()
     ) {
       onSubmit(todoData);
-      // Reset the form fields
       setTodoData({
         date: '',
         toDo: '',
-        time: '',
-        TimeRange: '',
+        startTime: '',
+        endTime: '',
       });
       onClose();
     }
@@ -69,19 +66,18 @@ function AddTodoModal({ isOpen, onClose, onSubmit }) {
           <div className="input-container">
             <input
               type="time"
-              name="time"
-              value={todoData.time}
+              name="startTime"
+              value={todoData.startTime}
               onChange={handleChange}
               className="todo-input"
             />
           </div>
           <div className="input-container">
             <input
-              type="text"
-              name="TimeRange"
-              value={todoData.TimeRange}
+              type="time"
+              name="endTime"
+              value={todoData.endTime}
               onChange={handleChange}
-              placeholder="Enter Duration (e.g., 15min)"
               className="todo-input"
             />
           </div>
