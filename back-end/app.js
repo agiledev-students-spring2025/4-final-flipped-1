@@ -13,8 +13,8 @@ import { body, validationResult } from 'express-validator'
 
 //middleware
 app.use(morgan('dev'))
-// app.use(cors())
-app.use(cors({ origin: 'https://localhost:3000', credentials: true, }))
+app.use(cors())
+// app.use(cors({ origin: 'https://localhost:3000', credentials: true, }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
