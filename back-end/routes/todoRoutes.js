@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     const todos = await Todo.find({});
     res.json(todos);
   } catch (err) {
-    res.status(500).json({ message: '获取失败', error: err });
+    res.status(500).json({ message: 'failed to fetch todos', error: err });
   }
 });
 
@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
     const saved = await newTodo.save();
     res.json(saved);
   } catch (err) {
-    res.status(400).json({ message: '添加失败', error: err });
+    res.status(400).json({ message: 'failed to add todo', error: err });
   }
 });
 
