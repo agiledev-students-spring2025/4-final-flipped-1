@@ -6,48 +6,52 @@ import "./Calendar.css";
 const CalendarWeekView = ({ toDoList }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Get start and end of the selected week
   const getStartOfWeek = (date) => {
     const d = new Date(date);
     const day = d.getDay();
-    return new Date(d.setDate(d.getDate() - day + (day === 0 ? -6 : 1))); // Start from Monday
+    return new Date(d.setDate(d.getDate() - day + (day === 0 ? -6 : 1))); // Monday
   };
 
   const getEndOfWeek = (date) => {
     const start = getStartOfWeek(date);
-    return new Date(start.setDate(start.getDate() + 6)); // Sunday
+    return new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000); // Sunday
   };
 
   const startOfWeek = getStartOfWeek(selectedDate).toISOString().split("T")[0];
   const endOfWeek = getEndOfWeek(selectedDate).toISOString().split("T")[0];
 
-  // Filter tasks for the selected week
+  // Filter todos within the week range
   const tasksForWeek = toDoList.filter((task) => {
     return task.date >= startOfWeek && task.date <= endOfWeek;
   });
 
-  // Group tasks by date
+  // Group and sort tasks by date
   const groupedToDo = tasksForWeek.reduce((acc, toDo) => {
-    acc[toDo.date] = acc[toDo.date] || [];
+    if (!acc[toDo.date]) acc[toDo.date] = [];
     acc[toDo.date].push(toDo);
     return acc;
   }, {});
+
+  Object.keys(groupedToDo).forEach((date) => {
+    groupedToDo[date].sort((a, b) => a.startTime.localeCompare(b.startTime));
+  });
 
   return (
     <div className="week-view-container">
       <h2>To-Do List for {startOfWeek} to {endOfWeek}</h2>
 
-      {/* Week Selector using react-calendar */}
+      {/* Week Selector */}
       <div className="calendar-wrapper">
         <ReactCalendar 
           onChange={setSelectedDate} 
           value={selectedDate} 
-          locale="en-US" //Show english by defult
-          showWeekNumbers={true} // Show week numbers for better selection
-          selectRange={false} // Select only one day to determine the week
+          locale="en-US"
+          showWeekNumbers={true}
+          selectRange={false}
         />
       </div>
 
+      {/* Display grouped tasks */}
       {Object.keys(groupedToDo).length === 0 ? (
         <p>No tasks for this week.</p>
       ) : (
@@ -58,7 +62,7 @@ const CalendarWeekView = ({ toDoList }) => {
               <ul className="toDo-list">
                 {toDos.map((toDo, index) => (
                   <li key={index} className="toDo-item">
-                    <strong>{toDo.time}</strong> - {toDo.toDo} ({toDo.TimeRange})
+                    <strong>{toDo.startTime} - {toDo.endTime}</strong> — {toDo.toDo}
                   </li>
                 ))}
               </ul>

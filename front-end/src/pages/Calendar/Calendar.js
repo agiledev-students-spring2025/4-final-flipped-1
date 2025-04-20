@@ -12,23 +12,23 @@ import "./Calendar.css";
 const Calendar = () => {
   const [view, setView] = useState("daily"); 
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [toDoList, setToDoList] = useState([])
+  const [toDoList, setToDoList] = useState([]);
 
   useEffect(() => {
     const fetchToDos = async () => {
-      try{
+      try {
         const response = await axios.get('http://localhost:3001/api/todos');
-        setToDoList(response.data);
+        setToDoList(response.data); // should include startTime and endTime in each todo object
       } catch (error) {
         console.error('Error fetching todos:', error);
       }
     };
 
     fetchToDos();
-  },[]);
+  }, []);
 
   const handleAddToDos = async (newToDo) => {
-    try{
+    try {
       const response = await axios.post('http://localhost:3001/api/todos', newToDo);
       setToDoList([...toDoList, response.data]);
     } catch (error) {
@@ -47,7 +47,6 @@ const Calendar = () => {
 
   return (
     <div className="calendar-container">
-      {/* Pass handleAddTask as a prop */}
       <Header3 title="Calendar" onAddTask={handleAddToDos} />
 
       {/* View Selector */}
@@ -57,26 +56,40 @@ const Calendar = () => {
         <button className={view === "monthly" ? "active" : ""} onClick={() => setView("monthly")}>Monthly</button>
       </div>
 
-      {/* Date Selector */}
+      {/* Date Picker for Daily View */}
       {view === "daily" && (
         <div className="calendar-wrapper">
           <ReactCalendar 
             onChange={setSelectedDate} 
             value={selectedDate} 
             locale="en-US"
-            style={{ width: "300px", fontSize: "14px", padding: "10px" }} 
           />
         </div>
       )}
 
-      {/* Render the selected view */}
+      {/* Render View */}
       <div className="calendar-view">
-        {view === "daily" && <CalendarDayView selectedDate={selectedDate.toISOString().split("T")[0]} toDoList={toDoList} onDelete={handleDeleteToDo} />}
-        {view === "weekly" && <CalendarWeekView toDoList={toDoList} onDelete={handleDeleteToDo} />}
-        {view === "monthly" && <CalendarMonthView toDoList={toDoList} onDelete={handleDeleteToDo} />}
+        {view === "daily" && (
+          <CalendarDayView
+            selectedDate={selectedDate.toISOString().split("T")[0]}
+            toDoList={toDoList}
+            onDelete={handleDeleteToDo}
+          />
+        )}
+        {view === "weekly" && (
+          <CalendarWeekView
+            toDoList={toDoList}
+            onDelete={handleDeleteToDo}
+          />
+        )}
+        {view === "monthly" && (
+          <CalendarMonthView
+            toDoList={toDoList}
+            onDelete={handleDeleteToDo}
+          />
+        )}
       </div>
 
-      {/* Bottom Nav */}
       <BottomNav />
     </div>
   );
