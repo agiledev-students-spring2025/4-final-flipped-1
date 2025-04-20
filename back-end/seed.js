@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import Task from './models/Task.js'
 import FlipLog from './models/FlipLog.js'
 import User from './models/User.js'
+import Todo from './models/ToDo.js';
 
 dotenv.config()
 
@@ -38,6 +39,23 @@ mongoose.connect(process.env.MONGO_URI)
 
     await User.insertMany(userSeedData);
     console.log("Task seed inserted!");
+
+    const todoSeedData = [
+      { date: "2025-02-20", toDo: "Interview with A", startTime: "14:00", endTime: "14:15", user_id: "seed_user" },
+      { date: "2025-02-26", toDo: "Lunch with B", startTime: "12:30", endTime: "13:15", user_id: "seed_user" },
+      { date: "2025-02-20", toDo: "Evening Study", startTime: "18:00", endTime: "20:00", user_id: "seed_user" },
+      { date: "2025-02-23", toDo: "Course A HW", startTime: "20:00", endTime: "21:00", user_id: "seed_user" },
+      { date: "2025-02-23", toDo: "Gym Session", startTime: "07:30", endTime: "08:30", user_id: "seed_user" },
+      { date: "2025-02-26", toDo: "Course B", startTime: "16:00", endTime: "18:15", user_id: "seed_user" },
+      { date: "2025-02-26", toDo: "Course C", startTime: "19:00", endTime: "21:15", user_id: "seed_user" },
+      { date: "2025-02-26", toDo: "Course D", startTime: "22:00", endTime: "00:15", user_id: "seed_user" },
+      { date: "2025-03-25", toDo: "Course B", startTime: "16:00", endTime: "18:15", user_id: "seed_user" },
+      { date: "2025-03-17", toDo: "Course B", startTime: "16:00", endTime: "18:15", user_id: "seed_user" }
+    ];
+
+    await Todo.deleteMany();
+    await Todo.insertMany(todoSeedData);
+    console.log("Todo seed inserted!");
 
     process.exit();
   })

@@ -6,39 +6,52 @@ import "./Calendar.css";
 const CalendarMonthView = ({ toDoList }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Get selected month and year
   const selectedYear = selectedDate.getFullYear();
-  const selectedMonth = selectedDate.getMonth(); // 0-based (0 = Jan)
+  const selectedMonth = selectedDate.getMonth();
 
-  // Format tasks to match YYYY-MM-DD for filtering
+  // Filter tasks for the selected month
   const formattedTasks = toDoList.filter((task) => {
     const taskDate = new Date(task.date);
-    return taskDate.getFullYear() === selectedYear && taskDate.getMonth() === selectedMonth;
+    return (
+      taskDate.getFullYear() === selectedYear &&
+      taskDate.getMonth() === selectedMonth
+    );
   });
 
   // Group tasks by date
   const tasksByDate = formattedTasks.reduce((acc, toDo) => {
-    acc[toDo.date] = acc[toDo.date] || [];
+    if (!acc[toDo.date]) acc[toDo.date] = [];
     acc[toDo.date].push(toDo);
     return acc;
   }, {});
 
+  // Sort each day's tasks by startTime
+  Object.keys(tasksByDate).forEach((date) => {
+    tasksByDate[date].sort((a, b) =>
+      a.startTime.localeCompare(b.startTime)
+    );
+  });
+
   return (
     <div className="week-view-container">
-      <h2>To-do List for {selectedDate.toLocaleString("default", { month: "long" })} {selectedYear}</h2>
-  
-      {/* Month Picker using React Calendar */}
+      <h2>
+        To-do List for{" "}
+        {selectedDate.toLocaleString("default", { month: "long" })}{" "}
+        {selectedYear}
+      </h2>
+
+      {/* Month Picker */}
       <div className="calendar-wrapper">
         <ReactCalendar
           onChange={setSelectedDate}
           value={selectedDate}
           locale="en-US"
           view="month"
-          onClickMonth={(value) => setSelectedDate(value)} // Allow month selection
+          onClickMonth={(value) => setSelectedDate(value)}
         />
       </div>
-  
-      {/* Display Tasks for Selected Month */}
+
+      {/* Display tasks */}
       <div className="month-view">
         {Object.keys(tasksByDate).length === 0 ? (
           <p>No tasks for this month.</p>
@@ -50,7 +63,10 @@ const CalendarMonthView = ({ toDoList }) => {
                 <ul className="toDo-list">
                   {toDos.map((toDo, index) => (
                     <li key={index} className="toDo-item">
-                      <strong>{toDo.time}</strong> - {toDo.toDo} ({toDo.TimeRange})
+                      <strong>
+                        {toDo.startTime} - {toDo.endTime}
+                      </strong>{" "}
+                      — {toDo.toDo}
                     </li>
                   ))}
                 </ul>
@@ -59,7 +75,8 @@ const CalendarMonthView = ({ toDoList }) => {
           </div>
         )}
       </div>
-    </div> 
+    </div>
   );
-}
-  export default CalendarMonthView;
+};
+
+export default CalendarMonthView;
