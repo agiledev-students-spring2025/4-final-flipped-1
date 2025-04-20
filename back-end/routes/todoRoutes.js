@@ -35,9 +35,9 @@ router.post('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const deleted = await Todo.findByIdAndDelete(req.params.id);
-    res.json({ message: '已删除', deleted });
+    res.json({ message: 'Todo deleted', deleted });
   } catch (err) {
-    res.status(400).json({ message: '删除失败', error: err });
+    res.status(400).json({ message: 'Delete failed', error: err });
   }
 });
 
