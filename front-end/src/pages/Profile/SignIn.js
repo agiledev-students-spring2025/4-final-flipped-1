@@ -3,20 +3,50 @@ import { useNavigate } from "react-router-dom";
 import "./SignIn.css";
 import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
+import axios from 'axios';
+import { API_ENDPOINTS } from '../../config/api';
 
 const SignIn = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const fakeUser = { username: "John Doe", email: "test@example.com" };
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      alert("Please fill in both email and password.");
+      return;
+    }
 
-  const handleSignIn = () => {
-    if (email === "test@example.com" && password === "password123") {
-      localStorage.setItem("user", JSON.stringify(fakeUser));
-      navigate("/profile"); // Navigate to Profile page after login
-    } else {
-      alert("Invalid email or password. Use 'test@example.com' and 'password123'.");
+    try {
+      const response = await axios.post(API_ENDPOINTS.PROFILE.LOGIN,{
+          user_id: email,
+          password: password
+        },
+        {
+          withCredentials: true
+        }
+      );
+
+      //JWT token
+      if (response.data.success) {
+        const user = {
+          token: response.data.token,
+          user_id: response.data.user_id,
+          username: response.data.username
+        };
+        localStorage.setItem("user", JSON.stringify(user));
+        // console.log(response.data.token)
+        // console.log(response.data.user_id)
+        // console.log(response.data.username)
+        // console.log("this is a test print")
+        // alert("Login successful!");
+        navigate("/profile");
+      } else {
+        alert("Login failed: " + response.data.message);
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("An error occurred during login. Please try again.");
     }
   };
 

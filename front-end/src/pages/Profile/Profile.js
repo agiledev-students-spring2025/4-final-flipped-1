@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 import BottomNav from "../../components/BottomNav/BottomNav";
 import Header from "../../components/header/Header";
+import axios from 'axios';
+import { API_ENDPOINTS } from '../../config/api';
+import { toast } from 'react-toastify';
 
 // Basic Modal Component Structure
 const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
@@ -12,6 +15,19 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
 
   if (!isOpen) return null;
 
+  // 清空所有输入框
+  const clearInputs = () => {
+    setOldPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  // 取消时：先清空，再关闭
+  const handleCancel = () => {
+    clearInputs();
+    onClose();
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
@@ -19,6 +35,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
       return;
     }
     onSubmit({ oldPassword, newPassword });
+    clearInputs(); 
     onClose();
   };
 
@@ -50,6 +67,45 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
           />
           <div className="modal-buttons">
             {/* English Button Text */}
+            <button type="button" onClick={handleCancel} className="cancel-btn">Cancel</button>
+            <button type="submit" className="confirm-btn">Confirm</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+
+const ChangeUsernameModal = ({ isOpen, onClose, onSubmit }) => {
+  const [newUsername, setNewUsername] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!newUsername) {
+      alert("Please enter a new username");
+      return;
+    }
+    onSubmit({ newUsername });
+    setNewUsername("");
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h2>Change Username</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="New Username"
+            value={newUsername}
+            onChange={(e) => setNewUsername(e.target.value)}
+            required
+          />
+          <div className="modal-buttons">
             <button type="button" onClick={onClose} className="cancel-btn">Cancel</button>
             <button type="submit" className="confirm-btn">Confirm</button>
           </div>
@@ -59,13 +115,20 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
   );
 };
 
+
+
+
 const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPasswordModalOpen, setisPasswordModalOpen] = useState(false);
+  const [isUsernameModalOpen, setIsUsernameModalOpen] = useState(false);
 
+
+  //进入页面的时候拉用户
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
+    console.log(storedUser)
     if (storedUser) {
       setUser(storedUser);
     } else {
@@ -73,23 +136,76 @@ const Profile = () => {
     }
   }, [navigate]);
 
-  const handleLogout = () => {
+  //logout
+  const handleLogout = async () => {
+    try {
+      await axios.get(API_ENDPOINTS.PROFILE.LOGOUT, {
+        withCredentials: true,
+      });
+    } catch (err) {
+      console.warn("Logout request failed (can be ignored for JWT):", err);
+    }
+
     localStorage.removeItem("user");
     setUser(null);
     navigate("/signin");
+    window.location.reload();
   };
 
-  const handlePasswordChange = (passwords) => {
-    console.log("Changing password:", passwords);
-    // TODO: Implement actual password change logic with API call
-    alert("Password change request submitted (backend function pending)"); // English alert
+  const handlePasswordChange = async ({ oldPassword, newPassword }) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+  
+    try {
+      const response = await axios.post(API_ENDPOINTS.PROFILE.CHANGE_PASSWORD, {
+        user_id: user.user_id,
+        oldPassword,
+        newPassword
+      });
+  
+      if (response.data.success) {
+        alert("Password changed successfully!");
+      } else {
+        alert("Failed to change password: " + response.data.message);
+      }
+    } catch (err) {
+      console.error("Change password error:", err);
+      alert("Error while changing password. Please try again.");
+    }
   };
 
+  const handleUsernameChange = async ({ newUsername }) => {
+    try {
+      const res = await axios.post(API_ENDPOINTS.PROFILE.CHANGE_USERNAME, {
+        user_id: user.user_id,
+        newUsername
+      }, {
+        headers: {
+          Authorization: `jwt ${user.token}`,
+        },
+        withCredentials: true
+      });
+  
+      if (res.data.success) {
+        const updatedUser = { ...user, username: res.data.username };
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        // toast.success("Username updated successfully!");
+      } else {
+        alert("Failed to update username: " + res.data.message);
+      }
+    } catch (err) {
+      console.error("Error updating username:", err);
+      alert("Server error while updating username.");
+    }
+  };
+  
+  
   // Define menu items - conditional based on user existing
   const menuItems = user ? [
-    { label: "Change Password", action: () => setIsModalOpen(true), clickable: true },
+    { label: `Email: ${user.user_id || 'N/A'}`, action: null, clickable: false },
+    { label: "Change Password", action: () => setisPasswordModalOpen(true), clickable: true },
     // Display email directly, make it non-clickable by omitting action or setting clickable to false
-    { label: `Email: ${user.email || 'N/A'}`, action: null, clickable: false },
+    { label: "Change Username", action: () => setIsUsernameModalOpen(true), clickable: true },
     { label: "Logout", action: handleLogout, clickable: true },
   ] : []; // Empty array if user is not loaded yet
 
@@ -145,9 +261,15 @@ const Profile = () => {
       </div>
 
       <ChangePasswordModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isPasswordModalOpen}
+        onClose={() => setisPasswordModalOpen(false)}
         onSubmit={handlePasswordChange}
+      />
+
+      <ChangeUsernameModal
+        isOpen={isUsernameModalOpen}
+        onClose={() => setIsUsernameModalOpen(false)}
+        onSubmit={handleUsernameChange}
       />
 
       <BottomNav />
