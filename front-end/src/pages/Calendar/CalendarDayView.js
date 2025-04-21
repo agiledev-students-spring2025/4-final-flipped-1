@@ -23,20 +23,20 @@ const CalendarDayView = ({ selectedDate, toDoList, onDelete }) => {
         <ul className="toDo-list">
           {tasksForDay.map((task) => (
             <li
-              key={task._id}
+              key={task.id}
               className={`toDo-item ${
-                completedTasks[`${task.date}-${task._id}`] ? "completed" : ""
+                completedTasks[`${task.date}-${task.id}`] ? "completed" : ""
               }`}
             >
               <input
                 type="checkbox"
-                checked={completedTasks[`${task.date}-${task._id}`] || false}
-                onChange={() => handleCheckboxChange(task.date, task._id)}
+                checked={completedTasks[`${task.date}-${task.id}`] || false}
+                onChange={() => handleCheckboxChange(task.date, task.id)}
               />
               <span>
                 {task.toDo} — {task.startTime} to {task.endTime}
               </span>
-              <button className="delete-btn" onClick={() => onDelete(task._id)}>
+              <button className="delete-btn" onClick={() => onDelete(task.id)}>
                 Delete
               </button>
             </li>
