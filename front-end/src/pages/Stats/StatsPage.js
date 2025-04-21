@@ -1,4 +1,3 @@
-// src/pages/StatsPage.js
 import React, { useState, useEffect } from "react";
 import {
   ResponsiveContainer,
@@ -26,25 +25,24 @@ const StatsPage = () => {
   const [totalHours, setTotalHours] = useState(0);
   const [totalMinutes, setTotalMinutes] = useState(0);
 
-  // helper: 把 Date 对象格式化成 "YYYY.M.D"
+  
   const formatDate = (date) =>
     `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
 
-  // helper: 反向将 "YYYY.M.D" 字符串 parse 回 Date
+  
   const parseLogDate = (dateStr) => {
     const [y, m, d] = dateStr.split(".").map(Number);
     return new Date(y, m - 1, d);
   };
 
-  // helper: 把总分钟数转成 "xh ym" 格式
+  
   const formatHoursMinutes = (minutesTotal) => {
     const h = Math.floor(minutesTotal / 60);
     const m = minutesTotal % 60;
     return `${h > 0 ? `${h}h ` : ""}${m}m`;
   };
 
-  // ───────────────────────────────────────────────────────────
-  // 第一个 effect：拉取日志，并给每条记录加上 date 字段
+  
   useEffect(() => {
     const fetchLogs = async () => {
       try {
@@ -54,7 +52,6 @@ const StatsPage = () => {
         const data = await res.json();
         console.log("raw fliplogs:", data);
 
-        // 映射出新的数组，每条记录都带上 date 字段
         const withDate = data.map((log) => ({
           ...log,
           date: formatDate(new Date(log.start_time)),
@@ -70,8 +67,7 @@ const StatsPage = () => {
     fetchLogs();
   }, [timeframe, selectedDate]);
 
-  // ───────────────────────────────────────────────────────────
-  // 第二个 effect：根据 timeframe+selectedDate 生成 chartData & 汇总时长
+
   useEffect(() => {
     let filtered = [];
     const formattedDate = formatDate(selectedDate);
@@ -161,7 +157,6 @@ const StatsPage = () => {
     }
   }, [logs, timeframe, selectedDate]);
 
-  // ───────────────────────────────────────────────────────────
   return (
     <div className="stats-container">
       <Header2 title="Statistics" />
