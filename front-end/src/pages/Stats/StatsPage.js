@@ -18,16 +18,26 @@ import BottomNav from "../../components/BottomNav/BottomNav";
 import { API_ENDPOINTS } from "../../config/api";
 
 const StatsPage = () => {
-  const [timeframe, setTimeframe] = useState("Monthly");
-  const [selectedDate, setSelectedDate] = useState(new Date(2025, 2, 1));
-  const [logs, setLogs] = useState([]);            
+-<<<<<<< Larisa
+-  const [timeframe, setTimeframe] = useState("Monthly");
+-  const [selectedDate, setSelectedDate] = useState(new Date(2025, 2, 1));
+-  const [logs, setLogs] = useState([]);            
+-=======
+-  const [timeframe, setTimeframe] = useState("Daily");
+-  const [selectedDate, setSelectedDate] = useState(new Date());
+->>>>>>> master
++  const [timeframe, setTimeframe] = useState("Monthly");
++  const [selectedDate, setSelectedDate] = useState(new Date(2025, 2, 1));
++  const [logs, setLogs] = useState([]);
+
   const [chartData, setChartData] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
   const [totalMinutes, setTotalMinutes] = useState(0);
 
-  
-  const formatDate = (date) =>
-    `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+
+// Utility: format date to YYYY.M.D
+const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+
 
   
   const parseLogDate = (dateStr) => {
@@ -157,6 +167,19 @@ const StatsPage = () => {
     }
   }, [logs, timeframe, selectedDate]);
 
+  // Generate array of dates for the date navigation
+  const getDateNumbers = () => {
+    const dates = [];
+    const currentDate = new Date(selectedDate);
+    currentDate.setDate(currentDate.getDate() - 3); // Start 3 days before
+    
+    for (let i = 0; i < 7; i++) {
+      dates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dates;
+  };
+
   return (
     <div className="stats-container">
       <Header2 title="Statistics" />
@@ -196,7 +219,7 @@ const StatsPage = () => {
                     1 + (offset <= 4 ? -offset + 1 : 8 - offset)
                   );
                   const start = new Date(isoStart);
-                  start.setDate(isoStart.getDate() + (week - 1) * 7);
+                  start.setDate(start.getDate() + (week - 1) * 7);
                   setSelectedDate(start);
                 }}
               />
@@ -216,10 +239,17 @@ const StatsPage = () => {
           <h1>
             {totalHours} <span>Hours</span> {totalMinutes} <span>Mins</span>
           </h1>
+
         </div>
 
         {/* —— 图表部分 —— */}
         <div className="distribution-card">
+          {/* Time Display */}
+          <h3>Total Time</h3>
+          <div className="time-display">
+            {totalHours}<span>Hours</span>{totalMinutes}<span>Mins</span>
+          </div>
+          
           <h3>{timeframe} Time Distribution</h3>
           <ResponsiveContainer width="100%" height={250}>
             {timeframe === "Daily" ? (
@@ -230,9 +260,15 @@ const StatsPage = () => {
                 <Area
                   type="monotone"
                   dataKey="minutes"
-                  stroke="#fcd34d"
-                  fill="#fde68a"
+                  stroke="#1E90FF"
+                  fill="url(#colorGradient)"
                 />
+                <defs>
+                  <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#1E90FF" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#99BADD" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
               </AreaChart>
             ) : (
               <LineChart
@@ -246,10 +282,10 @@ const StatsPage = () => {
                 <Line
                   type="monotone"
                   dataKey="minutes"
-                  stroke="#fcd34d"
-                  strokeWidth={3}
-                  dot={{ r: 6 }}
-                  activeDot={{ r: 8 }}
+                  stroke="#1E90FF"
+                  strokeWidth={2}
+                  dot={{ r: 4, fill: "#1E90FF", strokeWidth: 2 }}
+                  activeDot={{ r: 6, fill: "#1E90FF", stroke: "#fff", strokeWidth: 2 }}
                 >
                   <LabelList dataKey="label" position="top" offset={10} />
                 </Line>

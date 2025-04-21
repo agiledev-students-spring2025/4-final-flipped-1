@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "./Register.css";
 import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
+import axios from 'axios';
+import { API_ENDPOINTS } from '../../config/api';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -11,7 +13,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!username || !email || !password || !confirmPassword) {
       alert("Please fill in all fields.");
       return;
@@ -22,12 +24,35 @@ const Register = () => {
       return;
     }
 
-    // Simulating user registration by saving to localStorage
-    const newUser = { username, email };
-    localStorage.setItem("user", JSON.stringify(newUser));
+    try {
+      // https://localhost:3001/auth/api/signup
+      const response = await axios.post(API_ENDPOINTS.PROFILE.REGISTER, {
+        user_id: email,
+        username,
+        password
+      },
+      {
+        withCredentials: true 
+      });
+      // console.log(email,username,password,confirmPassword);
 
-    alert("Registration successful! You can now sign in.");
-    navigate("/signin"); // Navigate to SignIn page after registration
+      if (response.data.success) {
+        alert("Registration successful!");
+        navigate("/signin");
+      } else {
+        alert("Registration failed: " + response.data.message);
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
+      alert("Error registering user. Please try again.");
+    }
+
+    // // Simulating user registration by saving to localStorage
+    // const newUser = { username, email };
+    // localStorage.setItem("user", JSON.stringify(newUser));
+
+    // alert("Registration successful! You can now sign in.");
+    // navigate("/signin"); // Navigate to SignIn page after registration
   };
 
   return (

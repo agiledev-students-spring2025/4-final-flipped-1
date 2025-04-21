@@ -1,29 +1,53 @@
 import dotenv from 'dotenv'
 dotenv.config()
-import mongoose from 'mongoose'
 
 // import and instantiate express
 import express from 'express'
 const app = express()
+import mongoose from 'mongoose'
 import cors from 'cors'
-
-// import some useful middleware
 import morgan from 'morgan'
-import { body, validationResult } from 'express-validator';
+import passport from 'passport'
+import jwt from 'jsonwebtoken'
+import { body, validationResult } from 'express-validator'
+
+//middleware
+app.use(morgan('dev'))
+// app.use(cors())
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
+
+// app.use(cors({ origin: 'https://localhost:3000', credentials: true, }))
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+
+
+
+// routers
+import todoRoutes from './routes/todoRoutes.js';
+import cookieRouter from './routes/cookieRouter.js';
+import protectedContentRouter from './routes/protectedContentRoutes.js';
+import authenticationRouter from './routes/authenticationRoutes.js'
+
+app.use('/auth', authenticationRouter()) // all requests for /auth/* will be handled by the authenticationRoutes router
+app.use('/cookie', cookieRouter()) // all requests for /cookie/* will be handled by the cookieRoutes router
+app.use('/protected', protectedContentRouter()) // all requests for /protected/* will be handled by the protectedRoutes router
+
+
+//JWT
+import jwtStrategy from './config/jwt-config.js'
+passport.use(jwtStrategy)
+app.use(passport.initialize())
+
 
 // import database table
 import FlipLog from './models/FlipLog.js';
 import Task from './models/Task.js';
-// import ToDo from './models/ToDo.js';
+import User from './models/User.js';
+import ToDo from './models/ToDo.js';
 
-// use the morgan middleware to log all incoming http requests
-app.use(morgan('dev'))
-app.use(cors())
 
-// use express's builtin body-parser middleware to parse any data included in a request
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-
+//Database connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Connected to MongoDB Atlas: flip")
@@ -32,55 +56,70 @@ mongoose.connect(process.env.MONGO_URI)
     console.error("MongoDB connection error:", err)
   })
 
+
+
+
+
 // Mock data for todos
-const mockToDos = [
-  { id: 1, date: "2025-02-20", toDo: "Interview with A", time: "14:00", TimeRange: "15min" },
-  { id: 2, date: "2025-02-26", toDo: "Lunch with B", time: "12:30", TimeRange: "45min" },
-  { id: 3, date: "2025-02-26", toDo: "Lunch with B", time: "12:30", TimeRange: "45min" },
-  { id: 4, date: "2025-02-20", toDo: "Evening Study", time: "18:00", TimeRange: "2h" },
-  { id: 5, date: "2025-02-23", toDo: "Course A HW", time: "20:00", TimeRange: "1h" },
-  { id: 6, date: "2025-02-23", toDo: "Gym Session", time: "07:30", TimeRange: "1h" },
-  { id: 7, date: "2025-02-26", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
-  { id: 8, date: "2025-02-26", toDo: "Course C", time: "19:00", TimeRange: "2h 15min" },
-  { id: 9, date: "2025-02-26", toDo: "Course D", time: "22:00", TimeRange: "2h 15min" },
-  { id: 10, date: "2025-03-25", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" },
-  { id: 11, date: "2025-03-17", toDo: "Course B", time: "16:00", TimeRange: "2h 15min" }
-];
+// const mockToDos = [
+//   { id: 1, date: "2025-02-20", toDo: "Interview with A", startTime: "14:00", endTime: "14:15" },
+//   { id: 2, date: "2025-02-26", toDo: "Lunch with B", startTime: "12:30", endTime: "13:15" },
+//   { id: 3, date: "2025-02-20", toDo: "Evening Study", startTime: "18:00", endTime: "20:00" },
+//   { id: 4, date: "2025-02-23", toDo: "Course A HW", startTime: "20:00", endTime: "21:00" },
+//   { id: 5, date: "2025-02-23", toDo: "Gym Session", startTime: "07:30", endTime: "08:30" },
+//   { id: 6, date: "2025-02-26", toDo: "Course B", startTime: "16:00", endTime: "18:15" },
+//   { id: 7, date: "2025-02-26", toDo: "Course C", startTime: "19:00", endTime: "21:15" },
+//   { id: 8, date: "2025-02-26", toDo: "Course D", startTime: "22:00", endTime: "00:15" },
+//   { id: 9, date: "2025-03-25", toDo: "Course B", startTime: "16:00", endTime: "18:15" },
+//   { id: 10, date: "2025-03-17", toDo: "Course B", startTime: "16:00", endTime: "18:15" }
+// ];
 
-// API endpoint to get todos
-app.get('/api/todos', (req, res) => {
-  res.json(mockToDos);
-});
+// // GET: Return all todos
+// app.get('/api/todos', (req, res) => {
+//   res.json(mockToDos);
+// });
 
-// API endpoint to add a new task
-app.post('/api/todos', (req, res) => {
-  const { date, toDo, time, TimeRange } = req.body;
-  const newId = mockToDos.length ? Math.max(...mockToDos.map(todo => todo.id)) + 1 : 1;
-  const newToDo = {
-    id: newId,
-    date,
-    toDo,
-    time,
-    TimeRange
-  };
-  mockToDos.push(newToDo);
-  res.json(newToDo);
-});
+// // POST: Add a new todo
+// app.post('/api/todos', (req, res) => {
+//   const { date, toDo, startTime, endTime } = req.body;
 
-app.delete('/api/todos/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = mockToDos.findIndex(todo => todo.id === id);
+//   if (!date || !toDo || !startTime || !endTime) {
+//     return res.status(400).json({ message: 'All fields are required.' });
+//   }
 
-  if (index !== -1) {
-    const deleted = mockToDos.splice(index, 1);
-    res.json({ message: 'Todo deleted', deleted: deleted[0] });
-  } else {
-    res.status(404).json({ message: 'Todo not found' });
-  }
-});
+//   const newId = mockToDos.length ? Math.max(...mockToDos.map(todo => todo.id)) + 1 : 1;
 
+//   const newToDo = {
+//     id: newId,
+//     date,
+//     toDo,
+//     startTime,
+//     endTime
+//   };
 
+//   mockToDos.push(newToDo);
+//   res.json(newToDo);
+// });
 
+// // DELETE: Remove a todo by ID
+// app.delete('/api/todos/:id', (req, res) => {
+//   const id = parseInt(req.params.id);
+//   const index = mockToDos.findIndex(todo => todo.id === id);
+
+//   if (index !== -1) {
+//     const deleted = mockToDos.splice(index, 1);
+//     res.json({ message: 'Todo deleted', deleted: deleted[0] });
+//   } else {
+//     res.status(404).json({ message: 'Todo not found' });
+//   }
+// });
+
+// // Start server
+// const PORT = process.env.PORT || 3001;
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
+app.use('/api/todos', todoRoutes); //subtitute mock data
 
 
 

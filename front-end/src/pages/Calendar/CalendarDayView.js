@@ -2,19 +2,19 @@ import React, { useState } from "react";
 import "./Calendar.css";
 
 const CalendarDayView = ({ selectedDate, toDoList, onDelete }) => {
-  // Store completed tasks(for use of checkbox)
   const [completedTasks, setCompletedTasks] = useState({});
 
-  // Toggle task completion
-  const handleCheckboxChange = (date, index) => {
+  const handleCheckboxChange = (date, id) => {
     setCompletedTasks((prev) => ({
       ...prev,
-      [`${date}-${index}`]: !prev[`${date}-${index}`], // Toggle completion
+      [`${date}-${id}`]: !prev[`${date}-${id}`],
     }));
   };
 
-  // Filter tasks for the selected day
-  const tasksForDay = toDoList.filter((task) => task.date === selectedDate);
+  // Filter and sort tasks for the selected day
+  const tasksForDay = toDoList
+    .filter((task) => task.date === selectedDate)
+    .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   return (
     <div className="day-view-container">
@@ -22,13 +22,20 @@ const CalendarDayView = ({ selectedDate, toDoList, onDelete }) => {
       {tasksForDay.length > 0 ? (
         <ul className="toDo-list">
           {tasksForDay.map((task) => (
-            <li key={task.id} className={`toDo-item ${completedTasks[`${task.date}-${task.id}`] ? "completed" : ""}`}>
+            <li
+              key={task.id}
+              className={`toDo-item ${
+                completedTasks[`${task.date}-${task.id}`] ? "completed" : ""
+              }`}
+            >
               <input
                 type="checkbox"
                 checked={completedTasks[`${task.date}-${task.id}`] || false}
                 onChange={() => handleCheckboxChange(task.date, task.id)}
               />
-              <span>{task.toDo} at {task.time} ({task.TimeRange})</span>
+              <span>
+                {task.toDo} — {task.startTime} to {task.endTime}
+              </span>
               <button className="delete-btn" onClick={() => onDelete(task.id)}>
                 Delete
               </button>

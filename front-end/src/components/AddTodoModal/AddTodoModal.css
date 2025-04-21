@@ -38,3 +38,10 @@
     border-color: #1e90ff;
     box-shadow: 0 0 5px rgba(30, 144, 255, 0.3);
   }
+
+  .field-label {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 4px;
+    text-align: left;
+  }
