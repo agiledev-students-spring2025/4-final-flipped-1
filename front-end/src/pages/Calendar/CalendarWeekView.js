@@ -60,8 +60,8 @@ const CalendarWeekView = ({ toDoList }) => {
             <div key={date} className="day-group">
               <h3>{date}</h3>
               <ul className="toDo-list">
-                {toDos.map((toDo) => (
-                  <li key={toDo._id} className="toDo-item">
+                {toDos.map((toDo, index) => (
+                  <li key={index} className="toDo-item">
                     <strong>{toDo.startTime} - {toDo.endTime}</strong> — {toDo.toDo}
                   </li>
                 ))}

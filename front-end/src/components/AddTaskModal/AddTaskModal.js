@@ -20,14 +20,13 @@ function AddTaskModal({ isOpen, onClose, onSubmit, editingTask }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // console.log('Form submitted:', { taskName, taskColor });
     const trimmedName = taskName.trim();
-  
     if (trimmedName) {
-      const user = JSON.parse(localStorage.getItem("user"));
-      onSubmit({
-        task_name: trimmedName,
-        color: taskColor,
-        user_id: user?.user_id || null
+      // console.log('Calling onSubmit with:', { name: trimmedName, color: taskColor });
+      onSubmit({ 
+        name: trimmedName, 
+        color: taskColor 
       });
     }
   };
