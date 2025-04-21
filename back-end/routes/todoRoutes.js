@@ -1,22 +1,25 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import Todo from '../models/ToDo.js';
+import passport from 'passport';
 
 const router = express.Router();
 
-// GET: 获取所有 todos
-router.get('/', async (req, res) => {
+// GET: 当前用户的 todos
+router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const todos = await Todo.find({});
+    const userId = req.user.user_id; // 来自 decoded token
+    const todos = await Todo.find({ user_id: userId });
     res.json(todos);
   } catch (err) {
     res.status(500).json({ message: 'failed to fetch todos', error: err });
   }
 });
 
-// POST: 新增 todo，含数据验证
+// POST: 新增 todo
 router.post(
   '/',
+  passport.authenticate('jwt', { session: false }),
   [
     body('date').isString().notEmpty().withMessage('Date is required'),
     body('toDo').isString().notEmpty().withMessage('To-do content is required'),
@@ -30,9 +33,10 @@ router.post(
     }
 
     const { date, toDo, startTime, endTime } = req.body;
+    const userId = req.user.user_id;
     try {
       const newTodo = new Todo({
-        user_id: 'test_user',
+        user_id: userId,
         date,
         toDo,
         startTime,
@@ -47,8 +51,19 @@ router.post(
 );
 
 // DELETE: 删除 todo
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
+    const userId = req.user.user_id;
+    const todo = await Todo.findById(req.params.id);
+
+    if (!todo) {
+      return res.status(404).json({ message: 'Todo not found' });
+    }
+
+    if (todo.user_id !== userId) {
+      return res.status(403).json({ message: 'Not authorized to delete this todo' });
+    }
+
     const deleted = await Todo.findByIdAndDelete(req.params.id);
     res.json({ message: 'Todo deleted', deleted });
   } catch (err) {
