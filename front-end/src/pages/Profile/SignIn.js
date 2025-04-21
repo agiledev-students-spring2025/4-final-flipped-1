@@ -18,7 +18,7 @@ const SignIn = () => {
     }
 
     try {
-      const response = await axios.post(API_ENDPOINTS.PROFILE.LOGIN,{
+      const response = await axios.post(API_ENDPOINTS.PROFILE.LOGIN, {
           user_id: email,
           password: password
         },
@@ -27,19 +27,18 @@ const SignIn = () => {
         }
       );
 
-      //JWT token
       if (response.data.success) {
         const user = {
           token: response.data.token,
           user_id: response.data.user_id,
           username: response.data.username
         };
+
+        // 保存 token 和 user 到 localStorage
         localStorage.setItem("user", JSON.stringify(user));
-        // console.log(response.data.token)
-        // console.log(response.data.user_id)
-        // console.log(response.data.username)
-        // console.log("this is a test print")
-        // alert("Login successful!");
+        localStorage.setItem("token", response.data.token);
+
+        // 跳转到 profile
         navigate("/profile");
       } else {
         alert("Login failed: " + response.data.message);
@@ -82,6 +81,5 @@ const SignIn = () => {
     </div>
   );
 };
-  
 
 export default SignIn;

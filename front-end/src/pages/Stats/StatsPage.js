@@ -15,56 +15,73 @@ import {
 import "./StatsPage.css";
 import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
+import { API_ENDPOINTS } from "../../config/api";
 
 const StatsPage = () => {
-  const [timeframe, setTimeframe] = useState("Daily");
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [timeframe, setTimeframe] = useState("Monthly");
+  const [selectedDate, setSelectedDate] = useState(new Date(2025, 2, 1));
+  const [logs, setLogs] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
   const [totalMinutes, setTotalMinutes] = useState(0);
 
-  const flipLogs = [
-    { task_name: "Study", date: "2025.3.27", start_time: "14:00:00", end_time: "14:11:00", duration: 660 },
-    { task_name: "Study", date: "2025.3.26", start_time: "19:51:00", end_time: "06:56:46", duration: 36346 },
-    { task_name: "Study", date: "2025.3.24", start_time: "20:45:00", end_time: "21:26:05", duration: 2465 },
-    { task_name: "Read Books", date: "2025.3.21", start_time: "11:09:00", end_time: "13:11:00", duration: 7320 },
-    { task_name: "Read Books", date: "2025.3.20", start_time: "01:00:00", end_time: "01:00:22", duration: 22 },
-    { task_name: "Study", date: "2025.3.18", start_time: "21:19:00", end_time: "22:49:00", duration: 5400 },
-    { task_name: "Haha", date: "2025.3.16", start_time: "21:22:00", end_time: "23:59:00", duration: 9540 },
-    { task_name: "Exercise", date: "2025.3.13", start_time: "19:55:00", end_time: "20:32:43", duration: 2203 },
-    { task_name: "Study", date: "2025.4.16", start_time: "11:35:00", end_time: "20:35:07", duration: 5400 },
-    { task_name: "Exercise", date: "2025.4.16", start_time: "15:35:00", end_time: "20:35:07", duration: 2200 },
-    { task_name: "Read Books", date: "2025.4.16", start_time: "9:35:00", end_time: "20:35:07", duration: 1200 },
-  ];
 
-  // Utility: format date to YYYY.M.D
-  const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+// Utility: format date to YYYY.M.D
+const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
 
-  // Utility: parse a YYYY.M.D string to JS date
+
+  
   const parseLogDate = (dateStr) => {
     const [y, m, d] = dateStr.split(".").map(Number);
     return new Date(y, m - 1, d);
   };
 
-  // Utility: format minutes → "Xh Ym"
+  
   const formatHoursMinutes = (minutesTotal) => {
     const h = Math.floor(minutesTotal / 60);
     const m = minutesTotal % 60;
     return `${h > 0 ? `${h}h ` : ""}${m}m`;
   };
 
+  
   useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const res = await fetch(API_ENDPOINTS.FLIPLOG.LIST);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        console.log("raw fliplogs:", data);
+
+        const withDate = data.map((log) => ({
+          ...log,
+          date: formatDate(new Date(log.start_time)),
+        }));
+        console.log("fliplogs with date:", withDate);
+
+        setLogs(withDate);
+      } catch (err) {
+        console.error("Error fetching flip logs:", err);
+      }
+    };
+
+    fetchLogs();
+  }, [timeframe, selectedDate]);
+
+
+  useEffect(() => {
+    let filtered = [];
     const formattedDate = formatDate(selectedDate);
 
     if (timeframe === "Daily") {
-      // Filter logs for the selected day
-      const logs = flipLogs.filter((log) => log.date === formattedDate);
-      const hourBuckets = Array(24).fill(0);
+      // 按天：筛出 date = 选中日期
+      filtered = logs.filter((log) => log.date === formattedDate);
 
-      logs.forEach((log) => {
-        const [startHour] = log.start_time.split(":").map(Number);
-        const minutes = Math.round(log.duration / 60);
-        hourBuckets[startHour] += minutes;
+      // 按小时汇总
+      const hourBuckets = Array(24).fill(0);
+      filtered.forEach((log) => {
+        const [h] = log.start_time.split(":").map(Number);
+        hourBuckets[h] += Math.round(log.duration / 60);
       });
 
       const timeline = hourBuckets.map((minutes, hour) => ({
@@ -72,81 +89,74 @@ const StatsPage = () => {
         minutes,
       }));
 
-      const total = logs.reduce((sum, log) => sum + log.duration, 0);
+      const total = filtered.reduce((sum, l) => sum + l.duration, 0);
       setTotalHours(Math.floor(total / 3600));
       setTotalMinutes(Math.floor((total % 3600) / 60));
       setChartData(timeline);
 
     } else if (timeframe === "Weekly") {
-      const getStartOfWeek = (date) => {
-        const d = new Date(date);
-        const day = d.getDay();
-        d.setDate(d.getDate() - day);
-        d.setHours(0, 0, 0, 0);
-        return d;
+      // 按周：计算本周起止日
+      const getStartOfWeek = (d) => {
+        const dt = new Date(d);
+        const day = dt.getDay();
+        dt.setDate(dt.getDate() - day);
+        dt.setHours(0, 0, 0, 0);
+        return dt;
       };
-
       const startOfWeek = getStartOfWeek(selectedDate);
       const endOfWeek = new Date(startOfWeek);
       endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-      const logs = flipLogs.filter((log) => {
-        const logDate = parseLogDate(log.date);
-        return logDate >= startOfWeek && logDate <= endOfWeek;
+      filtered = logs.filter((log) => {
+        const dt = parseLogDate(log.date);
+        return dt >= startOfWeek && dt <= endOfWeek;
       });
 
       const dayBuckets = Array(7).fill(0);
-      logs.forEach((log) => {
-        const logDate = parseLogDate(log.date);
-        const dayIndex = logDate.getDay();
-        const minutes = Math.round(log.duration / 60);
-        dayBuckets[dayIndex] += minutes;
+      filtered.forEach((log) => {
+        const idx = parseLogDate(log.date).getDay();
+        dayBuckets[idx] += Math.round(log.duration / 60);
       });
 
       const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-      const weeklyChart = days.map((day, i) => ({
-        day,
+      const weeklyChart = days.map((d, i) => ({
+        day: d,
         minutes: dayBuckets[i],
         label: formatHoursMinutes(dayBuckets[i]),
       }));
 
-      const total = logs.reduce((sum, log) => sum + log.duration, 0);
+      const total = filtered.reduce((sum, l) => sum + l.duration, 0);
       setTotalHours(Math.floor(total / 3600));
       setTotalMinutes(Math.floor((total % 3600) / 60));
       setChartData(weeklyChart);
 
     } else if (timeframe === "Monthly") {
-      // Filter logs for the selected month/year
+      // 按月：筛出同年同月
       const year = selectedDate.getFullYear();
       const month = selectedDate.getMonth();
-
-      const logs = flipLogs.filter((log) => {
-        const logDate = parseLogDate(log.date);
-        return logDate.getFullYear() === year && logDate.getMonth() === month;
+      filtered = logs.filter((log) => {
+        const dt = parseLogDate(log.date);
+        return dt.getFullYear() === year && dt.getMonth() === month;
       });
 
       const weekBuckets = Array(6).fill(0);
-
-      logs.forEach((log) => {
-        const logDate = parseLogDate(log.date);
-        const weekIndex = Math.floor((logDate.getDate() - 1) / 7);
-        const minutes = Math.round(log.duration / 60);
-        weekBuckets[weekIndex] += minutes;
+      filtered.forEach((log) => {
+        const wk = Math.floor((parseLogDate(log.date).getDate() - 1) / 7);
+        weekBuckets[wk] += Math.round(log.duration / 60);
       });
 
-      // Keep the first 4 "weeks" so the shape is consistent
       const monthlyChart = weekBuckets.slice(0, 4).map((minutes, i) => ({
         week: `W${i + 1}`,
         minutes,
         label: formatHoursMinutes(minutes),
       }));
 
-      const total = logs.reduce((sum, log) => sum + log.duration, 0);
+      const total = filtered.reduce((sum, l) => sum + l.duration, 0);
       setTotalHours(Math.floor(total / 3600));
       setTotalMinutes(Math.floor((total % 3600) / 60));
       setChartData(monthlyChart);
     }
-  }, [selectedDate, timeframe]);
+  }, [logs, timeframe, selectedDate]);
 
   // Generate array of dates for the date navigation
   const getDateNumbers = () => {
@@ -165,116 +175,65 @@ const StatsPage = () => {
     <div className="stats-container">
       <Header2 title="Statistics" />
       <div className="stats-content">
+        {/* —— 上半部分保持不变 —— */}
         <div className="concentration-card">
-          {/* <h2>Concentration</h2> */}
-          
-          {/* Time Frame Selector */}
-          <div className="time-selector-container">
-            <button 
-              className={`time-option ${timeframe === 'Daily' ? 'active' : ''}`}
-              onClick={() => setTimeframe('Daily')}
+          <h2>Concentration</h2>
+          <div className="concentration-info">
+            <select
+              className="timeframe-selector"
+              value={timeframe}
+              onChange={(e) => setTimeframe(e.target.value)}
             >
-              Daily
-            </button>
-            <button 
-              className={`time-option ${timeframe === 'Weekly' ? 'active' : ''}`}
-              onClick={() => setTimeframe('Weekly')}
-            >
-              Weekly
-            </button>
-            <button 
-              className={`time-option ${timeframe === 'Monthly' ? 'active' : ''}`}
-              onClick={() => setTimeframe('Monthly')}
-            >
-              Monthly
-            </button>
+              <option value="Daily">Daily</option>
+              <option value="Weekly">Weekly</option>
+              <option value="Monthly">Monthly</option>
+            </select>
+
+            {timeframe === "Daily" && (
+              <input
+                type="date"
+                className="date-picker"
+                value={selectedDate.toISOString().split("T")[0]}
+                onChange={(e) => setSelectedDate(new Date(e.target.value))}
+              />
+            )}
+            {timeframe === "Weekly" && (
+              <input
+                type="week"
+                className="week-picker"
+                onChange={(e) => {
+                  const [year, week] = e.target.value.split("-W");
+                  const first = new Date(year, 0, 1);
+                  const offset = first.getDay();
+                  const isoStart = new Date(first);
+                  isoStart.setDate(
+                    1 + (offset <= 4 ? -offset + 1 : 8 - offset)
+                  );
+                  const start = new Date(isoStart);
+                  start.setDate(start.getDate() + (week - 1) * 7);
+                  setSelectedDate(start);
+                }}
+              />
+            )}
+            {timeframe === "Monthly" && (
+              <input
+                type="month"
+                className="month-picker"
+                value={selectedDate.toISOString().slice(0, 7)}
+                onChange={(e) => {
+                  const d = new Date(e.target.value + "-01");
+                  if (!isNaN(d)) setSelectedDate(d);
+                }}
+              />
+            )}
           </div>
+          <h1>
+            {totalHours} <span>Hours</span> {totalMinutes} <span>Mins</span>
+          </h1>
 
-          {/* Date Navigation */}
-          {timeframe === 'Daily' && (
-            <div className="date-navigation">
-              <div className="date-numbers">
-                {getDateNumbers().map((date, index) => (
-                  <div
-                    key={index}
-                    className={`date-number ${
-                      date.getDate() === selectedDate.getDate() ? 'active' : ''
-                    }`}
-                    onClick={() => setSelectedDate(new Date(date))}
-                  >
-                    {date.getDate()}
-                  </div>
-                ))}
-              </div>
-              <div className="date-text">
-                <label 
-                  htmlFor="date-picker-input" 
-                  className="date-picker-label"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const input = document.getElementById('date-picker-input');
-                    if (input) {
-                      input.showPicker();
-                    }
-                  }}
-                >
-                  <span className="date-display">
-                    {selectedDate.toLocaleDateString('en-US', { 
-                      weekday: 'long',
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })}
-                  </span>
-                  <span className="calendar-icon">📅</span>
-                </label>
-                <input
-                  type="date"
-                  id="date-picker-input"
-                  value={selectedDate.toISOString().split('T')[0]}
-                  onChange={(e) => {
-                    const newDate = new Date(e.target.value);
-                    newDate.setMinutes(newDate.getMinutes() + newDate.getTimezoneOffset());
-                    if (!isNaN(newDate)) {
-                      setSelectedDate(newDate);
-                    }
-                  }}
-                  className="date-picker"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Hidden date pickers for Weekly and Monthly views */}
-          {timeframe === "Weekly" && (
-            <input
-              type="week"
-              value={`${selectedDate.getFullYear()}-W${Math.ceil(
-                (selectedDate.getDate() + selectedDate.getDay()) / 7
-              )}`}
-              onChange={(e) => {
-                const [year, week] = e.target.value.split("-W");
-                const firstDayOfYear = new Date(year, 0, 1);
-                const days = (week - 1) * 7;
-                const newDate = new Date(firstDayOfYear);
-                newDate.setDate(firstDayOfYear.getDate() + days);
-                setSelectedDate(newDate);
-              }}
-            />
-          )}
-
-          {timeframe === "Monthly" && (
-            <input
-              type="month"
-              value={selectedDate.toISOString().slice(0, 7)}
-              onChange={(e) => {
-                const newDate = new Date(e.target.value + "-01");
-                if (!isNaN(newDate)) setSelectedDate(newDate);
-              }}
-            />
-          )}
         </div>
 
+        {/* —— 图表部分 —— */}
         <div className="distribution-card">
           {/* Time Display */}
           <h3>Total Time</h3>
@@ -287,8 +246,8 @@ const StatsPage = () => {
             {timeframe === "Daily" ? (
               <AreaChart data={chartData}>
                 <XAxis dataKey="time" />
-                <YAxis allowDecimals={false} tickFormatter={(val) => `${val}m`} />
-                <Tooltip formatter={(value) => `${value} min`} />
+                <YAxis allowDecimals={false} tickFormatter={(v) => `${v}m`} />
+                <Tooltip formatter={(v) => `${v} min`} />
                 <Area
                   type="monotone"
                   dataKey="minutes"
@@ -305,18 +264,12 @@ const StatsPage = () => {
             ) : (
               <LineChart
                 data={chartData}
-                // ADD MARGIN PROPS HERE
-                margin={{
-                  top: 20,    // extra space at the top
-                  right: 30,  // extra space on the right
-                  left: 20,   // extra space on the left
-                  bottom: 10, // extra space at the bottom
-                }}
+                margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
               >
                 <XAxis dataKey={timeframe === "Monthly" ? "week" : "day"} />
-                <YAxis tickFormatter={(val) => `${Math.floor(val / 60)}h`} />
+                <YAxis tickFormatter={(v) => `${Math.floor(v / 60)}h`} />
                 <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip formatter={(val) => `${Math.floor(val / 60)}h ${val % 60}m`} />
+                <Tooltip formatter={(v) => `${Math.floor(v / 60)}h ${v % 60}m`} />
                 <Line
                   type="monotone"
                   dataKey="minutes"
@@ -325,11 +278,9 @@ const StatsPage = () => {
                   dot={{ r: 4, fill: "#1E90FF", strokeWidth: 2 }}
                   activeDot={{ r: 6, fill: "#1E90FF", stroke: "#fff", strokeWidth: 2 }}
                 >
-                  {/* OFFSET THE LABELS TO GIVE THEM MORE ROOM */}
                   <LabelList dataKey="label" position="top" offset={10} />
                 </Line>
               </LineChart>
-
             )}
           </ResponsiveContainer>
         </div>
