@@ -18,18 +18,9 @@ import BottomNav from "../../components/BottomNav/BottomNav";
 import { API_ENDPOINTS } from "../../config/api";
 
 const StatsPage = () => {
--<<<<<<< Larisa
--  const [timeframe, setTimeframe] = useState("Monthly");
--  const [selectedDate, setSelectedDate] = useState(new Date(2025, 2, 1));
--  const [logs, setLogs] = useState([]);            
--=======
--  const [timeframe, setTimeframe] = useState("Daily");
--  const [selectedDate, setSelectedDate] = useState(new Date());
-->>>>>>> master
-+  const [timeframe, setTimeframe] = useState("Monthly");
-+  const [selectedDate, setSelectedDate] = useState(new Date(2025, 2, 1));
-+  const [logs, setLogs] = useState([]);
-
+  const [timeframe, setTimeframe] = useState("Monthly");
+  const [selectedDate, setSelectedDate] = useState(new Date(2025, 2, 1));
+  const [logs, setLogs] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
   const [totalMinutes, setTotalMinutes] = useState(0);
