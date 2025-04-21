@@ -137,20 +137,22 @@ const Profile = () => {
   }, [navigate]);
 
   //logout
-  const handleLogout = async () => {
-    try {
-      await axios.get(API_ENDPOINTS.PROFILE.LOGOUT, {
-        withCredentials: true,
-      });
-    } catch (err) {
-      console.warn("Logout request failed (can be ignored for JWT):", err);
-    }
+const handleLogout = async () => {
+  try {
+    await axios.get(API_ENDPOINTS.PROFILE.LOGOUT, {
+      withCredentials: true,
+    });
+  } catch (err) {
+    console.warn("Logout request failed (can be ignored for JWT):", err);
+  }
 
-    localStorage.removeItem("user");
-    setUser(null);
-    navigate("/signin");
-    window.location.reload();
-  };
+  localStorage.removeItem("user");
+  localStorage.removeItem("token"); // 必加这一行
+  setUser(null);
+  navigate("/signin");
+  window.location.reload();
+};
+
 
   const handlePasswordChange = async ({ oldPassword, newPassword }) => {
     const user = JSON.parse(localStorage.getItem("user"));
