@@ -26,7 +26,7 @@ function TaskList({ tasks, onEditTask, onDeleteTask }) {
     <div className="task-list">
       {tasks.map(task => (
         <div 
-          key={task.task_id} 
+        key={task._id || task.task_name}
           className="task-item"
           onClick={(e) => handleTaskClick(task, e)}
         >
