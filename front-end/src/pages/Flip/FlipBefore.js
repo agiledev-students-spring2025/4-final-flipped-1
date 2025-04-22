@@ -7,6 +7,8 @@ import Header from '../../components/header/Header';
 import BottomNav from '../../components/BottomNav/BottomNav';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../../config/api';
+// import { ToastContainer,toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function FlipBefore() {
 
@@ -24,21 +26,36 @@ function FlipBefore() {
 
     //进入页面的时候抓今天的该task的使用时长
     useEffect(() => {
-        const fetchTodayTime = async () => {
-          try {
-            const res = await axios.get(API_ENDPOINTS.FLIPLOG.GET_TODAY(taskName));
-            setTodayTime(res.data.todayTotalTime);
-          } catch (err) {
-            console.error("fail to get total flip time today:", err);
+      const fetchTodayTime = async () => {
+        try {
+          const user = JSON.parse(localStorage.getItem("user"));
+    
+          const config = {
+            withCredentials: true, // 如果你的 JWT 是基于 cookie 的
+          };
+    
+          if (user?.token) {
+            config.headers = {
+              Authorization: `jwt ${user.token}`
+            };
           }
-        };
-      
-        fetchTodayTime();
-      }, [taskName]);
+    
+          const res = await axios.get(API_ENDPOINTS.FLIPLOG.GET_TODAY(taskName), config);
+          setTodayTime(res.data.todayTotalTime);
+        } catch (err) {
+          console.error("fail to get total flip time today:", err);
+          // 如果未登录（401）也可以选择 setTodayTime(0);
+          setTodayTime(0);
+        }
+      };
+    
+      fetchTodayTime();
+    }, [taskName]);
 
 
     //用来发送flip log data的函数
     const sendFlipLog = async (task_name, startTimestamp, duration) => {
+      const user = JSON.parse(localStorage.getItem("user"));
       const startDate = new Date(startTimestamp); // 开始时间对象
       const endDate = new Date(startDate.getTime() + duration * 1000); // 结束时间对象（加 duration 秒）
     
@@ -50,9 +67,20 @@ function FlipBefore() {
       };
     
       try {
-        const res = await axios.post(API_ENDPOINTS.FLIPLOG.INSERT, flipData);
-        const todayTotal = res.data.todayTotalTime;
-        return todayTotal
+        //登陆否？
+        const config = { withCredentials: true,};
+        if (user?.token) {
+          config.headers = { Authorization: `jwt ${user.token}`};
+        }
+        const res = await axios.post(API_ENDPOINTS.FLIPLOG.INSERT, flipData, config);
+        
+        if (res.data.fromDB === false) {
+          // toast.info("You're not logged in, so your data won't be saved.");
+          return duration; // 未登录时就直接返回本次 flip duration
+        } else {
+          const todayTotal = res.data.todayTotalTime;
+          return todayTotal
+        }
       } catch (err) {
         console.error("Fail to send flip log data:", err);
       }
@@ -183,7 +211,7 @@ function FlipBefore() {
             {/* <Header /> */}
 
             <FlipTask taskName={taskName} mode = "before" duration={todayTime} />
-
+            {/* <ToastContainer /> */}
             {/* <BottomNav /> */}
         </div>
     );

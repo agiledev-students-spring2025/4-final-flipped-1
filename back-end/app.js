@@ -296,15 +296,23 @@ app.post('/api/tasks/:taskName/delete', async (req, res) => {
 
 
 
-
-
-
-
+const optionalAuth = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    if (user) {
+      req.user = user;
+    } else {
+      req.user = null; // 未登录也继续
+    }
+    next();
+  })(req, res, next);
+};
 
 
 //API real endpoint for insert new log to fliplog table
 // 接口，往FlipLog里面插入新的数据，返回该task name, task_name的今日总时长（单位秒）
-app.post('/api/fliplog/insert', [
+app.post('/api/fliplog/insert', 
+  optionalAuth,
+  [
   body('task_name').isString().notEmpty(),
   body('start_time').isISO8601(),
   body('end_time').isISO8601(),
@@ -325,32 +333,36 @@ app.post('/api/fliplog/insert', [
       end_time: new Date(end_time),
       duration: roundDuration
     });
+    
+    if (req.user) {
+      newLog.user_id = req.user.user_id;
 
-    await newLog.save();
+      await newLog.save();
 
-    // 拉今天的日期
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+      // 拉今天的日期
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
 
-    // 查今天这个task的总时长
-    const todayLogs = await FlipLog.find({
-      task_name,
-      start_time: { $gte: startOfDay, $lte: endOfDay }
-    });
+      // 查今天这个task的总时长
+      const todayLogs = await FlipLog.find({
+        task_name,
+        start_time: { $gte: startOfDay, $lte: endOfDay }
+      });
 
-    const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
+      const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
 
-    //返回数据
-    res.status(201).json({
-      success: true,
-      taskName: task_name,
-      duration: roundDuration,
-      log: newLog,
-      todayTotalTime,
-    });
-
+      res.status(201).json({
+        success: true,
+        taskName: task_name,
+        duration: roundDuration,
+        log: newLog,
+        todayTotalTime,
+      });
+    } else{
+      return res.json({ success: true, fromDB: false, data: newLog });
+    }
   } catch (err) {
     console.error("Fail to insert flip log into FlipLog Collection", err);
     res.status(500).json({ error: "server error" });
@@ -361,35 +373,41 @@ app.post('/api/fliplog/insert', [
 //get today total flip time
 //return：task name, today Total Time
 //flip before page显示时调用
-app.get('/api/today/:taskName', async (req, res) => {
-  const { taskName } = req.params;
+app.get('/api/today/:taskName', (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, async (err, user) => {
+    const { taskName } = req.params;
 
-  // 拉今天的日期
-  const now = new Date();
-  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    // 拉今天的日期
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
-  
-  try {
-    const todayLogs = await FlipLog.find({
-      task_name: taskName,
-      start_time: {
-        $gte: startOfDay,
-        $lte: endOfDay
-      }
-    });
+    
+    try {
+      let query = {
+          task_name: taskName,
+          start_time: { $gte: startOfDay, $lte: endOfDay },
+        };
 
-    const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
-    // console.log(todayTotalTime)
+        // 如果登录了，就加上 user_id 限定
+        if (user) {
+          query.user_id = user.user_id;
+        } else {
+          // 未登录直接返回 0
+          return res.json({ taskName, user_id: null, todayTotalTime: 0 });
+        }
 
-    res.json({
-      taskName,
-      todayTotalTime
-    });
-  } catch (err) {
-    console.error("Fail to get today total flip time", err);
-    res.status(500).json({ error: 'server error' });
-  }
+        const todayLogs = await FlipLog.find(query);
+        const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
+
+        res.json({ taskName, user_id: user.user_id, todayTotalTime });
+        console.log(taskName, user.user_id, todayTotalTime);
+
+    } catch (err) {
+      console.error("Fail to get today total flip time", err);
+      res.status(500).json({ error: 'server error' });
+    }
+  })(req, res, next); // 🔥 别忘了调用 authenticate 的返回值
 });
 
 //get全部flip log
