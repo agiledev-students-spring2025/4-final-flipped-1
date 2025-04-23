@@ -17,12 +17,24 @@ function MainPage() {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.TASKS.LIST);
+      const user = JSON.parse(localStorage.getItem("user"));
+      const config = {
+        withCredentials: true,
+      };
+  
+      if (user?.token) {
+        config.headers = {
+          Authorization: `jwt ${user.token}`,
+        };
+      }
+  
+      const response = await axios.get(API_ENDPOINTS.TASKS.LIST, config);
       setTasks(response.data);
     } catch (error) {
       console.error('Error fetching tasks:', error);
     }
   };
+  
 
   const handleAddTask = async (newTask) => {
     console.log('handleAddTask called with:', newTask);

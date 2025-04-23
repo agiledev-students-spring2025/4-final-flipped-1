@@ -7,7 +7,7 @@ import Header from '../../components/header/Header';
 import BottomNav from '../../components/BottomNav/BottomNav';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../../config/api';
-// import { ToastContainer,toast } from 'react-toastify';
+import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function FlipBefore() {
@@ -205,15 +205,16 @@ function FlipBefore() {
 
 
     return (
+      <>
         <div className={`flip-before-page ${isFlipped ? 'black-screen' : ''}`}
             style={{ backgroundColor: isFlipped ? 'black' : taskColor }}>
-        {/* <div className={`flip-before-page ${isFlipped ? 'black-screen' : ''}`}> */}
-            {/* <Header /> */}
 
             <FlipTask taskName={taskName} mode = "before" duration={todayTime} />
-            {/* <ToastContainer /> */}
-            {/* <BottomNav /> */}
+            <ToastContainer />
+
         </div>
+        {/* <ToastContainer /> */}
+      </>
     );
 }
 

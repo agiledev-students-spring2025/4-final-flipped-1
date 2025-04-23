@@ -124,24 +124,38 @@ app.use('/api/todos', todoRoutes); //subtitute mock data
 
 
 
-
-
-
-// Mock data for tasks
-// const mockTasks = [
-//   { task_id: 1, name: 'Read Books', color: "#dbf7ff" },
-//   { task_id: 2, name: 'Study', color: "#fefbfc" },
-//   { task_id: 3, name: 'Haha', color: "#fff6e6" },
-//   { task_id: 4, name: 'Exercise', color: "#e8f5e9" }
-// ];
+const optionalAuth = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    console.log("🔍 token raw:", req.headers.authorization);
+    console.log("🔍 user parsed from token:", user);
+    console.log("🔍 error info:", info);
+    if (user) {
+      req.user = user;
+    } else {
+      req.user = null; // 未登录也继续
+    }
+    next();
+  })(req, res, next);
+};
 
 
 // API endpoint to get tasks
 // 可以用
-app.get('/api/tasks', async (req, res) => {
+app.get('/api/tasks', optionalAuth, async (req, res) => {
   try {
-    // Fetch all tasks from the database
-    const tasks = await Task.find();  
+    let query = {};
+
+    if (req.user) {
+      // loggined
+      console.log("✅ User logged in:", req.user.user_id);
+      query.user_id = req.user.user_id;
+    } else {
+      // didn't loggined
+      console.log("🚫 No user logged in. Returning public (guest) tasks only.");
+      query.user_id = 'all';
+    }
+
+    const tasks = await Task.find(query);  
     res.json(tasks);  
     // console.log("get tasks and show on the main page")
   } catch (err) {
@@ -296,16 +310,7 @@ app.post('/api/tasks/:taskName/delete', async (req, res) => {
 
 
 
-const optionalAuth = (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, (err, user, info) => {
-    if (user) {
-      req.user = user;
-    } else {
-      req.user = null; // 未登录也继续
-    }
-    next();
-  })(req, res, next);
-};
+
 
 
 //API real endpoint for insert new log to fliplog table
