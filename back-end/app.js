@@ -143,7 +143,6 @@ const optionalAuth = (req, res, next) => {
 // 可以用
 app.get('/api/tasks', optionalAuth, async (req, res) => {
   try {
-<<<<<<< HEAD
     let query = {};
 
     if (req.user) {
@@ -157,15 +156,6 @@ app.get('/api/tasks', optionalAuth, async (req, res) => {
     }
 
     const tasks = await Task.find(query);  
-=======
-    // Fetch all tasks from the database
-    const tasks = await Task.find();
-    const formattedTasks = tasks.map(task => ({
-      task_id: task._id,
-      name: task.task_name,
-      color: task.color
-    }));
->>>>>>> 4580904b9b810721d277e18bf4c48e940f45281b
     res.json(tasks);  
     // console.log("get tasks and show on the main page")
   } catch (err) {
