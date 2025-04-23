@@ -141,7 +141,12 @@ app.use('/api/todos', todoRoutes); //subtitute mock data
 app.get('/api/tasks', async (req, res) => {
   try {
     // Fetch all tasks from the database
-    const tasks = await Task.find();  
+    const tasks = await Task.find();
+    const formattedTasks = tasks.map(task => ({
+      task_id: task._id,
+      name: task.task_name,
+      color: task.color
+    }));
     res.json(tasks);  
     // console.log("get tasks and show on the main page")
   } catch (err) {
