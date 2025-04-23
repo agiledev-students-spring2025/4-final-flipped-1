@@ -7,7 +7,8 @@ const FlipLogSchema = new mongoose.Schema({
     task_name: { type: String, required: true, },
     start_time: { type: Date, required: true, },
     end_time: { type: Date, required: true, },
-    duration: { type: Number, required: true, }// 单位：秒
+    duration: { type: Number, required: true, },// 单位：秒
+    user_id: { type: String,}
 })
   
 const FlipLog = mongoose.model('FlipLog', FlipLogSchema)

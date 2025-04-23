@@ -31,20 +31,31 @@ function FlipAfter() {
 
     //send flip log data to database
     const sendFlipLog = async (task_name, startTimestamp, duration) => {
+        const user = JSON.parse(localStorage.getItem("user"));
         const startDate = new Date(startTimestamp); 
         const endDate = new Date(startDate.getTime() + duration * 1000); 
       
         const flipData = {
-          task_name,
-          start_time: startDate,
-          end_time: endDate, 
-          duration
+            task_name,
+            start_time: startDate.toISOString(),
+            end_time: endDate.toISOString(),
+            duration
         };
-      
+
         try {
-          const res = await axios.post(API_ENDPOINTS.FLIPLOG.INSERT, flipData);
-          const todayTotal = res.data.todayTotalTime;
-          return todayTotal
+            const config = { withCredentials: true,};
+            if (user?.token) {
+              config.headers = { Authorization: `jwt ${user.token}`};
+            }
+            const res = await axios.post(API_ENDPOINTS.FLIPLOG.INSERT, flipData, config);
+            
+            if (res.data.fromDB === false) {
+              // toast.info("You're not logged in, so your data won't be saved.");
+              return duration; // 未登录时就直接返回本次 flip duration
+            } else {
+              const todayTotal = res.data.todayTotalTime;
+              return todayTotal
+            }
         } catch (err) {
           console.error("Fail to send flip log data:", err);
         }

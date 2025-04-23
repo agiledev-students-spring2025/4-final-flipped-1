@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "mocha": "^11.1.0"
+  },
+  "dependencies": {
+    "react-toastify": "^10.0.0"
   }
 }
