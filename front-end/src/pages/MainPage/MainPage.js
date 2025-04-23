@@ -25,7 +25,7 @@ function MainPage() {
   };
 
   const handleAddTask = async (newTask) => {
-    console.log('handleAddTask called with:', newTask);
+    //console.log('handleAddTask called with:', newTask);
     try {
       let response;
       if (editingTask) {
