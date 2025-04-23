@@ -18,8 +18,9 @@ import BottomNav from "../../components/BottomNav/BottomNav";
 import { API_ENDPOINTS } from "../../config/api";
 
 const StatsPage = () => {
-  const [timeframe, setTimeframe] = useState("Monthly");
-  const [selectedDate, setSelectedDate] = useState(new Date(2025, 2, 1));
+  const [timeframe, setTimeframe] = useState("Daily");
+  // const [selectedDate, setSelectedDate] = useState(new Date(2025, 2, 1));
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [logs, setLogs] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
@@ -47,7 +48,9 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const res = await fetch(API_ENDPOINTS.FLIPLOG.LIST);
+        //返回当天的数据
+        const dateStr = selectedDate.toISOString().slice(0, 10);
+        const res = await fetch(`${API_ENDPOINTS.FLIPLOG.LIST}?date=${dateStr}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const data = await res.json();
@@ -165,71 +168,146 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
     currentDate.setDate(currentDate.getDate() - 3); // Start 3 days before
     
     for (let i = 0; i < 7; i++) {
-      dates.push(new Date(currentDate));
+      dates.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
       currentDate.setDate(currentDate.getDate() + 1);
     }
     return dates;
   };
 
+  const getWeekRange = (date) => {
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() - date.getDay());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    return { startOfWeek, endOfWeek };
+  };
+
+  const getWeekInputValue = (date) => {
+    const temp = new Date(date);
+    temp.setHours(0, 0, 0, 0);
+    const firstDayOfYear = new Date(temp.getFullYear(), 0, 1);
+    const dayOffset = (firstDayOfYear.getDay() + 6) % 7;
+    const firstMonday = new Date(firstDayOfYear);
+    firstMonday.setDate(firstMonday.getDate() - dayOffset + 1);
+    const daysSinceFirstMonday = Math.floor((temp - firstMonday) / (1000 * 60 * 60 * 24));
+    const weekNumber = Math.floor(daysSinceFirstMonday / 7) + 1;
+    return `${temp.getFullYear()}-W${String(weekNumber).padStart(2, "0")}`;
+  };
+  
+
+  const handlePrevious = () => {
+    if (timeframe === "Daily") {
+      setSelectedDate(new Date(selectedDate.setDate(selectedDate.getDate() - 1)));
+    } else if (timeframe === "Weekly") {
+      setSelectedDate(new Date(selectedDate.setDate(selectedDate.getDate() - 7)));
+    } else if (timeframe === "Monthly") {
+      setSelectedDate(new Date(selectedDate.setMonth(selectedDate.getMonth() - 1)));
+    }
+  };
+
+  const handleNext = () => {
+    if (timeframe === "Daily") {
+      setSelectedDate(new Date(selectedDate.setDate(selectedDate.getDate() + 1)));
+    } else if (timeframe === "Weekly") {
+      setSelectedDate(new Date(selectedDate.setDate(selectedDate.getDate() + 7)));
+    } else if (timeframe === "Monthly") {
+      setSelectedDate(new Date(selectedDate.setMonth(selectedDate.getMonth() + 1)));
+    }
+  };
+
+  const formatDateInput = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份从0开始
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+  
   return (
     <div className="stats-container">
       <Header2 title="Statistics" />
       <div className="stats-content">
         {/* —— 上半部分保持不变 —— */}
         <div className="concentration-card">
-          <h2>Concentration</h2>
+          {/* <h2>Concentration</h2> */}
           <div className="concentration-info">
-            <select
-              className="timeframe-selector"
-              value={timeframe}
-              onChange={(e) => setTimeframe(e.target.value)}
-            >
-              <option value="Daily">Daily</option>
-              <option value="Weekly">Weekly</option>
-              <option value="Monthly">Monthly</option>
-            </select>
+            <div className="timeframe-buttons">
+              <button className={`timeframe-button ${timeframe === "Daily" ? "active" : ""}`} onClick={() => setTimeframe("Daily")}>Daily</button>
+              <button className={`timeframe-button ${timeframe === "Weekly" ? "active" : ""}`} onClick={() => setTimeframe("Weekly")}>Weekly</button>
+              <button className={`timeframe-button ${timeframe === "Monthly" ? "active" : ""}`} onClick={() => setTimeframe("Monthly")}>Monthly</button>
+            </div>
 
-            {timeframe === "Daily" && (
-              <input
-                type="date"
-                className="date-picker"
-                value={selectedDate.toISOString().split("T")[0]}
-                onChange={(e) => setSelectedDate(new Date(e.target.value))}
-              />
+            <div className="navigation-controls">
+              <button onClick={handlePrevious}>P</button>
+              <div className="date-navigation">
+                {getDateNumbers().map((date, index) => (
+                  <div key={index} className={`date-item ${date.toDateString() === selectedDate.toDateString() ? "selected" : ""}`} onClick={() => setSelectedDate(date)}>
+                    {date.getDate()}
+                  </div>
+                ))}
+              </div>
+                <button onClick={handleNext}>N</button>
+            </div>
+
+          
+            
+
+            {/* {timeframe === "Weekly" && (
+              <div className="week-display">
+                {`Week of ${getWeekRange(selectedDate).startOfWeek.toLocaleDateString()} - ${getWeekRange(selectedDate).endOfWeek.toLocaleDateString()}`}
+              </div>
             )}
-            {timeframe === "Weekly" && (
-              <input
-                type="week"
-                className="week-picker"
-                onChange={(e) => {
-                  const [year, week] = e.target.value.split("-W");
-                  const first = new Date(year, 0, 1);
-                  const offset = first.getDay();
-                  const isoStart = new Date(first);
-                  isoStart.setDate(
-                    1 + (offset <= 4 ? -offset + 1 : 8 - offset)
-                  );
-                  const start = new Date(isoStart);
-                  start.setDate(start.getDate() + (week - 1) * 7);
-                  setSelectedDate(start);
-                }}
-              />
-            )}
+
             {timeframe === "Monthly" && (
+              <div className="month-display">
+                {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </div>
+            )} */}
+
+            <div className="selected-date">
+               {timeframe === "Daily" && (
               <input
-                type="month"
-                className="month-picker"
-                value={selectedDate.toISOString().slice(0, 7)}
-                onChange={(e) => {
-                  const d = new Date(e.target.value + "-01");
-                  if (!isNaN(d)) setSelectedDate(d);
-                }}
-              />
-            )}
+              type="date"
+              className="date-picker"
+              // value={selectedDate.toISOString().split("T")[0]}
+              value={formatDateInput(selectedDate)}
+              onChange={(e) => setSelectedDate(new Date(e.target.value))}
+            />
+          )}
+          {timeframe === "Weekly" && (
+            <input
+              type="week"
+              className="week-picker"
+              value={getWeekInputValue(selectedDate)}
+              onChange={(e) => {
+                const [year, week] = e.target.value.split("-W");
+                const first = new Date(year, 0, 1);
+                const offset = first.getDay();
+                const isoStart = new Date(first);
+                isoStart.setDate(
+                  1 + (offset <= 4 ? -offset + 1 : 8 - offset)
+                );
+                const start = new Date(isoStart);
+                start.setDate(start.getDate() + (week - 1) * 7);
+                setSelectedDate(start);
+              }}
+            />
+          )}
+           {timeframe === "Monthly" && (
+            <input
+            type="month"
+            className="month-picker"
+            value={selectedDate.toISOString().slice(0, 7)}
+            onChange={(e) => {
+              const d = new Date(e.target.value + "-01");
+              if (!isNaN(d)) setSelectedDate(d);
+            }}
+          />
+        )}
+              {/* <span className="calendar-icon">📅</span> */}
+            </div>
+
+         
           </div>
-          <h1>
-            {totalHours} <span>Hours</span> {totalMinutes} <span>Mins</span>
-          </h1>
 
         </div>
 
@@ -245,7 +323,17 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
           <ResponsiveContainer width="100%" height={250}>
             {timeframe === "Daily" ? (
               <AreaChart data={chartData}>
-                <XAxis dataKey="time" />
+                {/* <XAxis dataKey="time" /> */}
+                <XAxis
+                  dataKey={
+                    timeframe === "Monthly"
+                      ? "week"      // Monthly 用的是 W1, W2...
+                      : timeframe === "Weekly"
+                      ? "day"       // Weekly 用的是 MON, TUE...
+                      : "time"      // Daily 用的是 00:00, 01:00...
+                  }
+                />
+
                 <YAxis allowDecimals={false} tickFormatter={(v) => `${v}m`} />
                 <Tooltip formatter={(v) => `${v} min`} />
                 <Area
@@ -266,10 +354,36 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
                 data={chartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
               >
-                <XAxis dataKey={timeframe === "Monthly" ? "week" : "day"} />
-                <YAxis tickFormatter={(v) => `${Math.floor(v / 60)}h`} />
-                <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip formatter={(v) => `${Math.floor(v / 60)}h ${v % 60}m`} />
+                <XAxis dataKey={
+  timeframe === "Monthly"
+    ? "week"
+    : timeframe === "Weekly"
+    ? "day"
+    : "time"
+} />
+
+                <YAxis
+  allowDecimals={false}
+  tickFormatter={(v) => {
+    // console.log(chartData.map(d => d.time)); // 看看 time 字段都是什么
+    // console.log("chartData", chartData);
+//     console.log("weekly selected week:", startOfWeek, endOfWeek);
+// console.log("weekly filtered logs:", filtered);
+
+    if (v < 60) return `${v}m`;
+    const h = Math.floor(v / 60);
+    const m = v % 60;
+    return m === 0 ? `${h}h` : `${h}h ${m}m`;
+  }}
+/>
+<Tooltip
+  formatter={(v) => {
+    const h = Math.floor(v / 60);
+    const m = v % 60;
+    return h === 0 ? `${m} min` : `${h}h ${m}m`;
+  }}
+/>
+
                 <Line
                   type="monotone"
                   dataKey="minutes"

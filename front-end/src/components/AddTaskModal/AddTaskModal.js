@@ -10,7 +10,7 @@ function AddTaskModal({ isOpen, onClose, onSubmit, editingTask }) {
   useEffect(() => {
     // console.log('Effect triggered:', { editingTask, isOpen });
     if (editingTask) {
-      setTaskName(editingTask.name);
+      setTaskName(editingTask.task_name);
       setTaskColor(editingTask.color);
     } else {
       setTaskName('');
@@ -24,11 +24,14 @@ function AddTaskModal({ isOpen, onClose, onSubmit, editingTask }) {
   
     if (trimmedName) {
       const user = JSON.parse(localStorage.getItem("user"));
-      onSubmit({
+      const payload = {
         task_name: trimmedName,
-        color: taskColor,
-        user_id: user?.user_id || null
-      });
+        color: taskColor
+      };
+      if (user?.user_id) {
+        payload.user_id = user.user_id;
+      }
+      onSubmit(payload); // 调用 MainPage.js 的 handleAddTask
     }
   };
 
