@@ -48,7 +48,9 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const res = await fetch(API_ENDPOINTS.FLIPLOG.LIST);
+        //返回当天的数据
+        const dateStr = selectedDate.toISOString().slice(0, 10);
+        const res = await fetch(`${API_ENDPOINTS.FLIPLOG.LIST}?date=${dateStr}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const data = await res.json();
@@ -323,14 +325,14 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
               <AreaChart data={chartData}>
                 {/* <XAxis dataKey="time" /> */}
                 <XAxis
-  dataKey={
-    timeframe === "Monthly"
-      ? "week"      // Monthly 用的是 W1, W2...
-      : timeframe === "Weekly"
-      ? "day"       // Weekly 用的是 MON, TUE...
-      : "time"      // Daily 用的是 00:00, 01:00...
-  }
-/>
+                  dataKey={
+                    timeframe === "Monthly"
+                      ? "week"      // Monthly 用的是 W1, W2...
+                      : timeframe === "Weekly"
+                      ? "day"       // Weekly 用的是 MON, TUE...
+                      : "time"      // Daily 用的是 00:00, 01:00...
+                  }
+                />
 
                 <YAxis allowDecimals={false} tickFormatter={(v) => `${v}m`} />
                 <Tooltip formatter={(v) => `${v} min`} />
