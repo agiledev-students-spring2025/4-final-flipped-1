@@ -210,7 +210,7 @@ function FlipBefore() {
             style={{ backgroundColor: isFlipped ? 'black' : taskColor }}>
 
             <FlipTask taskName={taskName} mode = "before" duration={todayTime} />
-            <ToastContainer />
+            {/* <ToastContainer /> */}
 
         </div>
         {/* <ToastContainer /> */}

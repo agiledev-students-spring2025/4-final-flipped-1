@@ -11,6 +11,8 @@ function MainPage() {
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
+  //抓最开始显示的task显示在主页面上
+  //后端会判断是否登陆 - 展示对应id的task或者展示默认task
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -18,14 +20,10 @@ function MainPage() {
   const fetchTasks = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      const config = {
-        withCredentials: true,
-      };
+      const config = { withCredentials: true, };
   
       if (user?.token) {
-        config.headers = {
-          Authorization: `jwt ${user.token}`,
-        };
+        config.headers = { Authorization: `jwt ${user.token}`, };
       }
   
       const response = await axios.get(API_ENDPOINTS.TASKS.LIST, config);
@@ -35,7 +33,7 @@ function MainPage() {
     }
   };
   
-
+  //Add
   const handleAddTask = async (newTask) => {
     //console.log('handleAddTask called with:', newTask);
     try {
@@ -57,16 +55,25 @@ function MainPage() {
     }
   };
 
+  //Edit
   const handleEditTask = (task) => {
     console.log('handleEditTask called with:', task);
     setEditingTask(task);
     setIsAddTaskModalOpen(true);
   };
 
-  const handleDeleteTask = async (taskId) => {
+  //Delete
+  const handleDeleteTask = async (taskName) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const config = { withCredentials: true,};
+
+    if (user?.token) {
+      config.headers = { Authorization: `jwt ${user.token}`, };
+    }
+  
     try {
-      await axios.post(API_ENDPOINTS.TASKS.DELETE(taskId));
-      setTasks(tasks.filter(task => task.task_id !== taskId));
+      await axios.post(API_ENDPOINTS.TASKS.DELETE(taskName), null, config);
+      setTasks(tasks.filter(task => task.task_name !== taskName));
     } catch (error) {
       console.error('Error deleting task:', error);
     }
