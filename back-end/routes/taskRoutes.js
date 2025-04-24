@@ -42,7 +42,7 @@ const taskRouter = () => {
     }
   });
 
-  router.post('api/add',
+  router.post('/api/add',
     passport.authenticate('jwt', { session: false }),
     [
       body('task_name').isString().notEmpty(),

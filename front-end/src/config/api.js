@@ -7,7 +7,7 @@ export const API_ENDPOINTS = {
     LIST: `${API_BASE_URL}/tasks/api`,
     CREATE: `${API_BASE_URL}/tasks/api/add`,
     // UPDATE: (taskId) => `${API_BASE_URL}/tasks/api/${taskId}`,
-    DELETE: (taskId) => `${API_BASE_URL}/tasks/api/${taskId}/delete`,
+    DELETE: (taskName) => `${API_BASE_URL}/tasks/api/${taskName}/delete`,
     // GET_TIME: (taskId) => `${API_BASE_URL}/tasks/api/${taskId}/time`,
   },
 
