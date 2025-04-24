@@ -13,6 +13,7 @@ import {
 } from "recharts";
 
 import "./StatsPage.css";
+import CalendarUI from "../../components/CalendarUI/CalendarUI";
 import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
 import { API_ENDPOINTS } from "../../config/api";
@@ -229,85 +230,15 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
         {/* —— 上半部分保持不变 —— */}
         <div className="concentration-card">
           {/* <h2>Concentration</h2> */}
-          <div className="concentration-info">
-            <div className="timeframe-buttons">
-              <button className={`timeframe-button ${timeframe === "Daily" ? "active" : ""}`} onClick={() => setTimeframe("Daily")}>Daily</button>
-              <button className={`timeframe-button ${timeframe === "Weekly" ? "active" : ""}`} onClick={() => setTimeframe("Weekly")}>Weekly</button>
-              <button className={`timeframe-button ${timeframe === "Monthly" ? "active" : ""}`} onClick={() => setTimeframe("Monthly")}>Monthly</button>
-            </div>
-
-            <div className="navigation-controls">
-              <button onClick={handlePrevious}>P</button>
-              <div className="date-navigation">
-                {getDateNumbers().map((date, index) => (
-                  <div key={index} className={`date-item ${date.toDateString() === selectedDate.toDateString() ? "selected" : ""}`} onClick={() => setSelectedDate(date)}>
-                    {date.getDate()}
-                  </div>
-                ))}
-              </div>
-                <button onClick={handleNext}>N</button>
-            </div>
-
-          
-            
-
-            {/* {timeframe === "Weekly" && (
-              <div className="week-display">
-                {`Week of ${getWeekRange(selectedDate).startOfWeek.toLocaleDateString()} - ${getWeekRange(selectedDate).endOfWeek.toLocaleDateString()}`}
-              </div>
-            )}
-
-            {timeframe === "Monthly" && (
-              <div className="month-display">
-                {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-              </div>
-            )} */}
-
-            <div className="selected-date">
-               {timeframe === "Daily" && (
-              <input
-              type="date"
-              className="date-picker"
-              // value={selectedDate.toISOString().split("T")[0]}
-              value={formatDateInput(selectedDate)}
-              onChange={(e) => setSelectedDate(new Date(e.target.value))}
-            />
-          )}
-          {timeframe === "Weekly" && (
-            <input
-              type="week"
-              className="week-picker"
-              value={getWeekInputValue(selectedDate)}
-              onChange={(e) => {
-                const [year, week] = e.target.value.split("-W");
-                const first = new Date(year, 0, 1);
-                const offset = first.getDay();
-                const isoStart = new Date(first);
-                isoStart.setDate(
-                  1 + (offset <= 4 ? -offset + 1 : 8 - offset)
-                );
-                const start = new Date(isoStart);
-                start.setDate(start.getDate() + (week - 1) * 7);
-                setSelectedDate(start);
-              }}
-            />
-          )}
-           {timeframe === "Monthly" && (
-            <input
-            type="month"
-            className="month-picker"
-            value={selectedDate.toISOString().slice(0, 7)}
-            onChange={(e) => {
-              const d = new Date(e.target.value + "-01");
-              if (!isNaN(d)) setSelectedDate(d);
-            }}
+          <CalendarUI
+            timeframe={timeframe}
+            setTimeframe={setTimeframe}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            getDateNumbers={getDateNumbers}
+            handlePrevious={handlePrevious}
+            handleNext={handleNext}
           />
-        )}
-              {/* <span className="calendar-icon">📅</span> */}
-            </div>
-
-         
-          </div>
 
         </div>
 

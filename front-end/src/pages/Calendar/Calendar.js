@@ -5,15 +5,78 @@ import "react-calendar/dist/Calendar.css";
 import CalendarDayView from "./CalendarDayView";
 import CalendarWeekView from "./CalendarWeekView";
 import CalendarMonthView from "./CalendarMonthView";
+
+import CalendarUI from "../../components/CalendarUI/CalendarUI";
 import Header3 from "../../components/header/Header3";  
 import BottomNav from "../../components/BottomNav/BottomNav";  
 import "./Calendar.css"; 
 
 const Calendar = () => {
   const [authorized, setAuthorized] = useState(false);
-  const [view, setView] = useState("daily"); 
+  //const [view, setView] = useState("daily"); 
+  const [timeframe, setTimeframe] = useState("Daily");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [toDoList, setToDoList] = useState([]);
+
+
+  // 1) the 7-day nav dates
+  const getDateNumbers = () => {
+    const dates = [];
+    const current = new Date(selectedDate);
+    current.setDate(current.getDate() - 3);
+    for (let i = 0; i < 7; i++) {
+      dates.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+    return dates;
+  };
+
+  // 2) prev button shifts by one unit
+  const handlePrevious = () => {
+    if (timeframe === "Daily") {
+      setSelectedDate(d => {
+        const nd = new Date(d);
+        nd.setDate(nd.getDate() - 1);
+        return nd;
+      });
+    } else if (timeframe === "Weekly") {
+      setSelectedDate(d => {
+        const nd = new Date(d);
+        nd.setDate(nd.getDate() - 7);
+        return nd;
+      });
+    } else {
+      setSelectedDate(d => {
+        const nd = new Date(d);
+        nd.setMonth(nd.getMonth() - 1);
+        return nd;
+      });
+    }
+  };
+
+  // 3) next button shifts by one unit
+  const handleNext = () => {
+    if (timeframe === "Daily") {
+      setSelectedDate(d => {
+        const nd = new Date(d);
+        nd.setDate(nd.getDate() + 1);
+        return nd;
+      });
+    } else if (timeframe === "Weekly") {
+      setSelectedDate(d => {
+        const nd = new Date(d);
+        nd.setDate(nd.getDate() + 7);
+        return nd;
+      });
+    } else {
+      setSelectedDate(d => {
+        const nd = new Date(d);
+        nd.setMonth(nd.getMonth() + 1);
+        return nd;
+      });
+    }
+  };
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -85,49 +148,55 @@ const Calendar = () => {
     <div className="calendar-container">
       <Header3 title="Calendar" onAddTask={handleAddToDos} />
 
-      {/* View Selector */}
-      <div className="view-selector">
-        <button className={view === "daily" ? "active" : ""} onClick={() => setView("daily")}>Daily</button>
-        <button className={view === "weekly" ? "active" : ""} onClick={() => setView("weekly")}>Weekly</button>
-        <button className={view === "monthly" ? "active" : ""} onClick={() => setView("monthly")}>Monthly</button>
-      </div>
-
-      {/* Date Picker for Daily View */}
-      {view === "daily" && (
-        <div className="calendar-wrapper">
-          <ReactCalendar 
-            onChange={setSelectedDate} 
-            value={selectedDate} 
-            locale="en-US"
+      <div className="stats-content">
+        <div className="concentration-card">
+          <CalendarUI
+            timeframe={timeframe}
+            setTimeframe={setTimeframe}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            getDateNumbers={getDateNumbers}
+            handlePrevious={handlePrevious}
+            handleNext={handleNext}
           />
         </div>
-      )}
 
-      {/* Render View */}
-      <div className="calendar-view">
-        {view === "daily" && (
-          <CalendarDayView
-            selectedDate={selectedDate.toISOString().split("T")[0]}
-            toDoList={toDoList}
-            onDelete={handleDeleteToDo}
-          />
-        )}
-        {view === "weekly" && (
-          <CalendarWeekView
-            toDoList={toDoList}
-            onDelete={handleDeleteToDo}
-          />
-        )}
-        {view === "monthly" && (
-          <CalendarMonthView
-            toDoList={toDoList}
-            onDelete={handleDeleteToDo}
-          />
-        )}
+        <div className="distribution-card">
+          {timeframe === "Daily" && (
+            <div className="calendar-wrapper">
+              <ReactCalendar
+                onChange={setSelectedDate}
+                value={selectedDate}
+                locale="en-US"
+              />
+            </div>
+          )}
+
+          {timeframe === "Daily" && (
+            <CalendarDayView
+              selectedDate={selectedDate.toISOString().split("T")[0]}
+              toDoList={toDoList}
+              onDelete={handleDeleteToDo}
+            />
+          )}
+          {timeframe === "Weekly" && (
+            <CalendarWeekView
+              toDoList={toDoList}
+              onDelete={handleDeleteToDo}
+            />
+          )}
+          {timeframe === "Monthly" && (
+            <CalendarMonthView
+              toDoList={toDoList}
+              onDelete={handleDeleteToDo}
+            />
+          )}
+        </div>
       </div>
 
       <BottomNav />
     </div>
+
   );
 };
 
