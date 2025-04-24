@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 import BottomNav from "../../components/BottomNav/BottomNav";
-import Header from "../../components/header/Header";
+import Header from "../../components/header/Header2";
 import axios from 'axios';
 import { API_ENDPOINTS } from '../../config/api';
 import { toast } from 'react-toastify';
@@ -121,20 +121,41 @@ const ChangeUsernameModal = ({ isOpen, onClose, onSubmit }) => {
 const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
   const [isPasswordModalOpen, setisPasswordModalOpen] = useState(false);
   const [isUsernameModalOpen, setIsUsernameModalOpen] = useState(false);
+  const [totalFlipTime, setTotalFlipTime] = useState(0)
 
 
   //进入页面的时候拉用户
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     console.log(storedUser)
-    if (storedUser) {
-      setUser(storedUser);
-    } else {
-      navigate("/signin");
-    }
+    if (storedUser) { setUser(storedUser); } 
+    else { navigate("/signin"); }
   }, [navigate]);
+
+  useEffect(() => {
+    if (!user) return
+    const fetchTotal = async () => {
+      try {
+        const res = await axios.get(API_ENDPOINTS.FLIPLOG.TOTAL, {
+          headers: { Authorization: `jwt ${user.token}` },
+          withCredentials: true
+        })
+        setTotalFlipTime(res.data.totalDuration)
+        setError(null); 
+      } catch (err) {
+        console.error('fail to fetch total flip time:', err)
+        if (err.response?.status === 401) {
+          setError('You are not logged in');
+        } else {
+          setError('Failed to load total focus time');
+        }
+      }
+    }
+    fetchTotal()
+  }, [user])
 
   //logout
 const handleLogout = async () => {
@@ -227,8 +248,8 @@ const handleLogout = async () => {
                  <div className="edit-icon-placeholder"></div>
               </div>
               <div className="profile-stats">
-                 {/* Placeholder for Time - Keep format or adjust as needed */}
-                 <span>🕒 90 days 11 hours 9 minutes</span>
+                {error ? ( <span className="error-text"> {error} </span> )
+                  : ( <span>🕒 Total focus time: {totalFlipTime} seconds</span> ) }
               </div>
                <div className="profile-summary-stats">
                  <span><div className="stat-icon-placeholder green"></div> 98%</span>
