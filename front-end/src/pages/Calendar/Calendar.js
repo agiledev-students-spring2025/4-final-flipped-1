@@ -82,6 +82,8 @@ const Calendar = () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
+      localStorage.setItem("loginMessage", "Please log in to access the Calendar page.");
+      localStorage.setItem("redirectAfterLogin", "/calendar");
       window.location.href = "/signin";
       return;
     }

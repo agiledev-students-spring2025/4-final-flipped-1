@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SignIn.css";
 import Header2 from "../../components/header/Header2";
@@ -11,6 +11,15 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // 检查是否有跳转提示信息
+  useEffect(() => {
+    const message = localStorage.getItem("loginMessage");
+    if (message) {
+      alert(message);
+      localStorage.removeItem("loginMessage");
+    }
+  }, []);
+
   const handleSignIn = async () => {
     if (!email || !password) {
       alert("Please fill in both email and password.");
@@ -19,13 +28,11 @@ const SignIn = () => {
 
     try {
       const response = await axios.post(API_ENDPOINTS.PROFILE.LOGIN, {
-          user_id: email,
-          password: password
-        },
-        {
-          withCredentials: true
-        }
-      );
+        user_id: email,
+        password: password
+      }, {
+        withCredentials: true
+      });
 
       if (response.data.success) {
         const user = {
@@ -34,12 +41,18 @@ const SignIn = () => {
           username: response.data.username
         };
 
-        // 保存 token 和 user 到 localStorage
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", response.data.token);
 
-        // 跳转到 profile
-        navigate("/profile");
+        // 检查用户原来想跳转的页面（redirectAfterLogin）
+        const redirect = localStorage.getItem("redirectAfterLogin");
+        if (redirect) {
+          localStorage.removeItem("redirectAfterLogin");
+          navigate(redirect);
+        } else {
+          navigate("/profile");
+        }
+
       } else {
         alert("Login failed: " + response.data.message);
       }
@@ -76,7 +89,7 @@ const SignIn = () => {
           Don't have an account with us? <span className="register-link" onClick={() => navigate("/register")}>Register</span>
         </p>
       </div>
-  
+
       <BottomNav />
     </div>
   );
