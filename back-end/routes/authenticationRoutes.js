@@ -76,7 +76,7 @@ const authenticationRouter = () => {
     const { user_id, password } = req.body
 
     if (!user_id || !password) {
-      return res.status(401).json({success: false, message: `No register email or password supplied.`,
+      return res.status(400).json({success: false, message: `No register email or password supplied.`,
       })
     }
 

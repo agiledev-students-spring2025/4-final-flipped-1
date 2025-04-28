@@ -26,6 +26,12 @@ const SignIn = () => {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
     try {
       const response = await axios.post(API_ENDPOINTS.PROFILE.LOGIN, {
         user_id: email,
@@ -59,6 +65,24 @@ const SignIn = () => {
     } catch (err) {
       console.error("Login error:", err);
       alert("An error occurred during login. Please try again.");
+      
+      if (err.response) {
+        const status = err.response.status;
+        const serverMessage = err.response.data?.message || '';
+
+        if (status === 400) {
+          alert(serverMessage || "Invalid input. Please check your information.");
+        } else if (status === 401) {
+          alert(serverMessage || "Incorrect email or password.");
+        } else if (status === 404) {
+          alert(serverMessage || "User not found. Please register first.");
+        } else {
+          alert(serverMessage || "Login failed. Please try again.");
+        }
+      } else {
+        alert("An error occurred during login. Please check your network and try again.");
+      }
+
     }
   };
 
