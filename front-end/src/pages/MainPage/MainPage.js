@@ -127,6 +127,7 @@ function MainPage() {
         onClose={handleCloseModal}
         onSubmit={handleAddTask}
         editingTask={editingTask}
+        tasks={tasks}
       />
     </div>
   );

@@ -224,7 +224,8 @@
 
 .modal-buttons .confirm-btn {
   /* Apply gradient and style from AddTaskModal */
-  background: linear-gradient(135deg, #6c5ce7 0%, #a8a4e6 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #99BADD 100%);
+  border: none;
   color: white;
   border: none; /* Remove border */
   box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3); /* Add similar shadow */
