@@ -6,15 +6,17 @@ export const API_ENDPOINTS = {
   TASKS: {
     LIST: `${API_BASE_URL}/tasks/api`,
     CREATE: `${API_BASE_URL}/tasks/api/add`,
-    // UPDATE: (taskId) => `${API_BASE_URL}/tasks/api/${taskId}`,
+    UPDATE: (taskName) => `${API_BASE_URL}/tasks/api/${taskName}/update`,
     DELETE: (taskName) => `${API_BASE_URL}/tasks/api/${taskName}/delete`,
-    // GET_TIME: (taskId) => `${API_BASE_URL}/tasks/api/${taskId}/time`,
+    GET_TIME: (taskName) => `${API_BASE_URL}/tasks/api/${taskName}/time`,
   },
 
   FLIPLOG: {
     INSERT: `${API_BASE_URL}/api/fliplog/insert`, 
     LIST: `${API_BASE_URL}/api/fliplog`,          
     GET_TODAY: (taskName) => `${API_BASE_URL}/api/today/${taskName}`,
+    GET_RANGE: (startDate, endDate) => 
+      `${API_BASE_URL}/api/fliplog/range?start=${startDate}&end=${endDate}`,
     TOTAL: `${API_BASE_URL}/api/fliplog/total`,
   },
 

@@ -35,20 +35,35 @@ function MainPage() {
   
   //Add
   const handleAddTask = async (newTask) => {
-    //console.log('handleAddTask called with:', newTask);
     try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const config = { 
+        withCredentials: true,
+        headers: { Authorization: `jwt ${user.token}` }
+      };
+
       let response;
       if (editingTask) {
-        console.log('Updating existing task:', editingTask.task_id);
-        response = await axios.put(API_ENDPOINTS.TASKS.UPDATE(editingTask.task_id), newTask);
-        setTasks(tasks.map(task => 
-          task.task_id === editingTask.task_id ? response.data : task
-        ));
+        console.log('Updating existing task:', editingTask.task_name);
+        console.log('Request URL:', API_ENDPOINTS.TASKS.UPDATE(editingTask.task_name));
+        console.log('Request data:', newTask);
+        console.log('Request config:', config);
+        
+        response = await axios.put(
+          API_ENDPOINTS.TASKS.UPDATE(editingTask.task_name), 
+          newTask,
+          config
+        );
       } else {
         console.log('Creating new task');
-        response = await axios.post(API_ENDPOINTS.TASKS.CREATE, newTask);
-        setTasks([...tasks, response.data]);
+        response = await axios.post(
+          API_ENDPOINTS.TASKS.CREATE, 
+          newTask,
+          config
+        );
       }
+      
+      await fetchTasks();
       handleCloseModal();
     } catch (error) {
       console.error('Error adding/updating task:', error);
@@ -64,16 +79,15 @@ function MainPage() {
 
   //Delete
   const handleDeleteTask = async (taskName) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const config = { withCredentials: true,};
-
-    if (user?.token) {
-      config.headers = { Authorization: `jwt ${user.token}`, };
-    }
-  
     try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const config = { 
+        withCredentials: true,
+        headers: { Authorization: `jwt ${user.token}` }
+      };
+
       await axios.post(API_ENDPOINTS.TASKS.DELETE(taskName), null, config);
-      setTasks(tasks.filter(task => task.task_name !== taskName));
+      await fetchTasks(); // 删除后重新获取任务列表
     } catch (error) {
       console.error('Error deleting task:', error);
     }
@@ -113,6 +127,7 @@ function MainPage() {
         onClose={handleCloseModal}
         onSubmit={handleAddTask}
         editingTask={editingTask}
+        tasks={tasks}
       />
     </div>
   );

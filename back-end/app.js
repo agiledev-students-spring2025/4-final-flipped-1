@@ -22,6 +22,10 @@ app.use(express.urlencoded({ extended: true }))
 
 
 
+//JWT
+import jwtStrategy from './config/jwt-config.js'
+passport.use(jwtStrategy)
+app.use(passport.initialize())
 
 // routers
 import taskRouter from './routes/taskRoutes.js'
@@ -37,10 +41,6 @@ app.use('/cookie', cookieRouter()) // all requests for /cookie/* will be handled
 app.use('/protected', protectedContentRouter()) // all requests for /protected/* will be handled by the protectedRoutes router
 
 
-//JWT
-import jwtStrategy from './config/jwt-config.js'
-passport.use(jwtStrategy)
-app.use(passport.initialize())
 
 
 // import database table
