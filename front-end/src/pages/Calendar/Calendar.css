@@ -107,6 +107,12 @@
   margin-top: 20px;
 }
 
+.day-view-container h2 {
+  text-align: center;
+  font-size: 19px;
+  color: #333;
+}
+
 .date-selector {
   display: flex;
   align-items: center;
@@ -146,7 +152,7 @@
   
   .week-view-container h2 {
     text-align: center;
-    font-size: 15px;
+    font-size: 19px;
     color: #333;
   }
   
@@ -193,7 +199,7 @@
 /* Calendar Header */
 .month-view-container h2 {
   text-align: center;
-  font-size: 24px;
+  font-size: 20px;
   color: #333;
   margin-bottom: 20px;
 }
