@@ -173,6 +173,8 @@ const Calendar = () => {
           {timeframe === "Weekly" && (
             <CalendarWeekView
               toDoList={toDoList}
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
               onDelete={handleDeleteToDo}
             />
           )}
