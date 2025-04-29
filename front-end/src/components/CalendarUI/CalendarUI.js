@@ -18,8 +18,14 @@ export default function CalendarUI({
   }
 
   const getWeekInputValue = date => {
-    // …copy your existing getWeekInputValue implementation…
-  }
+    const year = date.getFullYear();
+    const jan4 = new Date(year, 0, 4); // Jan 4 is always in week 1
+    const startOfWeek1 = new Date(jan4);
+    startOfWeek1.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7));
+    const diff = Math.floor((date - startOfWeek1) / (7 * 24 * 60 * 60 * 1000));
+    const week = String(diff + 1).padStart(2, '0');
+    return `${year}-W${week}`;
+  };
 
   return (
     <div className="concentration-info">
@@ -61,7 +67,12 @@ export default function CalendarUI({
             type="date"
             className="date-picker"
             value={formatDateInput(selectedDate)}
-            onChange={e=>setSelectedDate(new Date(e.target.value))}
+            onChange={e => {
+              // Fix for off-by-one bug from UTC parsing
+              const [year, month, day] = e.target.value.split('-');
+              const localDate = new Date(Number(year), Number(month) - 1, Number(day)); // Local midnight
+              setSelectedDate(localDate);
+            }}
           />
         )}
         {timeframe==='Weekly' && (
@@ -69,8 +80,25 @@ export default function CalendarUI({
             type="week"
             className="week-picker"
             value={getWeekInputValue(selectedDate)}
-            onChange={e=>{
-              // …your existing week->Date logic…
+            onChange={e => {
+              // Parse "YYYY-Wxx" ISO week format into the Monday of that week
+              const [yearStr, weekStr] = e.target.value.split('-W');
+              const year = Number(yearStr);
+              const week = Number(weekStr);
+              const jan4 = new Date(year, 0, 4);
+              const startOfWeek1 = new Date(jan4);
+              startOfWeek1.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7));
+              const mondayOfWeek = new Date(startOfWeek1);
+              mondayOfWeek.setDate(startOfWeek1.getDate() + (week - 1) * 7);
+
+              // Set local midnight to prevent timezone shift
+              const localMonday = new Date(
+                mondayOfWeek.getFullYear(),
+                mondayOfWeek.getMonth(),
+                mondayOfWeek.getDate()
+              );
+
+              setSelectedDate(localMonday);
             }}
           />
         )}
@@ -79,9 +107,11 @@ export default function CalendarUI({
             type="month"
             className="month-picker"
             value={selectedDate.toISOString().slice(0,7)}
-            onChange={e=>{
-              const d = new Date(e.target.value+'-01')
-              if(!isNaN(d)) setSelectedDate(d)
+            onChange={e => {
+              // Fix: avoid new Date('YYYY-MM-01') UTC parsing
+              const [year, month] = e.target.value.split('-');
+              const localDate = new Date(Number(year), Number(month) - 1, 1); // Local midnight
+              setSelectedDate(localDate);
             }}
           />
         )}
