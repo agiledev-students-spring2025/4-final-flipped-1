@@ -1,11 +1,7 @@
-import React, { useState } from "react";
-import ReactCalendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import React from "react";
 import "./Calendar.css"; 
 
-const CalendarMonthView = ({ toDoList }) => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
+const CalendarMonthView = ({ toDoList, selectedDate, setSelectedDate }) => {
   const selectedYear = selectedDate.getFullYear();
   const selectedMonth = selectedDate.getMonth();
 
@@ -39,17 +35,6 @@ const CalendarMonthView = ({ toDoList }) => {
         {selectedDate.toLocaleString("default", { month: "long" })}{" "}
         {selectedYear}
       </h2>
-
-      {/* Month Picker */}
-      <div className="calendar-wrapper">
-        <ReactCalendar
-          onChange={setSelectedDate}
-          value={selectedDate}
-          locale="en-US"
-          view="month"
-          onClickMonth={(value) => setSelectedDate(value)}
-        />
-      </div>
 
       {/* Display tasks */}
       <div className="month-view">

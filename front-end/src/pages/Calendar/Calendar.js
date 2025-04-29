@@ -179,6 +179,8 @@ const Calendar = () => {
           {timeframe === "Monthly" && (
             <CalendarMonthView
               toDoList={toDoList}
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
               onDelete={handleDeleteToDo}
             />
           )}
