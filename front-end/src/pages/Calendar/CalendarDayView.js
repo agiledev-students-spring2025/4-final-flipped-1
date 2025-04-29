@@ -18,7 +18,8 @@ const CalendarDayView = ({ selectedDate, toDoList, onDelete }) => {
 
   return (
     <div className="day-view-container">
-      <h3>Tasks for {selectedDate}</h3>
+      <h3>To-Do List</h3>
+      <h2>{selectedDate}</h2>
       {tasksForDay.length > 0 ? (
         <ul className="toDo-list">
           {tasksForDay.map((task) => (
@@ -28,11 +29,6 @@ const CalendarDayView = ({ selectedDate, toDoList, onDelete }) => {
                 completedTasks[`${task.date}-${task._id}`] ? "completed" : ""
               }`}
             >
-              <input
-                type="checkbox"
-                checked={completedTasks[`${task.date}-${task._id}`] || false}
-                onChange={() => handleCheckboxChange(task.date, task._id)}
-              />
               <span>
                 {task.toDo} — {task.startTime} to {task.endTime}
               </span>
