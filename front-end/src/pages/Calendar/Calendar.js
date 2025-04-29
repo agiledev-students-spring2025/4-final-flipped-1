@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import ReactCalendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import CalendarDayView from "./CalendarDayView";
 import CalendarWeekView from "./CalendarWeekView";
@@ -164,16 +163,6 @@ const Calendar = () => {
         </div>
 
         <div className="distribution-card">
-          {timeframe === "Daily" && (
-            <div className="calendar-wrapper">
-              <ReactCalendar
-                onChange={setSelectedDate}
-                value={selectedDate}
-                locale="en-US"
-              />
-            </div>
-          )}
-
           {timeframe === "Daily" && (
             <CalendarDayView
               selectedDate={selectedDate.toISOString().split("T")[0]}
