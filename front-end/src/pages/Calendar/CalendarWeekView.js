@@ -1,11 +1,7 @@
-import React, { useState } from "react";
-import ReactCalendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import React from "react";
 import "./Calendar.css";
 
-const CalendarWeekView = ({ toDoList }) => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
+const CalendarWeekView = ({ toDoList, selectedDate, setSelectedDate }) => {
   const getStartOfWeek = (date) => {
     const d = new Date(date);
     const day = d.getDay();
@@ -39,17 +35,6 @@ const CalendarWeekView = ({ toDoList }) => {
   return (
     <div className="week-view-container">
       <h2>To-Do List for {startOfWeek} to {endOfWeek}</h2>
-
-      {/* Week Selector */}
-      <div className="calendar-wrapper">
-        <ReactCalendar 
-          onChange={setSelectedDate} 
-          value={selectedDate} 
-          locale="en-US"
-          showWeekNumbers={true}
-          selectRange={false}
-        />
-      </div>
 
       {/* Display grouped tasks */}
       {Object.keys(groupedToDo).length === 0 ? (
