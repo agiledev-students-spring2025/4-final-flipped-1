@@ -29,11 +29,6 @@ const CalendarDayView = ({ selectedDate, toDoList, onDelete }) => {
                 completedTasks[`${task.date}-${task._id}`] ? "completed" : ""
               }`}
             >
-              <input
-                type="checkbox"
-                checked={completedTasks[`${task.date}-${task._id}`] || false}
-                onChange={() => handleCheckboxChange(task.date, task._id)}
-              />
               <span>
                 {task.toDo} — {task.startTime} to {task.endTime}
               </span>

@@ -46,7 +46,6 @@ const CalendarMonthView = ({ toDoList, selectedDate, setSelectedDate }) => {
           <div className="week-view">
             {Object.entries(tasksByDate).map(([date, toDos]) => (
               <div key={date} className="day-group">
-                <h3>{date}</h3>
                 <ul className="toDo-list">
                   {toDos.map((toDo) => (
                     <li key={toDo._id} className="toDo-item">
