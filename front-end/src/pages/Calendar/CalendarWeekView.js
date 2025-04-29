@@ -47,7 +47,8 @@ const CalendarWeekView = ({ toDoList, selectedDate, setSelectedDate }) => {
 
   return (
     <div className="week-view-container">
-      <h2>To-Do List for {startOfWeek} to {endOfWeek}</h2>
+      <h3>To-Do List</h3>
+      <h2>{startOfWeek} to {endOfWeek}</h2>
 
       <div className="navigation-buttons">
         <button onClick={handlePreviousWeek}>Previous Week</button>

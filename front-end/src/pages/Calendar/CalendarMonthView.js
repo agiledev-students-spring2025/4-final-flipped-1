@@ -29,9 +29,11 @@ const CalendarMonthView = ({ toDoList, selectedDate, setSelectedDate }) => {
   });
 
   return (
-    <div className="week-view-container">
+    <div className="month-view-container">
+      <h3>
+        To-Do List{" "}
+      </h3>
       <h2>
-        To-do List for{" "}
         {selectedDate.toLocaleString("default", { month: "long" })}{" "}
         {selectedYear}
       </h2>

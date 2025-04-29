@@ -18,7 +18,8 @@ const CalendarDayView = ({ selectedDate, toDoList, onDelete }) => {
 
   return (
     <div className="day-view-container">
-      <h3>Tasks for {selectedDate}</h3>
+      <h3>To-Do List</h3>
+      <h2>{selectedDate}</h2>
       {tasksForDay.length > 0 ? (
         <ul className="toDo-list">
           {tasksForDay.map((task) => (
