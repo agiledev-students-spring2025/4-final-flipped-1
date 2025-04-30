@@ -1,5 +1,5 @@
 import express from 'express';
-import FlipLog from '../models/FlipLog.js';    // 确保路径和模型名字对得上
+import FlipLog from '../models/FlipLog.js';   
 const router = express.Router();
 
 
