@@ -17,21 +17,17 @@ const CalendarDayView = ({ selectedDate, toDoList, onDelete }) => {
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   return (
-    <div className="day-view-container">
+    <div className="month-view-container">
       <h3>To-Do List</h3>
       <h2>{selectedDate}</h2>
       {tasksForDay.length > 0 ? (
         <ul className="toDo-list">
           {tasksForDay.map((task) => (
-            <li
-              key={task._id}
-              className={`toDo-item ${
-                completedTasks[`${task.date}-${task._id}`] ? "completed" : ""
-              }`}
-            >
-              <span>
-                {task.toDo} — {task.startTime} to {task.endTime}
-              </span>
+            <li key={task._id} className="toDo-item">
+              <strong>
+                {task.startTime} - {task.endTime}
+              </strong>{" "}
+              — {task.toDo}
               <button className="delete-btn" onClick={() => onDelete(task._id)}>
                 Delete
               </button>
@@ -43,6 +39,6 @@ const CalendarDayView = ({ selectedDate, toDoList, onDelete }) => {
       )}
     </div>
   );
-};
+  };
 
 export default CalendarDayView;

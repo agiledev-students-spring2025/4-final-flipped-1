@@ -155,8 +155,16 @@
     font-size: 19px;
     color: #333;
   }
+
+  .month-view-container h4 {
+    text-align: left;
+    font-size: 17px;
+    color: #333;
+    margin-bottom: 20px;
+  }
   
   .day-group {
+    text-align: left;
     margin-top: 20px;
     padding-bottom: 10px;
     border-bottom: 2px solid #ddd;
@@ -200,6 +208,13 @@
 .month-view-container h2 {
   text-align: center;
   font-size: 20px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.month-view-container h4 {
+  text-align: left;
+  font-size: 17px;
   color: #333;
   margin-bottom: 20px;
 }
