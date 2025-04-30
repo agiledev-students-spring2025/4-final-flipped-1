@@ -1,0 +1,46 @@
+version: '3.10'
+
+services:
+  front-end:
+    build: ./front-end
+    ports:
+      - "80:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost
+    networks:
+      - app-network
+    depends_on:
+      - back-end
+
+  back-end:
+    build: ./back-end
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGO_URI=mongodb://mongodb:27017/flip
+      - JWT_SECRET=your_jwt_secret_key
+      - JWT_EXP_DAYS=7
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb_data: 
