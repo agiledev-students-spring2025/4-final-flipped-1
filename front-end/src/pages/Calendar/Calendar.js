@@ -8,15 +8,15 @@ import CalendarMonthView from "./CalendarMonthView";
 import CalendarUI from "../../components/CalendarUI/CalendarUI";
 import Header3 from "../../components/header/Header3";  
 import BottomNav from "../../components/BottomNav/BottomNav";  
+import { API_ENDPOINTS } from "../../config/api"; //import API_ENDPOINTS
 import "./Calendar.css"; 
 
 const Calendar = () => {
   const [authorized, setAuthorized] = useState(false);
-  //const [view, setView] = useState("daily"); 
+  // const [view, setView] = useState("daily"); 
   const [timeframe, setTimeframe] = useState("Daily");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [toDoList, setToDoList] = useState([]);
-
 
   // 1) the 7-day nav dates
   const getDateNumbers = () => {
@@ -76,7 +76,6 @@ const Calendar = () => {
     }
   };
 
-
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -91,7 +90,7 @@ const Calendar = () => {
 
     const fetchToDos = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/todos', {
+        const response = await axios.get(API_ENDPOINTS.TODOS.LIST, {
           headers: {
             Authorization: `jwt ${token}`
           }
@@ -111,7 +110,7 @@ const Calendar = () => {
   const handleAddToDos = async (newToDo) => {
     const token = localStorage.getItem("token");
     try {
-      const response = await axios.post('http://localhost:3001/api/todos', newToDo, {
+      const response = await axios.post(API_ENDPOINTS.TODOS.ADD, newToDo, {
         headers: {
           Authorization: `jwt ${token}`
         }
@@ -128,7 +127,7 @@ const Calendar = () => {
   const handleDeleteToDo = async (id) => {
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`http://localhost:3001/api/todos/${id}`, {
+      await axios.delete(API_ENDPOINTS.TODOS.DELETE(id), {
         headers: {
           Authorization: `jwt ${token}`
         }
@@ -191,7 +190,6 @@ const Calendar = () => {
 
       <BottomNav />
     </div>
-
   );
 };
 

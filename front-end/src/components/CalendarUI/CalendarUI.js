@@ -69,7 +69,12 @@ export default function CalendarUI({
             type="date"
             className="date-picker"
             value={formatDateInput(selectedDate)}
-            onChange={e=>setSelectedDate(new Date(e.target.value))}
+            onChange={e => {
+              // Fix for off-by-one bug from UTC parsing
+              const [year, month, day] = e.target.value.split('-');
+              const localDate = new Date(Number(year), Number(month) - 1, Number(day)); // Local midnight
+              setSelectedDate(localDate);
+            }}
           />
         )}
         {timeframe==='Weekly' && (
@@ -86,6 +91,7 @@ export default function CalendarUI({
               const selectedWeekStart = new Date(firstMonday);
               selectedWeekStart.setDate(firstMonday.getDate() + (week - 1) * 7);
               setSelectedDate(selectedWeekStart);
+
             }}
             
           />
@@ -95,9 +101,11 @@ export default function CalendarUI({
             type="month"
             className="month-picker"
             value={selectedDate.toISOString().slice(0,7)}
-            onChange={e=>{
-              const d = new Date(e.target.value+'-01')
-              if(!isNaN(d)) setSelectedDate(d)
+            onChange={e => {
+              // Fix: avoid new Date('YYYY-MM-01') UTC parsing
+              const [year, month] = e.target.value.split('-');
+              const localDate = new Date(Number(year), Number(month) - 1, 1); // Local midnight
+              setSelectedDate(localDate);
             }}
           />
         )}

@@ -235,66 +235,49 @@ const handleLogout = async () => {
   return (
     <div className="profile-page-container">
       <Header title="Account" />
-
       <div className="profile-content-area">
         {user ? (
           <>
-            <div className="profile-user-info">
-              <div className="profile-avatar-placeholder">
-                {/* Placeholder Icon/Image */}
+            <div className="profile-focus-card">
+              <div className="profile-focus-circle">
+                <span className="profile-focus-number">{totalFlipTime || 0}</span>
               </div>
-              <div className="profile-name-edit">
-                 <span className="profile-username">{user.username || "User"}</span>
-                 <div className="edit-icon-placeholder"></div>
-              </div>
-              <div className="profile-stats">
-                {error ? ( <span className="error-text"> {error} </span> )
-                  : ( <span>🕒 Total focus time: {totalFlipTime} seconds</span> ) }
-              </div>
-               <div className="profile-summary-stats">
-                 <span><div className="stat-icon-placeholder green"></div> 98%</span>
-                 <span><div className="stat-icon-placeholder blue"></div> 4039</span>
-                 <span><div className="stat-icon-placeholder teal"></div> 1</span>
-              </div>
+              <div className="profile-focus-label">Total focus time: {totalFlipTime} seconds</div>
             </div>
 
-            <div className="profile-menu">
-              {menuItems.map((item, index) => (
-                <div
-                  key={index}
-                  className={`profile-menu-item ${!item.clickable ? 'non-clickable' : ''}`}
-                  onClick={item.clickable ? item.action : undefined} // Only attach onClick if clickable
-                 >
-                  {item.label}
-                  {/* Only show arrow if clickable */}
-                  {item.clickable && <span className="menu-arrow">&gt;</span>}
-                </div>
-              ))}
+            <div className="profile-card profile-menu">
+              <div className="profile-menu-item" >
+                Email: {user.user_id || 'N/A'}
+                <span className="menu-arrow">&gt;</span>
+              </div>
+              <div className="profile-menu-item" onClick={() => setisPasswordModalOpen(true)}>
+                Change Password
+                <span className="menu-arrow">&gt;</span>
+              </div>
+              <div className="profile-menu-item" onClick={() => setIsUsernameModalOpen(true)}>
+                Change Username
+                <span className="menu-arrow">&gt;</span>
+              </div>
+              <div className="profile-menu-item" onClick={handleLogout}>
+                Logout
+                <span className="menu-arrow">&gt;</span>
+              </div>
             </div>
-
-            {/* Footer Info - Removed the server line */}
-            {/* Email is now shown in the menu, so this section might be redundant or used for other info */}
-            {/* <div className="profile-footer-info">
-              <p>{user.email || "your-email@example.com"}</p>
-            </div> */}
           </>
         ) : (
-          <p>Loading...</p> // English Loading text
+          <p>Loading...</p>
         )}
       </div>
-
       <ChangePasswordModal
         isOpen={isPasswordModalOpen}
         onClose={() => setisPasswordModalOpen(false)}
         onSubmit={handlePasswordChange}
       />
-
       <ChangeUsernameModal
         isOpen={isUsernameModalOpen}
         onClose={() => setIsUsernameModalOpen(false)}
         onSubmit={handleUsernameChange}
       />
-
       <BottomNav />
     </div>
   );

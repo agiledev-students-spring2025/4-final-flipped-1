@@ -17,7 +17,8 @@ import axios from 'axios';
 import CalendarUI from "../../components/CalendarUI/CalendarUI";
 import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
-import { API_ENDPOINTS } from "../../config/api";
+import { API_ENDPOINTS } from '../../config/api';
+
 
 const StatsPage = () => {
   const [timeframe, setTimeframe] = useState("Daily");
@@ -43,6 +44,7 @@ const StatsPage = () => {
     return `${h > 0 ? `${h}h ` : ""}${m}m`;
   };
 
+  
   
   useEffect(() => {
     const fetchLogs = async () => {
@@ -85,6 +87,7 @@ const StatsPage = () => {
         }
 
         const data = res.data.map(log => ({
+
           ...log,
           date: formatDate(new Date(log.start_time))
         }));
@@ -110,7 +113,7 @@ const StatsPage = () => {
         console.error("Error fetching flip logs:", err);
       }
     };
-
+  
     fetchLogs();
   }, [timeframe, selectedDate]);
 

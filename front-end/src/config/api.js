@@ -26,6 +26,11 @@ export const API_ENDPOINTS = {
     LOGOUT: `${API_BASE_URL}/auth/api/logout`,
     CHANGE_PASSWORD: `${API_BASE_URL}/auth/api/changepassword`,
     CHANGE_USERNAME: `${API_BASE_URL}/auth/api/changeusername`,
-  }
+  },
 
+  TODOS: {
+    LIST: `${API_BASE_URL}/api/todos`,
+    ADD: `${API_BASE_URL}/api/todos`,
+    DELETE: (id) => `${API_BASE_URL}/api/todos/${id}`,
+  }
 };

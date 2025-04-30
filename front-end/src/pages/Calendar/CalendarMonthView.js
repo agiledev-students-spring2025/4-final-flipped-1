@@ -1,7 +1,7 @@
 import React from "react";
 import "./Calendar.css"; 
 
-const CalendarMonthView = ({ toDoList, selectedDate, setSelectedDate }) => {
+const CalendarMonthView = ({ toDoList, selectedDate, onDelete }) => {
   const selectedYear = selectedDate.getFullYear();
   const selectedMonth = selectedDate.getMonth();
 
@@ -46,6 +46,7 @@ const CalendarMonthView = ({ toDoList, selectedDate, setSelectedDate }) => {
           <div className="week-view">
             {Object.entries(tasksByDate).map(([date, toDos]) => (
               <div key={date} className="day-group">
+                <h4>{date}</h4>
                 <ul className="toDo-list">
                   {toDos.map((toDo) => (
                     <li key={toDo._id} className="toDo-item">
@@ -53,6 +54,9 @@ const CalendarMonthView = ({ toDoList, selectedDate, setSelectedDate }) => {
                         {toDo.startTime} - {toDo.endTime}
                       </strong>{" "}
                       — {toDo.toDo}
+                      <button className="delete-btn" onClick={() => onDelete(toDo._id)}>
+                        Delete
+                      </button>
                     </li>
                   ))}
                 </ul>

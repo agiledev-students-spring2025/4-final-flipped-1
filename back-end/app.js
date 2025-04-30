@@ -28,7 +28,7 @@ passport.use(jwtStrategy)
 app.use(passport.initialize())
 
 // routers
-import taskRouter from './routes/taskRoutes.js'
+import taskRouter from './routes/taskRoutes.js';
 import todoRoutes from './routes/todoRoutes.js';
 import cookieRouter from './routes/cookieRouter.js';
 import protectedContentRouter from './routes/protectedContentRoutes.js';
@@ -41,7 +41,6 @@ app.use('/auth', authenticationRouter()) // all requests for /auth/* will be han
 app.use('/cookie', cookieRouter()) // all requests for /cookie/* will be handled by the cookieRoutes router
 app.use('/protected', protectedContentRouter()) // all requests for /protected/* will be handled by the protectedRoutes router
 app.use('/fliplog', fliplogsRouter());
-
 
 
 // import database table
@@ -96,6 +95,10 @@ app.post('/api/fliplog/insert',
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
+  }
+
+  if (!req.user) {
+    return res.status(401).json({ error: 'Must be logged in to record a flip.' });
   }
 
   const { task_name, start_time, end_time, duration } = req.body;
@@ -213,7 +216,7 @@ app.get( '/api/fliplog/total',
 
 
 
-
+//实际上目前不使用这个
 //get对应时间段的flip log，pass argument start/end date
 app.get('/api/fliplog/range', async (req, res) => {
   const { startDate, endDate } = req.query;
