@@ -8,9 +8,9 @@ const taskRouter = () => {
 
   const optionalAuth = (req, res, next) => {
     passport.authenticate('jwt', { session: false }, (err, user, info) => {
-      console.log("🔍 token raw:", req.headers.authorization);
-      console.log("🔍 user parsed from token:", user);
-      console.log("🔍 error info:", info);
+      // console.log("🔍 token raw:", req.headers.authorization);
+      // console.log("🔍 user parsed from token:", user);
+      // console.log("🔍 error info:", info);
       if (user) {
         req.user = user;
       } else {
