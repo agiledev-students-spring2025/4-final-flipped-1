@@ -17,8 +17,7 @@ import axios from 'axios';
 import CalendarUI from "../../components/CalendarUI/CalendarUI";
 import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
-import { API_ENDPOINTS } from '../../config/api';
-
+import { API_ENDPOINTS } from "../../config/api";
 
 const StatsPage = () => {
   const [timeframe, setTimeframe] = useState("Daily");
@@ -44,8 +43,7 @@ const StatsPage = () => {
     return `${h > 0 ? `${h}h ` : ""}${m}m`;
   };
 
-  
-  
+
   useEffect(() => {
     const fetchLogs = async () => {
       try {
@@ -54,11 +52,11 @@ const StatsPage = () => {
         //   console.warn("User not logged in");
         //   return;
         // }
-    
+
         const config = {
           withCredentials: true, 
         };
-  
+
         if (user?.token) {
           config.headers = {
             Authorization: `jwt ${user.token}`
@@ -87,33 +85,18 @@ const StatsPage = () => {
         }
 
         const data = res.data.map(log => ({
-
           ...log,
           date: formatDate(new Date(log.start_time))
         }));
 
         setLogs(data);
         console.log("this is modified",data);
-  
-        // const dateStr = selectedDate.toISOString().slice(0, 10); //2025-4-30
-        // const res = await axios.get(API_ENDPOINTS.FLIPLOG.TODAY_LIST(dateStr), config);
-        // const data = res.data;
 
-        // console.log("fliplogs with date1:", dateStr, data);
-    
-    
-        // const withDate = data.map((log) => ({
-        //   ...log,
-        //   date: formatDate(new Date(log.start_time)), //新增一个date字段格式为2025.4.30
-        // }));
-        // console.log("fliplogs with date2:", withDate);
-    
-        // setLogs(withDate);
       } catch (err) {
         console.error("Error fetching flip logs:", err);
       }
     };
-  
+
     fetchLogs();
   }, [timeframe, selectedDate]);
 
@@ -128,12 +111,25 @@ const StatsPage = () => {
       // 按天：筛出 date = 选中日期
       // console.log("this is a checkprint",logs)
       //logs = withDate data抓过来的数据
-      filtered = logs.filter((log) => {
-        const logDateStr = formatDate(new Date(log.start_time));
-        return logDateStr === formattedDate;
-      });
+      const isSameDay = (d1, d2) => {
+        return d1.getUTCFullYear() === d2.getUTCFullYear() &&
+               d1.getUTCMonth() === d2.getUTCMonth() &&
+               d1.getUTCDate() === d2.getUTCDate();
+      };
+      
+      filtered = logs.filter((log) => isSameDay(new Date(log.start_time), selectedDate));
 
-      console.log("this is flitered", filtered)
+      
+      logs.forEach(log => {
+        const logDate = new Date(log.start_time);
+        console.log(
+          "Log date (UTC):", logDate.toISOString(),
+          "| Selected (UTC):", selectedDate.toISOString(),
+          "| Match?", isSameDay(logDate, selectedDate)
+        );
+      });
+      
+      
 
       // 按小时汇总
       const hourBuckets = Array(24).fill(0);
@@ -194,6 +190,7 @@ const StatsPage = () => {
       setChartData(weeklyChart);
 
     } else if (timeframe === "Monthly") {
+
       const year = selectedDate.getFullYear();
       const month = selectedDate.getMonth();
     
@@ -229,7 +226,7 @@ const StatsPage = () => {
     const dates = [];
     const currentDate = new Date(selectedDate);
     currentDate.setDate(currentDate.getDate() - 3); // Start 3 days before
-    
+
     for (let i = 0; i < 7; i++) {
       dates.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
       currentDate.setDate(currentDate.getDate() + 1);
@@ -266,7 +263,7 @@ const StatsPage = () => {
     const weekNumber = Math.floor(daysSinceFirstMonday / 7) + 1;
     return `${temp.getFullYear()}-W${String(weekNumber).padStart(2, "0")}`;
   };
-  
+
 
   const handlePrevious = () => {
     if (timeframe === "Daily") {
@@ -294,7 +291,7 @@ const StatsPage = () => {
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
-  
+
   return (
     <div className="stats-container">
       <Header2 title="Statistics" />
@@ -321,7 +318,7 @@ const StatsPage = () => {
           <div className="time-display">
             {totalHours}<span>Hours</span>{totalMinutes}<span>Mins</span>
           </div>
-          
+
           <h3>{timeframe} Time Distribution</h3>
           <ResponsiveContainer width="100%" height={250}>
             {timeframe === "Daily" ? (

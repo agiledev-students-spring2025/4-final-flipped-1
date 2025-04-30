@@ -46,18 +46,16 @@ Larisa Li(rl4737)
 - Integration with a **task manager** allows users to create, edit, and track tasks. Help users **stay on top of deadlines**.
 - 
 
-## **Scope**  
+## **Project Set Up**  
 
-This project is suitable for a team of 4–6 programmers to complete within one semester. 
+Local Manual Setup
 
-#### **1. Flip Function**  
-- Requires access to the **mobile device’s gyroscope sensor** to detect the flipping action.  
-- Accurately distinguish flipping from other movements.  
-- Ensures **real-time responsiveness** and integrates it with the focus feature.  
-- Able to **stop immediately** for user to check time and message during flip timer.
-- Intergrate with Statistics page to **clearly show focused time period**.
+#### Prerequisites
 
-#### **2. Calendar with To-Do List**  
-- Implements a **user-friendly calendar interface** with views for daily, weekly, and monthly schedules.  
-- Allows users to **add, edit, and delete** tasks and events.  
-- Requires a **database structure** to store tasks, deadlines, and events.  
+Make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/) (v14+ or v16+ recommended)
+- [npm](https://www.npmjs.com/)
+- [Git](https://git-scm.com/) for version control
+
+

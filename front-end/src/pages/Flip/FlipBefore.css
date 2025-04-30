@@ -56,6 +56,6 @@
 }
 
 .black-screen * {
-    visibility: hidden;
+    opacity: 0;
 }
 
