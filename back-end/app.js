@@ -33,15 +33,14 @@ import todoRoutes from './routes/todoRoutes.js';
 import cookieRouter from './routes/cookieRouter.js';
 import protectedContentRouter from './routes/protectedContentRoutes.js';
 import authenticationRouter from './routes/authenticationRoutes.js';
-import fliplogsRouter from './routes/fliplogs.js';
+import fliplogsRouter from './routes/fliplogRoutes.js';
 
 app.use('/tasks', taskRouter());
 app.use('/api/todos', todoRoutes);
 app.use('/auth', authenticationRouter()) // all requests for /auth/* will be handled by the authenticationRoutes router
 app.use('/cookie', cookieRouter()) // all requests for /cookie/* will be handled by the cookieRoutes router
 app.use('/protected', protectedContentRouter()) // all requests for /protected/* will be handled by the protectedRoutes router
-app.use('/api/fliplog', fliplogsRouter);
-
+app.use('/fliplog', fliplogsRouter());
 
 
 // import database table
@@ -217,7 +216,7 @@ app.get( '/api/fliplog/total',
 
 
 
-
+//实际上目前不使用这个
 //get对应时间段的flip log，pass argument start/end date
 app.get('/api/fliplog/range', async (req, res) => {
   const { startDate, endDate } = req.query;

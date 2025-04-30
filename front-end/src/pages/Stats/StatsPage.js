@@ -13,6 +13,7 @@ import {
 } from "recharts";
 
 import "./StatsPage.css";
+import axios from 'axios';
 import CalendarUI from "../../components/CalendarUI/CalendarUI";
 import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
@@ -29,19 +30,14 @@ const StatsPage = () => {
   const [totalMinutes, setTotalMinutes] = useState(0);
 
 
-// Utility: format date to YYYY.M.D
-const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+  // Utility: format date to YYYY.M.D
+  const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
 
-
-  
-  
   const parseLogDate = (dateStr) => {
     const [y, m, d] = dateStr.split(".").map(Number);
     return new Date(y, m - 1, d);
   };
 
-  
-  
   const formatHoursMinutes = (minutesTotal) => {
     const h = Math.floor(minutesTotal / 60);
     const m = minutesTotal % 60;
@@ -53,21 +49,66 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        //返回当天的数据
-        const dateStr = selectedDate.toISOString().slice(0, 10);
-        const res = await fetch(`${API_ENDPOINTS.FLIPLOG.LIST}?date=${dateStr}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const user = JSON.parse(localStorage.getItem("user"));
+        // if (!user?.token) {
+        //   console.warn("User not logged in");
+        //   return;
+        // }
+    
+        const config = {
+          withCredentials: true, 
+        };
   
-        const data = await res.json();
-        console.log("raw fliplogs:", data);
+        if (user?.token) {
+          config.headers = {
+            Authorization: `jwt ${user.token}`
+          };
+        }
+        console.log("fliplogs with date:");
+        
+        let res;
+        if (timeframe === "Daily") {
+          const dateStr = selectedDate.toISOString().slice(0, 10);
+          res = await axios.get(API_ENDPOINTS.FLIPLOG.TODAY_LIST(dateStr), config);
+        } else {
+          const start = new Date(selectedDate);
+          const end = new Date(selectedDate);
+          if (timeframe === "Weekly") {
+            start.setDate(start.getDate() - start.getDay());
+            end.setDate(start.getDate() + 6);
+          } else if (timeframe === "Monthly") {
+            start.setDate(1);
+            end.setMonth(start.getMonth() + 1, 0); 
+          }
 
-        const withDate = data.map((log) => ({
+          const startStr = start.toISOString().slice(0, 10);
+          const endStr = end.toISOString().slice(0, 10);
+          res = await axios.get(API_ENDPOINTS.FLIPLOG.GET_RANGE(startStr, endStr), config);
+        }
+
+        const data = res.data.map(log => ({
+
           ...log,
-          date: formatDate(new Date(log.start_time)),
+          date: formatDate(new Date(log.start_time))
         }));
-        console.log("fliplogs with date:", withDate);
 
-        setLogs(withDate);
+        setLogs(data);
+        console.log("this is modified",data);
+  
+        // const dateStr = selectedDate.toISOString().slice(0, 10); //2025-4-30
+        // const res = await axios.get(API_ENDPOINTS.FLIPLOG.TODAY_LIST(dateStr), config);
+        // const data = res.data;
+
+        // console.log("fliplogs with date1:", dateStr, data);
+    
+    
+        // const withDate = data.map((log) => ({
+        //   ...log,
+        //   date: formatDate(new Date(log.start_time)), //新增一个date字段格式为2025.4.30
+        // }));
+        // console.log("fliplogs with date2:", withDate);
+    
+        // setLogs(withDate);
       } catch (err) {
         console.error("Error fetching flip logs:", err);
       }
@@ -79,18 +120,32 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
 
   useEffect(() => {
     let filtered = [];
+    //formate: 2025.4.30
     const formattedDate = formatDate(selectedDate);
+
 
     if (timeframe === "Daily") {
       // 按天：筛出 date = 选中日期
-      filtered = logs.filter((log) => log.date === formattedDate);
+      // console.log("this is a checkprint",logs)
+      //logs = withDate data抓过来的数据
+      filtered = logs.filter((log) => {
+        const logDateStr = formatDate(new Date(log.start_time));
+        return logDateStr === formattedDate;
+      });
+
+      console.log("this is flitered", filtered)
 
       // 按小时汇总
       const hourBuckets = Array(24).fill(0);
       filtered.forEach((log) => {
-        const [h] = log.start_time.split(":").map(Number);
+        const h = new Date(log.start_time).getHours(); // ✅ 正确提取小时
         hourBuckets[h] += Math.round(log.duration / 60);
       });
+
+      // filtered.forEach((log) => {
+      //   const [h] = log.start_time.split(":").map(Number);
+      //   hourBuckets[h] += Math.round(log.duration / 60);
+      // });
 
       const timeline = hourBuckets.map((minutes, hour) => ({
         time: `${String(hour).padStart(2, "0")}:00`,
@@ -139,26 +194,29 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
       setChartData(weeklyChart);
 
     } else if (timeframe === "Monthly") {
-      // 按月：筛出同年同月
       const year = selectedDate.getFullYear();
       const month = selectedDate.getMonth();
+    
+      const weekCount = getWeeksInMonth(year, month); // 动态周数
+    
       filtered = logs.filter((log) => {
         const dt = parseLogDate(log.date);
         return dt.getFullYear() === year && dt.getMonth() === month;
       });
-
-      const weekBuckets = Array(6).fill(0);
+    
+      const weekBuckets = Array(weekCount).fill(0);
+    
       filtered.forEach((log) => {
         const wk = Math.floor((parseLogDate(log.date).getDate() - 1) / 7);
         weekBuckets[wk] += Math.round(log.duration / 60);
       });
-
-      const monthlyChart = weekBuckets.slice(0, 4).map((minutes, i) => ({
+    
+      const monthlyChart = weekBuckets.map((minutes, i) => ({
         week: `W${i + 1}`,
         minutes,
         label: formatHoursMinutes(minutes),
       }));
-
+    
       const total = filtered.reduce((sum, l) => sum + l.duration, 0);
       setTotalHours(Math.floor(total / 3600));
       setTotalMinutes(Math.floor((total % 3600) / 60));
@@ -178,6 +236,16 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
     }
     return dates;
   };
+
+  //计算一个月有几个礼拜
+  const getWeeksInMonth = (year, month) => {
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const firstWeekDay = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+  
+    return Math.ceil((firstWeekDay + totalDays) / 7);
+  };  
 
   const getWeekRange = (date) => {
     const startOfWeek = new Date(date);
@@ -290,34 +358,34 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
                 margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
               >
                 <XAxis dataKey={
-  timeframe === "Monthly"
-    ? "week"
-    : timeframe === "Weekly"
-    ? "day"
-    : "time"
-} />
+                  timeframe === "Monthly"
+                    ? "week"
+                    : timeframe === "Weekly"
+                    ? "day"
+                    : "time"
+                } />
 
                 <YAxis
-  allowDecimals={false}
-  tickFormatter={(v) => {
-    // console.log(chartData.map(d => d.time)); // 看看 time 字段都是什么
-    // console.log("chartData", chartData);
-//     console.log("weekly selected week:", startOfWeek, endOfWeek);
-// console.log("weekly filtered logs:", filtered);
+                  allowDecimals={false}
+                  tickFormatter={(v) => {
+                    // console.log(chartData.map(d => d.time)); // 看看 time 字段都是什么
+                    // console.log("chartData", chartData);
+                //     console.log("weekly selected week:", startOfWeek, endOfWeek);
+                // console.log("weekly filtered logs:", filtered);
 
-    if (v < 60) return `${v}m`;
-    const h = Math.floor(v / 60);
-    const m = v % 60;
-    return m === 0 ? `${h}h` : `${h}h ${m}m`;
-  }}
-/>
-<Tooltip
-  formatter={(v) => {
-    const h = Math.floor(v / 60);
-    const m = v % 60;
-    return h === 0 ? `${m} min` : `${h}h ${m}m`;
-  }}
-/>
+                    if (v < 60) return `${v}m`;
+                    const h = Math.floor(v / 60);
+                    const m = v % 60;
+                    return m === 0 ? `${h}h` : `${h}h ${m}m`;
+                  }}
+                />
+                <Tooltip
+                  formatter={(v) => {
+                    const h = Math.floor(v / 60);
+                    const m = v % 60;
+                    return h === 0 ? `${m} min` : `${h}h ${m}m`;
+                  }}
+                />
 
                 <Line
                   type="monotone"
