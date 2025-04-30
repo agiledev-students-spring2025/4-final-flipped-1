@@ -16,7 +16,8 @@ import "./StatsPage.css";
 import CalendarUI from "../../components/CalendarUI/CalendarUI";
 import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
-import { API_ENDPOINTS } from "../../config/api";
+import { API_ENDPOINTS } from '../../config/api';
+
 
 const StatsPage = () => {
   const [timeframe, setTimeframe] = useState("Daily");
@@ -33,11 +34,13 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
 
 
   
+  
   const parseLogDate = (dateStr) => {
     const [y, m, d] = dateStr.split(".").map(Number);
     return new Date(y, m - 1, d);
   };
 
+  
   
   const formatHoursMinutes = (minutesTotal) => {
     const h = Math.floor(minutesTotal / 60);
@@ -46,6 +49,7 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
   };
 
   
+  
   useEffect(() => {
     const fetchLogs = async () => {
       try {
@@ -53,7 +57,7 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
         const dateStr = selectedDate.toISOString().slice(0, 10);
         const res = await fetch(`${API_ENDPOINTS.FLIPLOG.LIST}?date=${dateStr}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
+  
         const data = await res.json();
         console.log("raw fliplogs:", data);
 
@@ -68,7 +72,7 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
         console.error("Error fetching flip logs:", err);
       }
     };
-
+  
     fetchLogs();
   }, [timeframe, selectedDate]);
 
