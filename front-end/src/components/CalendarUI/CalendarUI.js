@@ -17,9 +17,17 @@ export default function CalendarUI({
     return `${y}-${m}-${d}`
   }
 
-  const getWeekInputValue = date => {
-    // …copy your existing getWeekInputValue implementation…
-  }
+  const getWeekInputValue = (date) => {
+    const temp = new Date(date);
+    temp.setHours(0, 0, 0, 0);
+    const firstDayOfYear = new Date(temp.getFullYear(), 0, 1);
+    const dayOffset = (firstDayOfYear.getDay() + 6) % 7;
+    const firstMonday = new Date(firstDayOfYear);
+    firstMonday.setDate(firstDayOfYear.getDate() - dayOffset + 1);
+    const daysSinceFirstMonday = Math.floor((temp - firstMonday) / (1000 * 60 * 60 * 24));
+    const weekNumber = Math.floor(daysSinceFirstMonday / 7) + 1;
+    return `${temp.getFullYear()}-W${String(weekNumber).padStart(2, "0")}`;
+  };
 
   return (
     <div className="concentration-info">
@@ -69,9 +77,17 @@ export default function CalendarUI({
             type="week"
             className="week-picker"
             value={getWeekInputValue(selectedDate)}
-            onChange={e=>{
-              // …your existing week->Date logic…
+            onChange={e => {
+              const [year, week] = e.target.value.split("-W").map(Number);
+              const firstDayOfYear = new Date(year, 0, 1);
+              const dayOffset = (firstDayOfYear.getDay() + 6) % 7;
+              const firstMonday = new Date(firstDayOfYear);
+              firstMonday.setDate(firstDayOfYear.getDate() - dayOffset + 1);
+              const selectedWeekStart = new Date(firstMonday);
+              selectedWeekStart.setDate(firstMonday.getDate() + (week - 1) * 7);
+              setSelectedDate(selectedWeekStart);
             }}
+            
           />
         )}
         {timeframe==='Monthly' && (

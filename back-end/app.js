@@ -40,7 +40,7 @@ app.use('/api/todos', todoRoutes);
 app.use('/auth', authenticationRouter()) // all requests for /auth/* will be handled by the authenticationRoutes router
 app.use('/cookie', cookieRouter()) // all requests for /cookie/* will be handled by the cookieRoutes router
 app.use('/protected', protectedContentRouter()) // all requests for /protected/* will be handled by the protectedRoutes router
-app.use('/fliplog', fliplogsRouter);
+app.use('/fliplog', fliplogsRouter());
 
 
 

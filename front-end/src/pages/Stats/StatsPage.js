@@ -62,23 +62,50 @@ const StatsPage = () => {
             Authorization: `jwt ${user.token}`
           };
         }
-        console.log("fliplogs with date1:");
-    
-  
-        const dateStr = selectedDate.toISOString().slice(0, 10);
-        const res = await axios.get(API_ENDPOINTS.FLIPLOG.TODAY_LIST(dateStr), config);
-        const data = res.data;
+        console.log("fliplogs with date:");
+        
+        let res;
+        if (timeframe === "Daily") {
+          const dateStr = selectedDate.toISOString().slice(0, 10);
+          res = await axios.get(API_ENDPOINTS.FLIPLOG.TODAY_LIST(dateStr), config);
+        } else {
+          const start = new Date(selectedDate);
+          const end = new Date(selectedDate);
+          if (timeframe === "Weekly") {
+            start.setDate(start.getDate() - start.getDay());
+            end.setDate(start.getDate() + 6);
+          } else if (timeframe === "Monthly") {
+            start.setDate(1);
+            end.setMonth(start.getMonth() + 1, 0); 
+          }
 
-        console.log("fliplogs with date1:", data);
-    
-    
-        const withDate = data.map((log) => ({
+          const startStr = start.toISOString().slice(0, 10);
+          const endStr = end.toISOString().slice(0, 10);
+          res = await axios.get(API_ENDPOINTS.FLIPLOG.GET_RANGE(startStr, endStr), config);
+        }
+
+        const data = res.data.map(log => ({
           ...log,
-          date: formatDate(new Date(log.start_time)),
+          date: formatDate(new Date(log.start_time))
         }));
-        console.log("fliplogs with date2:", withDate);
+
+        setLogs(data);
+        console.log("this is modified",data);
+  
+        // const dateStr = selectedDate.toISOString().slice(0, 10); //2025-4-30
+        // const res = await axios.get(API_ENDPOINTS.FLIPLOG.TODAY_LIST(dateStr), config);
+        // const data = res.data;
+
+        // console.log("fliplogs with date1:", dateStr, data);
     
-        setLogs(withDate);
+    
+        // const withDate = data.map((log) => ({
+        //   ...log,
+        //   date: formatDate(new Date(log.start_time)), //新增一个date字段格式为2025.4.30
+        // }));
+        // console.log("fliplogs with date2:", withDate);
+    
+        // setLogs(withDate);
       } catch (err) {
         console.error("Error fetching flip logs:", err);
       }
@@ -90,18 +117,32 @@ const StatsPage = () => {
 
   useEffect(() => {
     let filtered = [];
+    //formate: 2025.4.30
     const formattedDate = formatDate(selectedDate);
+
 
     if (timeframe === "Daily") {
       // 按天：筛出 date = 选中日期
-      filtered = logs.filter((log) => log.date === formattedDate);
+      // console.log("this is a checkprint",logs)
+      //logs = withDate data抓过来的数据
+      filtered = logs.filter((log) => {
+        const logDateStr = formatDate(new Date(log.start_time));
+        return logDateStr === formattedDate;
+      });
+
+      console.log("this is flitered", filtered)
 
       // 按小时汇总
       const hourBuckets = Array(24).fill(0);
       filtered.forEach((log) => {
-        const [h] = log.start_time.split(":").map(Number);
+        const h = new Date(log.start_time).getHours(); // ✅ 正确提取小时
         hourBuckets[h] += Math.round(log.duration / 60);
       });
+
+      // filtered.forEach((log) => {
+      //   const [h] = log.start_time.split(":").map(Number);
+      //   hourBuckets[h] += Math.round(log.duration / 60);
+      // });
 
       const timeline = hourBuckets.map((minutes, hour) => ({
         time: `${String(hour).padStart(2, "0")}:00`,
@@ -150,26 +191,29 @@ const StatsPage = () => {
       setChartData(weeklyChart);
 
     } else if (timeframe === "Monthly") {
-      // 按月：筛出同年同月
       const year = selectedDate.getFullYear();
       const month = selectedDate.getMonth();
+    
+      const weekCount = getWeeksInMonth(year, month); // 动态周数
+    
       filtered = logs.filter((log) => {
         const dt = parseLogDate(log.date);
         return dt.getFullYear() === year && dt.getMonth() === month;
       });
-
-      const weekBuckets = Array(6).fill(0);
+    
+      const weekBuckets = Array(weekCount).fill(0);
+    
       filtered.forEach((log) => {
         const wk = Math.floor((parseLogDate(log.date).getDate() - 1) / 7);
         weekBuckets[wk] += Math.round(log.duration / 60);
       });
-
-      const monthlyChart = weekBuckets.slice(0, 4).map((minutes, i) => ({
+    
+      const monthlyChart = weekBuckets.map((minutes, i) => ({
         week: `W${i + 1}`,
         minutes,
         label: formatHoursMinutes(minutes),
       }));
-
+    
       const total = filtered.reduce((sum, l) => sum + l.duration, 0);
       setTotalHours(Math.floor(total / 3600));
       setTotalMinutes(Math.floor((total % 3600) / 60));
@@ -189,6 +233,16 @@ const StatsPage = () => {
     }
     return dates;
   };
+
+  //计算一个月有几个礼拜
+  const getWeeksInMonth = (year, month) => {
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const firstWeekDay = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+  
+    return Math.ceil((firstWeekDay + totalDays) / 7);
+  };  
 
   const getWeekRange = (date) => {
     const startOfWeek = new Date(date);
