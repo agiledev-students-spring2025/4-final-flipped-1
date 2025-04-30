@@ -17,14 +17,16 @@ export default function CalendarUI({
     return `${y}-${m}-${d}`
   }
 
-  const getWeekInputValue = date => {
-    const year = date.getFullYear();
-    const jan4 = new Date(year, 0, 4); // Jan 4 is always in week 1
-    const startOfWeek1 = new Date(jan4);
-    startOfWeek1.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7));
-    const diff = Math.floor((date - startOfWeek1) / (7 * 24 * 60 * 60 * 1000));
-    const week = String(diff + 1).padStart(2, '0');
-    return `${year}-W${week}`;
+  const getWeekInputValue = (date) => {
+    const temp = new Date(date);
+    temp.setHours(0, 0, 0, 0);
+    const firstDayOfYear = new Date(temp.getFullYear(), 0, 1);
+    const dayOffset = (firstDayOfYear.getDay() + 6) % 7;
+    const firstMonday = new Date(firstDayOfYear);
+    firstMonday.setDate(firstDayOfYear.getDate() - dayOffset + 1);
+    const daysSinceFirstMonday = Math.floor((temp - firstMonday) / (1000 * 60 * 60 * 24));
+    const weekNumber = Math.floor(daysSinceFirstMonday / 7) + 1;
+    return `${temp.getFullYear()}-W${String(weekNumber).padStart(2, "0")}`;
   };
 
   return (
@@ -81,25 +83,17 @@ export default function CalendarUI({
             className="week-picker"
             value={getWeekInputValue(selectedDate)}
             onChange={e => {
-              // Parse "YYYY-Wxx" ISO week format into the Monday of that week
-              const [yearStr, weekStr] = e.target.value.split('-W');
-              const year = Number(yearStr);
-              const week = Number(weekStr);
-              const jan4 = new Date(year, 0, 4);
-              const startOfWeek1 = new Date(jan4);
-              startOfWeek1.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7));
-              const mondayOfWeek = new Date(startOfWeek1);
-              mondayOfWeek.setDate(startOfWeek1.getDate() + (week - 1) * 7);
+              const [year, week] = e.target.value.split("-W").map(Number);
+              const firstDayOfYear = new Date(year, 0, 1);
+              const dayOffset = (firstDayOfYear.getDay() + 6) % 7;
+              const firstMonday = new Date(firstDayOfYear);
+              firstMonday.setDate(firstDayOfYear.getDate() - dayOffset + 1);
+              const selectedWeekStart = new Date(firstMonday);
+              selectedWeekStart.setDate(firstMonday.getDate() + (week - 1) * 7);
+              setSelectedDate(selectedWeekStart);
 
-              // Set local midnight to prevent timezone shift
-              const localMonday = new Date(
-                mondayOfWeek.getFullYear(),
-                mondayOfWeek.getMonth(),
-                mondayOfWeek.getDate()
-              );
-
-              setSelectedDate(localMonday);
             }}
+            
           />
         )}
         {timeframe==='Monthly' && (
