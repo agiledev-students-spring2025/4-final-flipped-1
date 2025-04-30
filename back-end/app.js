@@ -216,36 +216,6 @@ app.get( '/api/fliplog/total',
 
 
 
-//实际上目前不使用这个
-//get对应时间段的flip log，pass argument start/end date
-app.get('/api/fliplog/range', async (req, res) => {
-  const { startDate, endDate } = req.query;
-
-  //这里强制两个都，之后可以改
-  if (!startDate || !endDate) {
-    return res.status(400).json({ error: "Please provide both startDate and endDate in query parameters." });
-  }
-
-  try {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
-
-    const logs = await FlipLog.find({
-      start_time: {
-        $gte: start,
-        $lte: end
-      }
-    }).sort({ start_time: -1 }); // 时间倒序
-
-    res.status(200).json(logs);
-  } catch (err) {
-    console.error("Failed to fetch flip logs in date range", err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-
 
 
 // export the express app we created to make it available to other modules
