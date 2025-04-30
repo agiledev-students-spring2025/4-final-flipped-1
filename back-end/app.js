@@ -28,18 +28,19 @@ passport.use(jwtStrategy)
 app.use(passport.initialize())
 
 // routers
-import taskRouter from './routes/taskRoutes.js'
+import taskRouter from './routes/taskRoutes.js';
 import todoRoutes from './routes/todoRoutes.js';
 import cookieRouter from './routes/cookieRouter.js';
 import protectedContentRouter from './routes/protectedContentRoutes.js';
-import authenticationRouter from './routes/authenticationRoutes.js'
+import authenticationRouter from './routes/authenticationRoutes.js';
+import fliplogsRouter from './routes/fliplogs.js';
 
 app.use('/tasks', taskRouter());
 app.use('/api/todos', todoRoutes);
 app.use('/auth', authenticationRouter()) // all requests for /auth/* will be handled by the authenticationRoutes router
 app.use('/cookie', cookieRouter()) // all requests for /cookie/* will be handled by the cookieRoutes router
 app.use('/protected', protectedContentRouter()) // all requests for /protected/* will be handled by the protectedRoutes router
-
+app.use('/api/fliplog', fliplogsRouter);
 
 
 
@@ -95,6 +96,10 @@ app.post('/api/fliplog/insert',
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
+  }
+
+  if (!req.user) {
+    return res.status(401).json({ error: 'Must be logged in to record a flip.' });
   }
 
   const { task_name, start_time, end_time, duration } = req.body;
