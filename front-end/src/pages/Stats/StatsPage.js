@@ -13,6 +13,7 @@ import {
 } from "recharts";
 
 import "./StatsPage.css";
+import axios from 'axios';
 import CalendarUI from "../../components/CalendarUI/CalendarUI";
 import Header2 from "../../components/header/Header2";
 import BottomNav from "../../components/BottomNav/BottomNav";
@@ -28,17 +29,14 @@ const StatsPage = () => {
   const [totalMinutes, setTotalMinutes] = useState(0);
 
 
-// Utility: format date to YYYY.M.D
-const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+  // Utility: format date to YYYY.M.D
+  const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
 
-
-  
   const parseLogDate = (dateStr) => {
     const [y, m, d] = dateStr.split(".").map(Number);
     return new Date(y, m - 1, d);
   };
 
-  
   const formatHoursMinutes = (minutesTotal) => {
     const h = Math.floor(minutesTotal / 60);
     const m = minutesTotal % 60;
@@ -49,20 +47,37 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        //返回当天的数据
+        const user = JSON.parse(localStorage.getItem("user"));
+        // if (!user?.token) {
+        //   console.warn("User not logged in");
+        //   return;
+        // }
+    
+        const config = {
+          withCredentials: true, 
+        };
+  
+        if (user?.token) {
+          config.headers = {
+            Authorization: `jwt ${user.token}`
+          };
+        }
+        console.log("fliplogs with date1:");
+    
+  
         const dateStr = selectedDate.toISOString().slice(0, 10);
-        const res = await fetch(`${API_ENDPOINTS.FLIPLOG.LIST}?date=${dateStr}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const res = await axios.get(API_ENDPOINTS.FLIPLOG.TODAY_LIST(dateStr), config);
+        const data = res.data;
 
-        const data = await res.json();
-        console.log("raw fliplogs:", data);
-
+        console.log("fliplogs with date1:", data);
+    
+    
         const withDate = data.map((log) => ({
           ...log,
           date: formatDate(new Date(log.start_time)),
         }));
-        console.log("fliplogs with date:", withDate);
-
+        console.log("fliplogs with date2:", withDate);
+    
         setLogs(withDate);
       } catch (err) {
         console.error("Error fetching flip logs:", err);
@@ -286,34 +301,34 @@ const formatDate = (date) => `${date.getFullYear()}.${date.getMonth() + 1}.${dat
                 margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
               >
                 <XAxis dataKey={
-  timeframe === "Monthly"
-    ? "week"
-    : timeframe === "Weekly"
-    ? "day"
-    : "time"
-} />
+                  timeframe === "Monthly"
+                    ? "week"
+                    : timeframe === "Weekly"
+                    ? "day"
+                    : "time"
+                } />
 
                 <YAxis
-  allowDecimals={false}
-  tickFormatter={(v) => {
-    // console.log(chartData.map(d => d.time)); // 看看 time 字段都是什么
-    // console.log("chartData", chartData);
-//     console.log("weekly selected week:", startOfWeek, endOfWeek);
-// console.log("weekly filtered logs:", filtered);
+                  allowDecimals={false}
+                  tickFormatter={(v) => {
+                    // console.log(chartData.map(d => d.time)); // 看看 time 字段都是什么
+                    // console.log("chartData", chartData);
+                //     console.log("weekly selected week:", startOfWeek, endOfWeek);
+                // console.log("weekly filtered logs:", filtered);
 
-    if (v < 60) return `${v}m`;
-    const h = Math.floor(v / 60);
-    const m = v % 60;
-    return m === 0 ? `${h}h` : `${h}h ${m}m`;
-  }}
-/>
-<Tooltip
-  formatter={(v) => {
-    const h = Math.floor(v / 60);
-    const m = v % 60;
-    return h === 0 ? `${m} min` : `${h}h ${m}m`;
-  }}
-/>
+                    if (v < 60) return `${v}m`;
+                    const h = Math.floor(v / 60);
+                    const m = v % 60;
+                    return m === 0 ? `${h}h` : `${h}h ${m}m`;
+                  }}
+                />
+                <Tooltip
+                  formatter={(v) => {
+                    const h = Math.floor(v / 60);
+                    const m = v % 60;
+                    return h === 0 ? `${m} min` : `${h}h ${m}m`;
+                  }}
+                />
 
                 <Line
                   type="monotone"

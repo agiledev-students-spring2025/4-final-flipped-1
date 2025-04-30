@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
     GET_TODAY: (taskName) => `${API_BASE_URL}/api/today/${taskName}`,
     GET_RANGE: (startDate, endDate) => 
       `${API_BASE_URL}/api/fliplog/range?start=${startDate}&end=${endDate}`,
+    TODAY_LIST: (todayDate) => `${API_BASE_URL}/fliplog/api/date/${todayDate}`,
     TOTAL: `${API_BASE_URL}/api/fliplog/total`,
   },
 
