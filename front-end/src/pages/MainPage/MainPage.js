@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TaskList from '../../components/TaskList/TaskList';
 import AddTaskModal from '../../components/AddTaskModal/AddTaskModal';
@@ -10,12 +11,23 @@ function MainPage() {
   const [tasks, setTasks] = useState([]);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   //抓最开始显示的task显示在主页面上
   //后端会判断是否登陆 - 展示对应id的task或者展示默认task
   useEffect(() => {
     fetchTasks();
-  }, []);
+
+    if (location.state?.fromFlipAfter) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.token) {
+        setShowLoginPrompt(true);
+      }
+    }
+  }, [location.state]);
 
   const fetchTasks = async () => {
     try {
@@ -105,6 +117,14 @@ function MainPage() {
     setEditingTask(null);
   };
 
+  const handleConfirmLogin = () => {
+    navigate('/login');
+  };
+
+  const handleCancelPrompt = () => {
+    setShowLoginPrompt(false);
+  };
+
   return (
     <div className="main-page">
       <header className="header">
@@ -129,6 +149,22 @@ function MainPage() {
         editingTask={editingTask}
         tasks={tasks}
       />
+
+      {showLoginPrompt && (
+        <div className="overlay">
+          <div className="modal-card">
+            <h2 className="modal-title">Not Logged In</h2>
+            <p className="modal-message">You haven't logged in yet, so your Flip record will not be saved. Would you like to login now?</p>
+            <div className="modal-actions">
+              <button className="modal-button cancel" onClick={handleCancelPrompt}>Cancel</button>
+              <button className="modal-button confirm" onClick={handleConfirmLogin}>Go to Login</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
     </div>
   );
 }

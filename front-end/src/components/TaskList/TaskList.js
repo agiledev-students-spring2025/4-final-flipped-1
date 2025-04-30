@@ -11,7 +11,30 @@ function TaskList({ tasks, onEditTask, onDeleteTask }) {
   
 
   //函数，点对应task的flip按钮跳转对应flipbefore page
-  const FlipTaskClick = (task) => {
+  const FlipTaskClick = async (task) => {
+    try {
+      if (
+        typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function"
+      ) {
+        // alert("Gamma: ");
+        const permissionState = await DeviceOrientationEvent.requestPermission();
+        if (permissionState === "granted") {
+          console.log("Device orientation permission granted.");
+        } else {
+          alert("Please allow the device orientation permission for flip!");
+          return; 
+        }
+      } else {
+        console.log("No need to request permission or not supported device.");
+      }
+    } catch (error) {
+      console.error("Error requesting device orientation permission:", error);
+      alert("Error requesting device orientation permission, please clean cache and check your settings!");
+      return;
+    }
+    
+    //如果请求权限成功了的话跑flipbefore页面
     navigate(`/flipbefore/${task.task_name}`, { state: { taskName: task.task_name, taskColor: task.color } }); 
     console.log("Navigating to flip page with task name:", task.task_name);
   };

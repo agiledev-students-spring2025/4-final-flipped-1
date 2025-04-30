@@ -1,7 +1,11 @@
 import React from 'react';
 import './FlipTask.css';
+import { useNavigate } from 'react-router-dom';
+
 
 function FlipTask({ taskName, mode, duration }) {
+    const navigate = useNavigate();
+
     console.log(taskName, mode, duration)
 
     // input: duration in second 
@@ -30,8 +34,11 @@ function FlipTask({ taskName, mode, duration }) {
                 <p className="flip-time">You have flipped for {formatDuration(duration)}</p>
             )}
 
-            <button className="return-home" onClick={() => window.location.href = '/'}>
-                Return Home
+            <button
+                className="return-home"
+                onClick={() => navigate('/', { state: { fromFlipAfter: true } })}
+            >
+            Return Home
             </button>
 
             <p className="flip-start">Flip to Start!</p>
