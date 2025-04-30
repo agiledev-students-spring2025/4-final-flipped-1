@@ -34,39 +34,25 @@ Larisa Li(rl4737)
 ## **How? - Main Features**  
 
 #### **1. Flip for Time Focus**  
-- Users **set a focus goal** and **flip their phone** to start a timer automatically. When the user lifts up the phone, the timing will automatically pause, and an option will pop up asking the user whether to continue timing.
-- Encourages self-discipline by keeping users away from distractions.  
-- After their **first focus session** each day, users receive a designed **Tarot card** as a collection in the application.  For subsequent sessions, users receive **motivational quotes**.  
+- Users **set a focus goal** and **flip their phone** to start a timer automatically. When the user lifts up the phone, the timing will automatically pause, and shows user the focused period.
+- Encourages self-discipline by keeping users away from distractions.
+- Users are able to check their Focus period in the statistics page in **daily, weekly or monthly formats**.
 
 #### **2. Calendar with To-Do List**  
 - Users can view their schedules in **daily, weekly or monthly formats**.  
-- Integration with a **task manager** allows users to create, edit, and track tasks.  
-- Reminders and notifications help users **stay on top of deadlines**.  
-- Tasks can be integrated with the Flip function and the progress can be counted after a time counting from Flip.
+- Integration with a **task manager** allows users to create, edit, and track tasks. Help users **stay on top of deadlines**.
+- 
 
-#### **3. Wish Feature**  
-- Users can **set personal goals or wishes** and track their progress.  
-- Encourages motivation and goal-setting by **rewarding achievements**.  
-- Data privacy is ensured, allowing users to manage their aspirations securely.
+## **Project Set Up**  
 
-## **Scope**  
+Local Manual Setup
 
-This project is suitable for a team of 4–6 programmers to complete within one semester. 
+#### Prerequisites
 
-#### **1. Flip Function**  
-- Requires access to the **mobile device’s gyroscope sensor** to detect the flipping action.  
-- Develops an **algorithm** to accurately distinguish flipping from other movements.  
-- Ensures **real-time responsiveness** and integrates it with the focus timer feature.  
-- Implements **a reward system** where users receive a Tarot card or an inspirational quote after a session.  
-- Able to **pause** for user to check time and message during flip timer.
+Make sure you have the following installed:
 
-#### **2. Calendar with To-Do List**  
-- Implements a **user-friendly calendar interface** with views for daily, weekly, and monthly schedules.  
-- Allows users to **add, edit, and delete** tasks and events.  
-- Requires a **database structure** to store tasks, deadlines, and events.  
-- (Optional)Integrates **task reminders and notifications** for tasks to enhance productivity.  
+- [Node.js](https://nodejs.org/) (v14+ or v16+ recommended)
+- [npm](https://www.npmjs.com/)
+- [Git](https://git-scm.com/) for version control
 
-#### **3. Wish Function**  
-- Requires a **database to store and track user wishes**.  
-- Develops a UI where users can **submit, edit, and view** their wishes.  
-- Optionally implements **progress tracking** to encourage users to achieve their goals.    
+

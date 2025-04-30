@@ -5,5 +5,14 @@
 }
 
 .black-screen * {
-    visibility: hidden;
+    opacity: 0;
 }
+
+.flip-after-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  
