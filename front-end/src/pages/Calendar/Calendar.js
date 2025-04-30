@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 import "react-calendar/dist/Calendar.css";
 import CalendarDayView from "./CalendarDayView";
 import CalendarWeekView from "./CalendarWeekView";
@@ -17,6 +18,7 @@ const Calendar = () => {
   const [timeframe, setTimeframe] = useState("Daily");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [toDoList, setToDoList] = useState([]);
+  const navigate = useNavigate();
 
   // 1) the 7-day nav dates
   const getDateNumbers = () => {
@@ -82,11 +84,11 @@ const Calendar = () => {
     if (!token) {
       localStorage.setItem("loginMessage", "Please log in to access the Calendar page.");
       localStorage.setItem("redirectAfterLogin", "/calendar");
-      window.location.href = "/signin";
+      navigate("/signin");
       return;
     }
 
-    setAuthorized(true); // 允许渲染页面
+    setAuthorized(true);
 
     const fetchToDos = async () => {
       try {
