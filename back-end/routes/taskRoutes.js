@@ -20,7 +20,7 @@ const taskRouter = () => {
     })(req, res, next);
   };
 
-  router.get('/api', optionalAuth, async (req, res) => {
+  router.get('/', optionalAuth, async (req, res) => {
     try {
       let query = {};
   
@@ -42,7 +42,7 @@ const taskRouter = () => {
     }
   });
 
-  router.post('/api/add',
+  router.post('/add',
     passport.authenticate('jwt', { session: false }),
     [
       body('task_name').isString().notEmpty(),
@@ -67,7 +67,7 @@ const taskRouter = () => {
     }
   );
 
-  router.post('/api/:taskName/delete', 
+  router.post('/:taskName/delete', 
     passport.authenticate('jwt', { session: false }),
     async (req, res) => {
     const { taskName } = req.params; 
@@ -91,7 +91,7 @@ const taskRouter = () => {
     }
   });
 
-  router.put('/api/:taskName/update',
+  router.put('/:taskName/update',
     passport.authenticate('jwt', { session: false }),
     [
       body('task_name').isString().notEmpty(),

@@ -35,7 +35,7 @@ import protectedContentRouter from './routes/protectedContentRoutes.js';
 import authenticationRouter from './routes/authenticationRoutes.js';
 import fliplogsRouter from './routes/fliplogRoutes.js';
 
-app.use('api/tasks', taskRouter());
+app.use('/api/tasks', taskRouter());
 app.use('/api/todos', todoRoutes);
 app.use('/auth', authenticationRouter()) // all requests for /auth/* will be handled by the authenticationRoutes router
 app.use('/cookie', cookieRouter()) // all requests for /cookie/* will be handled by the cookieRoutes router
