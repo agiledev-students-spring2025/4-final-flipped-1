@@ -16,11 +16,8 @@ services:
     build: ./back-end
     ports:
       - "3001:3001"
-    environment:
-      - PORT=3001
-      - MONGO_URI=mongodb://mongodb:27017/flip
-      - JWT_SECRET=your_jwt_secret_key
-      - JWT_EXP_DAYS=7
+    env_file:
+      - .env
     networks:
       - app-network
     depends_on:

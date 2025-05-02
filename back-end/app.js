@@ -14,11 +14,34 @@ import { body, validationResult } from 'express-validator'
 //middleware
 app.use(morgan('dev'))
 // app.use(cors())
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
+app.use(cors({ origin: ['http://localhost:3000', 'http://192.168.88.6:3000', 'http://165.227.97.236:3000'],
+  credentials: true
+}));
+console.log("✅ CORS settings are active");
 
 // app.use(cors({ origin: 'https://localhost:3000', credentials: true, }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+app.use((req, res, next) => {
+  const allowedOrigins = ['http://localhost:3000', 'http://192.168.88.6:3000'];
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+
+  // For preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 
 
@@ -35,7 +58,7 @@ import protectedContentRouter from './routes/protectedContentRoutes.js';
 import authenticationRouter from './routes/authenticationRoutes.js';
 import fliplogsRouter from './routes/fliplogRoutes.js';
 
-app.use('/api/tasks', taskRouter());
+app.use('/tasks', taskRouter());
 app.use('/api/todos', todoRoutes);
 app.use('/auth', authenticationRouter()) // all requests for /auth/* will be handled by the authenticationRoutes router
 app.use('/cookie', cookieRouter()) // all requests for /cookie/* will be handled by the cookieRoutes router
