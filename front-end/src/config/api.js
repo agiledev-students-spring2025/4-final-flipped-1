@@ -4,11 +4,11 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 export const API_ENDPOINTS = {
   TASKS: {
-    LIST: `${API_BASE_URL}/api/tasks`,
-    CREATE: `${API_BASE_URL}/api/tasks/add`,
-    UPDATE: (taskName) => `${API_BASE_URL}/api/tasks/${taskName}/update`,
-    DELETE: (taskName) => `${API_BASE_URL}/api/tasks/${taskName}/delete`,
-    GET_TIME: (taskName) => `${API_BASE_URL}/api/tasks/${taskName}/time`,
+    LIST: `${API_BASE_URL}/tasks`,
+    CREATE: `${API_BASE_URL}/tasks/add`,
+    UPDATE: (taskName) => `${API_BASE_URL}/tasks/${taskName}/update`,
+    DELETE: (taskName) => `${API_BASE_URL}/tasks/${taskName}/delete`,
+    GET_TIME: (taskName) => `${API_BASE_URL}/tasks/${taskName}/time`, // if you use this route later
   },
 
   FLIPLOG: {

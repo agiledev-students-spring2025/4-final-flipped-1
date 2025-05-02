@@ -19,6 +19,7 @@ function MainPage() {
   //抓最开始显示的task显示在主页面上
   //后端会判断是否登陆 - 展示对应id的task或者展示默认task
   useEffect(() => {
+    console.log("🚀 API endpoint:", API_ENDPOINTS.TASKS.LIST);
     fetchTasks();
 
     if (location.state?.fromFlipAfter) {

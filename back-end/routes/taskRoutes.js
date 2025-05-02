@@ -67,13 +67,13 @@ const taskRouter = () => {
     }
   );
 
-  router.post('/:taskName/delete', 
+  router.post('/:taskName/delete',  
     passport.authenticate('jwt', { session: false }),
     async (req, res) => {
     const { taskName } = req.params; 
     const user_id = req.user.user_id;
   
-    console.log("delete ",taskName)
+    console.log("delete ", taskName)
   
     try {
       const task = await Task.findOne({ task_name: taskName, user_id: user_id });
@@ -123,8 +123,7 @@ const taskRouter = () => {
     }
   );
 
-  return router
-
+  return router;
 };
 
 export default taskRouter;
