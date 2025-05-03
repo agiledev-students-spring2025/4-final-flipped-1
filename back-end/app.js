@@ -11,6 +11,11 @@ import passport from 'passport'
 import jwt from 'jsonwebtoken'
 import { body, validationResult } from 'express-validator'
 
+// 健康检查路由
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 //middleware
 app.use(morgan('dev'))
 // app.use(cors())
@@ -138,29 +143,29 @@ app.post('/api/fliplog/insert',
     if (req.user) {
       newLog.user_id = req.user.user_id;
 
-      await newLog.save();
+    await newLog.save();
 
-      // 拉今天的日期
-      const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    // 拉今天的日期
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
 
-      // 查今天这个task的总时长
-      const todayLogs = await FlipLog.find({
-        task_name,
-        start_time: { $gte: startOfDay, $lte: endOfDay }
-      });
+    // 查今天这个task的总时长
+    const todayLogs = await FlipLog.find({
+      task_name,
+      start_time: { $gte: startOfDay, $lte: endOfDay }
+    });
 
-      const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
+    const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
 
-      res.status(201).json({
-        success: true,
-        taskName: task_name,
-        duration: roundDuration,
-        log: newLog,
-        todayTotalTime,
-      });
+    res.status(201).json({
+      success: true,
+      taskName: task_name,
+      duration: roundDuration,
+      log: newLog,
+      todayTotalTime,
+    });
     } else{
       return res.json({ success: true, fromDB: false, data: newLog });
     }
@@ -176,17 +181,17 @@ app.post('/api/fliplog/insert',
 //flip before page显示时调用
 app.get('/api/today/:taskName', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async (err, user) => {
-    const { taskName } = req.params;
+  const { taskName } = req.params;
 
-    // 拉今天的日期
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  // 拉今天的日期
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
-    
-    try {
+  
+  try {
       let query = {
-          task_name: taskName,
+      task_name: taskName,
           start_time: { $gte: startOfDay, $lte: endOfDay },
         };
 
@@ -199,15 +204,15 @@ app.get('/api/today/:taskName', (req, res, next) => {
         }
 
         const todayLogs = await FlipLog.find(query);
-        const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
+    const todayTotalTime = todayLogs.reduce((sum, log) => sum + log.duration, 0);
 
         res.json({ taskName, user_id: user.user_id, todayTotalTime });
         console.log(taskName, user.user_id, todayTotalTime);
 
-    } catch (err) {
-      console.error("Fail to get today total flip time", err);
-      res.status(500).json({ error: 'server error' });
-    }
+  } catch (err) {
+    console.error("Fail to get today total flip time", err);
+    res.status(500).json({ error: 'server error' });
+  }
   })(req, res, next); // 🔥 别忘了调用 authenticate 的返回值
 });
 
@@ -230,9 +235,9 @@ app.get( '/api/fliplog/total',
       ]);
       const total = (result[0] && result[0].total) || 0;
       res.json({ totalDuration: total });
-    } catch (err) {
+  } catch (err) {
       console.error('Fail to get total flip time', err);
-      res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error' });
     }
   }
 );

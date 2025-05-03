@@ -13,5 +13,5 @@ COPY --from=build /app/build /usr/share/nginx/html
 # 添加 nginx 配置
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"] 

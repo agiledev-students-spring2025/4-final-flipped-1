@@ -240,8 +240,9 @@ const handleLogout = async () => {
           <>
             <div className="profile-focus-card">
               <div className="profile-focus-circle">
-                <span className="profile-focus-number">{totalFlipTime || 0}</span>
+                <span>{user.username.charAt(0).toUpperCase()}</span>
               </div>
+              <div className="profile-username">{user.username}</div>
               <div className="profile-focus-label">Total focus time: {totalFlipTime} seconds</div>
             </div>
 
