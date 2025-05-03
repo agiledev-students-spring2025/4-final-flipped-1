@@ -85,6 +85,11 @@ function MainPage() {
 
   //Edit
   const handleEditTask = (task) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user || !user.token) {
+      setShowLoginPrompt(true);
+      return;
+    }
     console.log('handleEditTask called with:', task);
     setEditingTask(task);
     setIsAddTaskModalOpen(true);
@@ -92,21 +97,30 @@ function MainPage() {
 
   //Delete
   const handleDeleteTask = async (taskName) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user || !user.token) {
+      setShowLoginPrompt(true);
+      return;
+    }
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
       const config = { 
         withCredentials: true,
         headers: { Authorization: `jwt ${user.token}` }
       };
 
       await axios.post(API_ENDPOINTS.TASKS.DELETE(taskName), null, config);
-      await fetchTasks(); // 删除后重新获取任务列表
+      await fetchTasks();
     } catch (error) {
       console.error('Error deleting task:', error);
     }
   };
 
   const handleOpenAddModal = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user || !user.token) {
+      setShowLoginPrompt(true);
+      return;
+    }
     console.log('Opening add modal');
     setEditingTask(null);
     setIsAddTaskModalOpen(true);
@@ -119,7 +133,7 @@ function MainPage() {
   };
 
   const handleConfirmLogin = () => {
-    navigate('/login');
+    navigate('/signin');
   };
 
   const handleCancelPrompt = () => {

@@ -44,7 +44,9 @@ export default function CalendarUI({
 
       {/* prev / date nav / next */}
       <div className="navigation-controls">
-        <button onClick={handlePrevious}>P</button>
+        <button onClick={handlePrevious}>
+          <img src="/left-arrow.png" alt="Previous" className="nav-arrow" />
+        </button>
         <div className="date-navigation">
           {getDateNumbers().map((date,i) =>
             <div
@@ -59,7 +61,9 @@ export default function CalendarUI({
             </div>
           )}
         </div>
-        <button onClick={handleNext}>N</button>
+        <button onClick={handleNext}>
+          <img src="/right-arrow.png" alt="Next" className="nav-arrow" />
+        </button>
       </div>
 
       {/* date / week / month picker */}
@@ -100,7 +104,7 @@ export default function CalendarUI({
           <input
             type="month"
             className="month-picker"
-            value={selectedDate.toISOString().slice(0,7)}
+            value={`${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`}
             onChange={e => {
               // Fix: avoid new Date('YYYY-MM-01') UTC parsing
               const [year, month] = e.target.value.split('-');
