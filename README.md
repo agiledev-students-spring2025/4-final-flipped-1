@@ -4,6 +4,38 @@
 
 Filpped Team 1
 
+## **Tech Stack**
+### Frontend
+- **Framework**: React.js
+- **State Management**: React Hooks
+- **Routing**: React Router
+- **Styling**: CSS3, Flexbox, Grid
+- **HTTP Client**: Axios
+- **UI Components**: Custom Components
+- **Build Tool**: Docker
+
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: MongoDB
+- **Authentication**: JWT (JSON Web Tokens)
+- **API Documentation**: RESTful API
+- **Containerization**: Docker
+
+### DevOps
+- **Container Orchestration**: Docker Compose
+- **Version Control**: Git
+- **CI/CD**: Manual Deployment
+- **Cloud Platform**: DigitalOcean
+- **Web Server**: Nginx (Production)
+
+### Development Tools
+- **Code Editor**: VS Code
+- **Package Manager**: npm
+- **Version Control**: Git
+- **API Testing**: Postman
+- **Database Management**: MongoDB Compass
+
 ## **Project Link**
 http://165.227.97.236:8080/
 
@@ -62,32 +94,135 @@ Make sure you have the following installed:
 - [npm](https://www.npmjs.com/)
 - [Git](https://git-scm.com/) for version control
 
-#### Front end setup
 
-Open your terminal and navigate to your cloned repository
-navigate to the front-end folder, install dependencies and start the react server.
-The application should automatically open in your browser in localhost:3000.
-
-```
-cd front-end
-npm install
-npm start
-```
-
-#### Back end setup
-
-Open your a new terminal window (Do not close the old one with front end)
-Terminal and navigate to your cloned repository
-navigate to the back-end folder, install dependencies and start the react server.
-The backend could be run in localhost:3001.
-
-```
-cd back-end
-npm install
-npm start
-```
-
+Open your terminal and navigate to your 
 If you would like to access our database for development use, please contact us for getting the .env file.
+
+## Docker Setup Instructions
+
+### Prerequisites
+- Docker and Docker Compose installed
+- Git installed
+- Node.js and npm (for development)
+
+### Local Development Setup
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd <repository-name>
+```
+
+2. Create a `.env` file in the root directory with the following content:
+```env
+MONGODB_URI=mongodb://admin:secret@mongodb:27017/flipped?authSource=admin
+JWT_SECRET=your_jwt_secret_here
+```
+
+3. Start the application:
+```bash
+docker-compose up --build
+```
+
+4. Access the application:
+- Frontend: http://localhost:8080
+- Backend API: http://localhost:3001
+- MongoDB: localhost:27017
+
+### Server Deployment
+
+1. SSH into your server and clone the repository:
+```bash
+git clone <repository-url>
+cd <repository-name>
+```
+
+2. Create a `.env` file with production settings:
+```env
+MONGODB_URI=mongodb://xxx
+JWT_SECRET=xxx
+```
+
+3. Build and start the containers:
+```bash
+docker-compose up -d --build
+```
+
+4. Configure your web server (Nginx/Apache) to proxy requests to the frontend container.
+
+### Environment Variables
+
+#### Frontend (.env in front-end directory)
+```env
+REACT_APP_API_URL=http://localhost:3001
+```
+
+#### Backend (.env in root directory)
+```env
+MONGODB_URI=mongodb://admin:secret@mongodb:27017/flipped?authSource=admin
+JWT_SECRET=your_jwt_secret_here
+PORT=3001
+```
+
+### Docker Compose Services
+
+- **front-end**: React application running on port 8080
+- **back-end**: Node.js API server running on port 3001
+- **mongodb**: MongoDB database running on port 27017
+
+### Common Commands
+
+- Start all services:
+```bash
+docker-compose up -d
+```
+
+- Stop all services:
+```bash
+docker-compose down
+```
+
+- View logs:
+```bash
+docker-compose logs -f
+```
+
+- Rebuild and restart:
+```bash
+docker-compose up -d --build
+```
+
+### Troubleshooting
+
+1. If MongoDB connection fails:
+   - Check if MongoDB container is running
+   - Verify credentials in .env file
+   - Check network connectivity between containers
+
+2. If frontend can't connect to backend:
+   - Verify REACT_APP_API_URL in frontend .env
+   - Check if backend container is running
+   - Ensure CORS is properly configured
+
+3. If containers won't start:
+   - Check port conflicts
+   - Verify Docker and Docker Compose versions
+   - Check system resources
+
+### Development Workflow
+
+1. Make code changes in your local environment
+2. Test changes locally using `docker-compose up --build`
+3. Commit changes to version control
+4. Deploy to server using `docker-compose up -d --build`
+
+### Security Considerations
+
+1. Always use strong passwords for MongoDB
+2. Keep JWT_SECRET secure and unique
+3. Use HTTPS in production
+4. Regularly update dependencies
+5. Monitor container logs for suspicious activity
 
 
 
